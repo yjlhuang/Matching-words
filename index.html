@@ -689,8 +689,10 @@ function handleOpt(chosen) {
     // ── Demo 步驟一：找線索 ──
     if (chosen === q.clueKey) {
       markOpt(chosen, true);
-      // 立即切換到步驟二，不用 setTimeout
+      // 切換到步驟二：收起教學框，更新提示
       cur.mode = 'main';
+      // 收起 lesson box 節省空間
+      document.getElementById('prac-lesson').style.display = 'none';
       showFB('info', '🕵️ 線索找到了！', q.clueExplain + '<br><br><span style="color:var(--gold);font-size:12px;">▼ 現在請選出正確答案：</span>');
       document.getElementById('prac-step-ind').innerHTML = '→ <b>步驟二</b>：現在選答案';
       document.getElementById('prac-gq').innerHTML = q.mainQ;
@@ -834,7 +836,11 @@ function showFB(type, title, body) {
 function hideFB() { document.getElementById('prac-fb').className = 'fb'; }
 function showNext(label, fn) {
   const nb = document.getElementById('prac-next');
-  nb.textContent = label; nb.className = 'act-btn primary on'; nb.onclick = fn;
+  nb.textContent = label;
+  nb.className = 'act-btn primary on';
+  nb.onclick = fn;
+  // 自動捲動到按鈕位置
+  setTimeout(() => nb.scrollIntoView({ behavior:'smooth', block:'nearest' }), 80);
 }
 
 // ═══════════════════════════════════════════════════════
