@@ -3,1224 +3,2117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文義選填偵探 Cloze Detective</title>
+<title>文義選填偵探 — 學測攻略</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
-  :root {
-    --bg: #0f0e0b;
-    --surface: #1a1814;
-    --card: #221f1a;
-    --border: #3a3428;
-    --gold: #c9a84c;
-    --gold-dim: #7a6128;
-    --text: #e8dcc8;
-    --text-dim: #8a7d6a;
-    --green: #4caf72;
-    --red: #e05555;
-    --blue: #5588cc;
-    --accent: #c9a84c;
-  }
+/* ── TOKENS ──────────────────────────────────────────── */
+:root {
+  --bg:       #0c0b09;
+  --bg2:      #131210;
+  --surface:  #1c1a16;
+  --card:     #242018;
+  --border:   #38321e;
+  --border2:  #2a2518;
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  --gold:     #c8a24a;
+  --gold-dim: #7a6128;
+  --gold-bg:  #1e1a0c;
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans TC', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 16px 60px;
-  }
+  --text:     #e6d9b8;
+  --text-dim: #8a7d5e;
+  --text-xs:  #5a5040;
 
-  /* Header */
-  .header {
-    text-align: center;
-    padding: 32px 0 24px;
-    width: 100%;
-    max-width: 720px;
-  }
-  .header .badge {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .header h1 {
-    font-family: 'Noto Serif TC', serif;
-    font-size: clamp(22px, 5vw, 32px);
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: 2px;
-    margin-bottom: 6px;
-  }
-  .header .subtitle {
-    font-size: 13px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-  }
+  --green:    #5ab876;
+  --green-bg: #0e1e12;
+  --green-b:  #1e4028;
 
-  /* Progress bar */
-  .progress-wrap {
-    width: 100%;
-    max-width: 720px;
-    margin-bottom: 24px;
-  }
-  .progress-info {
-    display: flex;
-    justify-content: space-between;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
-  .progress-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-    border-radius: 2px;
-    transition: width 0.5s ease;
-  }
+  --red:      #d45050;
+  --red-bg:   #1e0e0e;
+  --red-b:    #4a1a1a;
 
-  /* Main card */
-  .card {
-    width: 100%;
-    max-width: 720px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px 28px;
-    margin-bottom: 16px;
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    opacity: 0.6;
-  }
+  --blue:     #5588cc;
+  --blue-bg:  #0e1622;
+  --blue-b:   #1a2e4a;
 
-  /* Stage label */
-  .stage-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--gold-dim);
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .stage-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  --amber:    #d4883a;
+  --amber-bg: #1e1208;
 
-  /* Lesson / hint box */
-  .lesson-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--gold);
-    border-radius: 6px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--text);
-  }
-  .lesson-box .lesson-title {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--gold);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-  }
+  /* stage colours */
+  --s1: #5ab876; /* grammar - green */
+  --s2: #c8a24a; /* colloc  - gold */
+  --s3: #5588cc; /* logic   - blue */
+  --s4: #b066cc; /* battle  - purple */
+}
 
-  /* Question label */
-  .q-meta {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-  }
+/* ── RESET ───────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans TC',sans-serif;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 0 80px;
+}
 
-  /* Sentence */
-  .sentence {
-    font-family: 'Noto Serif TC', serif;
-    font-size: clamp(15px, 3.5vw, 18px);
-    line-height: 1.9;
-    color: var(--text);
-    margin-bottom: 10px;
-    background: var(--surface);
-    padding: 18px 20px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  .blank {
-    display: inline-block;
-    min-width: 80px;
-    border-bottom: 2px solid var(--gold);
-    color: var(--gold);
-    font-family: 'Space Mono', monospace;
-    text-align: center;
-    padding: 0 6px;
-    font-size: 14px;
-    letter-spacing: 1px;
-  }
-  .blank.correct { color: var(--green); border-color: var(--green); }
-  .blank.wrong { color: var(--red); border-color: var(--red); }
+/* ── SCREENS ─────────────────────────────────────────── */
+.screen{width:100%;max-width:760px;padding:0 14px;display:none;flex-direction:column;align-items:center;}
+.screen.on{display:flex;}
 
-  /* Context hint */
-  .context-hint {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-bottom: 18px;
-    padding-left: 4px;
-    font-style: italic;
-  }
+/* ── SITE HEADER ─────────────────────────────────────── */
+.site-hd{text-align:center;padding:26px 0 18px;width:100%;}
+.site-hd .eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px;}
+.site-hd h1{font-family:'Noto Serif TC',serif;font-size:clamp(19px,4.5vw,28px);font-weight:700;color:var(--text);letter-spacing:2px;margin-bottom:4px;}
+.site-hd .sub{font-size:11px;color:var(--text-dim);letter-spacing:1px;}
 
-  /* Guide question */
-  .guide-q {
-    font-size: 14px;
-    color: var(--text);
-    margin-bottom: 16px;
-    line-height: 1.7;
-    font-weight: 500;
-  }
+/* ── CARD ────────────────────────────────────────────── */
+.card{
+  width:100%;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;
+  padding:22px 20px;margin-bottom:12px;
+  position:relative;overflow:hidden;
+}
+.card-top-line{
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,var(--gold-dim) 40%,var(--gold) 50%,var(--gold-dim) 60%,transparent 100%);
+  opacity:.6;
+}
 
-  /* Options */
-  .options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  @media (max-width: 480px) {
-    .options { grid-template-columns: 1fr; }
-  }
-  .opt-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: var(--text);
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    line-height: 1.5;
-  }
-  .opt-btn:hover:not(:disabled) {
-    border-color: var(--gold-dim);
-    background: #2a2620;
-  }
-  .opt-btn .key {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--gold);
-    min-width: 20px;
-    font-weight: 700;
-  }
-  .opt-btn.correct-anim {
-    border-color: var(--green);
-    background: #1a2e1e;
-    color: var(--green);
-  }
-  .opt-btn.correct-anim .key { color: var(--green); }
-  .opt-btn.wrong-anim {
-    border-color: var(--red);
-    background: #2e1a1a;
-    color: var(--red);
-  }
-  .opt-btn.wrong-anim .key { color: var(--red); }
-  .opt-btn:disabled { cursor: default; opacity: 0.7; }
+/* ── HOME: STAGE SECTIONS ────────────────────────────── */
+.stage-section{width:100%;margin-bottom:20px;}
+.stage-header{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:10px;padding:0 2px;
+}
+.stage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.stage-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;}
+.stage-progress{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-xs);margin-left:auto;}
 
-  /* Feedback */
-  .feedback {
-    padding: 14px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-    display: none;
-  }
-  .feedback.show { display: block; }
-  .feedback.good {
-    background: #1a2e1e;
-    border: 1px solid #2e5a3a;
-    color: #7dcf95;
-  }
-  .feedback.bad {
-    background: #2e1a1a;
-    border: 1px solid #5a2e2e;
-    color: #e08888;
-  }
-  .feedback.info {
-    background: #1a2030;
-    border: 1px solid #2e4060;
-    color: #88aae0;
-  }
-  .feedback .fb-title {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    opacity: 0.8;
-  }
+/* ── HOME: LESSON CARDS ──────────────────────────────── */
+.lesson-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:460px){.lesson-grid{grid-template-columns:1fr;}}
+.lc{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:8px;padding:14px 14px 12px;
+  cursor:pointer;transition:border-color .18s,background .18s;
+  position:relative;overflow:hidden;
+}
+.lc:hover:not(.lc-locked){border-color:var(--gold-dim);background:#1e1c16;}
+.lc.lc-locked{opacity:.38;cursor:not-allowed;}
+.lc.lc-done{border-color:var(--green-b);}
+.lc.lc-done::after{
+  content:'✓';position:absolute;top:9px;right:11px;
+  color:var(--green);font-family:'JetBrains Mono',monospace;font-size:11px;
+}
+.lc-num{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-xs);margin-bottom:5px;}
+.lc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4;}
+.lc-desc{font-size:11px;color:var(--text-dim);line-height:1.6;}
+.lc-tag{
+  display:inline-block;margin-top:8px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  padding:2px 7px;border-radius:3px;letter-spacing:1px;
+}
+.lc-locked .lc-num::before{content:'🔒 ';}
+.lc-lock-note{font-size:10px;color:var(--text-xs);margin-top:5px;font-style:italic;}
 
-  /* Action buttons */
-  .action-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-    display: none;
-  }
-  .action-btn.show { display: block; }
-  .action-btn.primary {
-    background: var(--gold);
-    color: var(--bg);
-  }
-  .action-btn.primary:hover { background: #d4b060; }
-  .action-btn.secondary {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    margin-top: 10px;
-  }
-  .action-btn.secondary:hover { border-color: var(--gold-dim); color: var(--text); }
+/* tag colours */
+.tag-g{background:#0a1a0e;color:var(--s1);}
+.tag-c{background:var(--gold-bg);color:var(--s2);}
+.tag-l{background:var(--blue-bg);color:var(--s3);}
+.tag-b{background:#14081e;color:var(--s4);}
 
-  /* Score bar */
-  .score-row {
-    display: flex;
-    gap: 20px;
-    margin-top: 6px;
-  }
-  .score-item {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-  .score-item span { color: var(--gold); font-size: 14px; font-weight: 700; }
+/* ── BACK BUTTON ─────────────────────────────────────── */
+.back-btn{
+  align-self:flex-start;background:none;border:none;
+  color:var(--text-dim);font-size:12px;cursor:pointer;
+  padding:8px 0;margin-bottom:2px;
+  display:flex;align-items:center;gap:5px;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:color .15s;
+}
+.back-btn:hover{color:var(--text);}
 
-  /* Skill tip cards */
-  .skill-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 14px;
-  }
-  @media(max-width:480px){ .skill-grid{grid-template-columns:1fr;} }
-  .skill-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 12px;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-  .skill-card .sk-title {
-    color: var(--gold);
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-    font-family: 'Space Mono', monospace;
-  }
+/* ── PROGRESS BAR ────────────────────────────────────── */
+.prog-wrap{width:100%;margin-bottom:16px;}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);
+  margin-bottom:6px;letter-spacing:.5px;}
+.prog-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:2px;transition:width .4s ease;}
 
-  /* Welcome screen */
-  #screen-welcome { display: block; }
-  #screen-game { display: none; }
-  #screen-result { display: none; }
+/* phase dots row */
+.phase-dots{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;}
+.pd{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  padding:3px 9px;border-radius:20px;letter-spacing:.5px;
+  border:1px solid var(--border2);color:var(--text-xs);
+  transition:all .2s;
+}
+.pd.pd-done{border-color:var(--green-b);color:var(--green);background:var(--green-bg);}
+.pd.pd-active{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-bg);}
 
-  .welcome-icon {
-    font-size: 48px;
-    text-align: center;
-    margin: 24px 0 16px;
-  }
-  .welcome-desc {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.8;
-    margin-bottom: 24px;
-  }
-  .strategy-list {
-    list-style: none;
-    padding: 0;
-  }
-  .strategy-list li {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .strategy-list li:last-child { border-bottom: none; }
-  .s-num {
-    font-family: 'Space Mono', monospace;
-    color: var(--gold);
-    font-size: 12px;
-    min-width: 24px;
-    margin-top: 2px;
-  }
+/* ── LESSON BOX ──────────────────────────────────────── */
+.lesson-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-left:2px solid var(--gold);border-radius:6px;
+  padding:14px 16px;margin-bottom:16px;
+  font-size:13px;line-height:1.85;
+}
+.lesson-box .lb-title{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:2px;color:var(--gold);margin-bottom:8px;text-transform:uppercase;
+}
+.lesson-box b{color:var(--text);}
+.lesson-box code{
+  font-family:'JetBrains Mono',monospace;font-size:12px;
+  background:var(--surface);padding:1px 5px;border-radius:3px;color:var(--amber);
+}
 
-  /* Result screen */
-  .result-score {
-    text-align: center;
-    padding: 20px 0;
-  }
-  .result-big {
-    font-family: 'Space Mono', monospace;
-    font-size: 60px;
-    color: var(--gold);
-    font-weight: 700;
-    line-height: 1;
-  }
-  .result-label {
-    font-size: 13px;
-    color: var(--text-dim);
-    margin-top: 8px;
-    letter-spacing: 2px;
-  }
-  .result-message {
-    font-size: 15px;
-    color: var(--text);
-    margin: 20px 0;
-    line-height: 1.8;
-    padding: 16px;
-    background: var(--surface);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  .wrong-review {
-    margin-top: 20px;
-  }
-  .wrong-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--red);
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 10px;
-    font-size: 13px;
-    line-height: 1.7;
-  }
-  .wrong-item .wi-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--red);
-    letter-spacing: 2px;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-  }
-  .wi-answer {
-    color: var(--green);
-    font-weight: 700;
-  }
+/* ── Q META ROW ──────────────────────────────────────── */
+.q-meta-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.q-case{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-xs);letter-spacing:2px;}
+.phase-badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:3px;letter-spacing:1px;}
+.pb-demo   {background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-dim);}
+.pb-guided {background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b);}
+.pb-solo   {background:var(--red-bg); color:#d47070;   border:1px solid var(--red-b);}
+.pb-battle {background:#14081e;       color:var(--s4); border:1px solid #3a1a4a;}
+.source-tag{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;margin-left:auto;}
+.src-real{background:#0c1a0c;color:#4a8a5a;border:1px solid #1a3a2a;}
+.src-made{background:#0c100e;color:#3a6a4a;border:1px solid #162818;}
 
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    margin-left: 8px;
-    vertical-align: middle;
-  }
-  .tag-colloc { background: #2a2010; color: var(--gold); }
-  .tag-meaning { background: #102028; color: var(--blue); }
-  .tag-grammar { background: #102018; color: var(--green); }
+/* ── STEP INDICATOR ──────────────────────────────────── */
+.step-ind{
+  font-size:11px;color:var(--text-dim);
+  padding:5px 11px;background:var(--surface);
+  border-radius:5px;border:1px solid var(--border2);
+  display:inline-block;margin-bottom:12px;
+}
+.step-ind b{color:var(--gold);}
 
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 20px 0;
-  }
+/* ── SENTENCE ────────────────────────────────────────── */
+.sent-wrap{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;padding:16px 18px;margin-bottom:7px;
+}
+.sentence{
+  font-family:'Noto Serif TC',serif;
+  font-size:clamp(13px,3.2vw,16px);
+  line-height:2.1;color:var(--text);
+}
+.blank{
+  display:inline-block;min-width:68px;
+  border-bottom:1.5px solid var(--gold);
+  color:var(--gold);font-family:'JetBrains Mono',monospace;
+  text-align:center;padding:0 4px;font-size:12px;
+  transition:color .2s,border-color .2s;
+}
+.blank.ok{color:var(--green);border-color:var(--green);}
+.blank.no{color:var(--red);border-color:var(--red);}
+
+.ctx-hint{font-size:11px;color:var(--text-dim);margin-bottom:14px;padding-left:2px;font-style:italic;}
+
+/* ── GUIDE QUESTION ──────────────────────────────────── */
+.guide-q{font-size:13px;color:var(--text);margin-bottom:13px;line-height:1.75;font-weight:500;}
+
+/* ── OPTIONS ─────────────────────────────────────────── */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.opts.single-col{grid-template-columns:1fr;}
+@media(max-width:440px){.opts{grid-template-columns:1fr;}}
+
+.opt{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:7px;padding:10px 13px;
+  color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:12.5px;
+  cursor:pointer;text-align:left;transition:border-color .15s,background .15s;
+  display:flex;align-items:flex-start;gap:9px;line-height:1.55;
+}
+.opt:hover:not(:disabled){border-color:var(--gold-dim);background:#1e1c14;}
+.opt .key{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--gold);min-width:16px;font-weight:700;margin-top:1px;flex-shrink:0;
+}
+.opt.ok{border-color:var(--green-b);background:var(--green-bg);color:var(--green);}
+.opt.ok .key{color:var(--green);}
+.opt.no{border-color:var(--red-b);background:var(--red-bg);color:#d47070;}
+.opt.no .key{color:#d47070;}
+.opt:disabled{cursor:default;opacity:.72;}
+
+/* ── FEEDBACK ────────────────────────────────────────── */
+.fb{padding:12px 15px;border-radius:7px;font-size:12.5px;line-height:1.75;display:none;margin-bottom:13px;}
+.fb.on{display:block;}
+.fb.good{background:var(--green-bg);border:1px solid var(--green-b);color:#85cf9a;}
+.fb.bad {background:var(--red-bg);  border:1px solid var(--red-b);  color:#d47878;}
+.fb.info{background:var(--blue-bg); border:1px solid var(--blue-b); color:#80a8e8;}
+.fb-t{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;margin-bottom:5px;opacity:.75;text-transform:uppercase;}
+
+/* unit-hint inline block */
+.unit-hint{margin-top:7px;padding:6px 10px;background:var(--bg);border-radius:4px;border:1px solid var(--border);font-size:11px;color:var(--text-dim);}
+.unit-hint a{color:var(--gold);cursor:pointer;text-decoration:underline;}
+
+/* ── ACTION BUTTONS ──────────────────────────────────── */
+.act-btn{
+  width:100%;padding:12px;border-radius:7px;border:none;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  font-size:13px;font-weight:700;letter-spacing:1px;
+  transition:all .18s;display:none;
+}
+.act-btn.on{display:block;}
+.act-btn.primary{background:var(--gold);color:var(--bg);}
+.act-btn.primary:hover{background:#d4ac5a;}
+.act-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text-dim);margin-top:8px;}
+.act-btn.ghost:hover{border-color:var(--gold-dim);color:var(--text);}
+.retry-btn{
+  background:none;border:none;color:var(--text-dim);font-size:12px;
+  cursor:pointer;padding:6px 0;display:none;
+  font-family:'Noto Sans TC',sans-serif;text-decoration:underline;
+}
+
+/* ── COMPLETE SCREEN ─────────────────────────────────── */
+.done-icon{font-size:44px;text-align:center;margin:14px 0 8px;}
+.done-stars{font-size:26px;text-align:center;margin-bottom:8px;}
+.done-big{font-family:'JetBrains Mono',monospace;font-size:52px;color:var(--gold);font-weight:700;line-height:1;text-align:center;}
+.done-lbl{font-size:11px;color:var(--text-dim);text-align:center;margin-top:3px;letter-spacing:2px;}
+.done-msg{font-size:13px;color:var(--text);line-height:1.8;padding:13px 15px;background:var(--bg2);border-radius:7px;border:1px solid var(--border);margin:14px 0;}
+
+.wrong-review{margin-top:4px;}
+.wr-item{background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--red);border-radius:6px;padding:10px 14px;margin-bottom:8px;font-size:12px;line-height:1.75;}
+.wr-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:4px;text-transform:uppercase;}
+.wr-ans{color:var(--green);font-weight:700;}
+
+.formula-box{background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:6px;padding:13px 15px;font-size:12.5px;line-height:1.9;margin-top:6px;}
+.formula-box .fb-head{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;}
+
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+
+/* ── BATTLE / PASSAGE ────────────────────────────────── */
+.passage-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;padding:18px;margin-bottom:14px;
+  font-size:13px;line-height:2.1;color:var(--text);
+}
+.p-blank{
+  display:inline-block;min-width:52px;border-bottom:1.5px solid var(--gold);
+  text-align:center;color:var(--gold);font-family:'JetBrains Mono',monospace;
+  font-size:11px;padding:0 3px;cursor:default;
+  transition:color .2s,border-color .2s;
+}
+.p-blank.ok{color:var(--green);border-color:var(--green);}
+.p-blank.no{color:var(--red);border-color:var(--red);}
+
+/* strategy steps */
+.strat-steps{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
+.strat-step{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:7px;padding:13px 15px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.strat-num{
+  font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;
+  color:var(--gold);min-width:24px;margin-top:1px;
+}
+.strat-body{font-size:13px;line-height:1.75;}
+.strat-body .strat-title{font-weight:700;color:var(--text);margin-bottom:3px;}
+.strat-body .strat-desc{color:var(--text-dim);font-size:12px;}
+
+/* score row */
+.score-row{display:flex;gap:14px;}
+.sc{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);}
+.sc span{color:var(--gold);font-size:12px;font-weight:700;}
+
+/* ── MISC ────────────────────────────────────────────── */
+.tag-inline{display:inline-block;padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;margin-left:5px;vertical-align:middle;}
 </style>
 </head>
 <body>
 
-<!-- WELCOME SCREEN -->
-<div id="screen-welcome">
-  <div class="header">
-    <div class="badge">🔍 GSAT English Training</div>
+<!-- ████████████████████████████████████████
+     SCREEN: HOME
+████████████████████████████████████████ -->
+<div id="s-home" class="screen on">
+  <div class="site-hd">
+    <div class="eyebrow">🔍 GSAT Cloze Detective</div>
     <h1>文義選填偵探</h1>
-    <div class="subtitle">Cloze Detective — 學測攻略特訓</div>
+    <div class="sub">從詞性到實戰 · 16個學習點 · 80題訓練</div>
   </div>
 
-  <div class="card" style="max-width:720px;width:100%;">
-    <div class="welcome-icon">🕵️</div>
-    <div class="welcome-desc">
-      學測文義選填最常見的錯誤是「靠感覺猜意思」。<br>
-      真正高分的做法是像偵探一樣——先找線索，再填答案。<br><br>
-      這個訓練會一步步教你辨認三種核心線索，讓你不再靠猜的。
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-top-line"></div>
+    <div style="font-size:12.5px;color:var(--text-dim);line-height:1.85;margin-bottom:14px;">
+      高分關鍵不是「猜感覺」，而是找線索。<br>
+      每個學習點：<b style="color:var(--gold)">示範題</b> → <b style="color:var(--blue)">輔助題</b> → <b style="color:var(--red)">3題獨立作答</b>，一步步建立解題本能。
     </div>
-
-    <div class="lesson-box">
-      <div class="lesson-title">🎯 三種破案線索</div>
-      <div class="skill-grid">
-        <div class="skill-card">
-          <div class="sk-title">線索一</div>
-          搭配詞<br>
-          <span style="color:var(--text);font-size:13px;">某些動詞/名詞有固定搭配，例如 <em>take action、make a decision</em></span>
-        </div>
-        <div class="skill-card">
-          <div class="sk-title">線索二</div>
-          句型結構<br>
-          <span style="color:var(--text);font-size:13px;">空格前後的 to / ing / 冠詞等，決定填什麼詞性</span>
-        </div>
-        <div class="skill-card">
-          <div class="sk-title">線索三</div>
-          句子語境<br>
-          <span style="color:var(--text);font-size:13px;">整句或上下文的意思，決定填哪個字最合理</span>
-        </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;text-align:center;">
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:10px 5px;">
+        <div style="font-size:18px;margin-bottom:3px;">🎓</div>
+        <div style="font-size:10px;color:var(--text-dim);">示範<br>兩步引導</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:10px 5px;">
+        <div style="font-size:18px;margin-bottom:3px;">🔎</div>
+        <div style="font-size:10px;color:var(--text-dim);">輔助<br>中文提示</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:10px 5px;">
+        <div style="font-size:18px;margin-bottom:3px;">🕵️</div>
+        <div style="font-size:10px;color:var(--text-dim);">獨立<br>純英文</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:10px 5px;">
+        <div style="font-size:18px;margin-bottom:3px;">⚔️</div>
+        <div style="font-size:10px;color:var(--text-dim);">實戰<br>歷屆真題</div>
       </div>
     </div>
-
-    <ul class="strategy-list">
-      <li>
-        <span class="s-num">01</span>
-        <span>從簡單題開始，每一關只練一種線索，慢慢疊加</span>
-      </li>
-      <li>
-        <span class="s-num">02</span>
-        <span>答錯不會直接公布答案，而是給你引導線索再試一次</span>
-      </li>
-      <li>
-        <span class="s-num">03</span>
-        <span>每題都用真實的學測風格出題，高頻搭配詞優先練習</span>
-      </li>
-    </ul>
-
-    <br>
-    <button class="action-btn primary show" onclick="startGame()">🕵️ 開始偵探訓練</button>
   </div>
+
+  <div id="home-stages" style="width:100%;"></div>
 </div>
 
-<!-- GAME SCREEN -->
-<div id="screen-game" style="width:100%;flex-direction:column;align-items:center;display:none;">
-  <div class="header">
-    <div class="badge">🔍 GSAT English Training</div>
-    <h1>文義選填偵探</h1>
+<!-- ████████████████████████████████████████
+     SCREEN: PRACTICE
+████████████████████████████████████████ -->
+<div id="s-practice" class="screen">
+  <button class="back-btn" onclick="goHome()">← 返回</button>
+  <div class="site-hd" style="padding-top:6px;">
+    <div class="eyebrow" id="prac-eyebrow">1-1</div>
+    <h1 id="prac-title">學習點標題</h1>
   </div>
 
-  <div class="progress-wrap">
-    <div class="progress-info">
-      <span id="prog-label">關卡 1 / 12</span>
+  <div class="prog-wrap">
+    <div class="prog-meta">
+      <span id="prac-prog-lbl">題目 1 / 5</span>
       <div class="score-row">
-        <div class="score-item">答對 <span id="score-correct">0</span></div>
-        <div class="score-item">答錯 <span id="score-wrong">0</span></div>
+        <div class="sc">答對 <span id="prac-c">0</span></div>
+        <div class="sc">答錯 <span id="prac-w">0</span></div>
       </div>
     </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+    <div class="prog-bar">
+      <div class="prog-fill" id="prac-prog-fill" style="width:0%;background:var(--gold);"></div>
     </div>
   </div>
+  <div class="phase-dots" id="prac-phase-dots"></div>
 
-  <div class="card" id="game-card">
-    <div class="stage-label" id="stage-label">STAGE 1 — 句型結構</div>
-
-    <div class="lesson-box" id="lesson-box" style="display:none;">
-      <div class="lesson-title" id="lesson-title">偵探提示</div>
-      <div id="lesson-content"></div>
+  <div class="card" id="prac-card">
+    <div class="card-top-line"></div>
+    <div class="q-meta-row">
+      <span class="q-case" id="prac-case">CASE 01</span>
+      <span class="phase-badge pb-demo" id="prac-phase-badge">示範題</span>
+      <span class="source-tag src-made" id="prac-source-tag">自製</span>
     </div>
 
-    <div class="q-meta" id="q-meta">CASE 01</div>
-    <div class="sentence" id="sentence-display"></div>
-    <div class="context-hint" id="context-hint"></div>
-
-    <div class="guide-q" id="guide-question"></div>
-
-    <div class="options" id="options-container"></div>
-
-    <div class="feedback" id="feedback-box">
-      <div class="fb-title" id="fb-title"></div>
-      <div id="fb-content"></div>
+    <div class="lesson-box" id="prac-lesson" style="display:none;">
+      <div class="lb-title" id="prac-lesson-title">提示</div>
+      <div id="prac-lesson-body"></div>
     </div>
 
-    <button class="action-btn primary" id="next-btn" onclick="nextStep()"></button>
-    <button class="action-btn secondary" id="retry-btn" onclick="retryGuide()" style="display:none;">↩ 再想想</button>
+    <div class="step-ind" id="prac-step-ind" style="display:none;">
+      <b>步驟一</b>：找線索 → <b>步驟二</b>：選答案
+    </div>
+
+    <div class="sent-wrap">
+      <div class="sentence" id="prac-sentence"></div>
+    </div>
+    <div class="ctx-hint" id="prac-ctx"></div>
+
+    <div class="guide-q" id="prac-gq"></div>
+    <div class="opts" id="prac-opts"></div>
+
+    <div class="fb" id="prac-fb">
+      <div class="fb-t" id="prac-fb-t"></div>
+      <div id="prac-fb-body"></div>
+    </div>
+
+    <button class="act-btn primary" id="prac-next" onclick="pracNext()"></button>
+    <button class="retry-btn" id="prac-retry" onclick="pracRetry()">↩ 再看一次</button>
   </div>
 </div>
 
-<!-- RESULT SCREEN -->
-<div id="screen-result" style="width:100%;flex-direction:column;align-items:center;display:none;">
-  <div class="header">
-    <div class="badge">🔍 訓練完成</div>
-    <h1>偵探報告</h1>
+<!-- ████████████████████████████████████████
+     SCREEN: UNIT DONE
+████████████████████████████████████████ -->
+<div id="s-done" class="screen">
+  <div class="site-hd">
+    <div class="eyebrow" id="done-eyebrow">完成</div>
+    <h1>偵探任務完成</h1>
   </div>
-  <div class="card" style="max-width:720px;width:100%;">
-    <div class="result-score">
-      <div class="result-big" id="final-score">0/12</div>
-      <div class="result-label">本次答題成績</div>
+  <div class="card">
+    <div class="card-top-line"></div>
+    <div class="done-icon" id="done-icon">🕵️</div>
+    <div class="done-stars" id="done-stars"></div>
+    <div class="done-big" id="done-big"></div>
+    <div class="done-lbl">本學習點成績</div>
+    <div class="done-msg" id="done-msg"></div>
+    <div class="wrong-review" id="done-wrong"></div>
+    <div class="divider"></div>
+    <div class="formula-box">
+      <div class="fb-head">本學習點核心技巧</div>
+      <div id="done-formula"></div>
     </div>
-    <div class="result-message" id="result-message"></div>
-
-    <div class="wrong-review" id="wrong-review"></div>
-
-    <hr class="divider">
-    <div class="lesson-box">
-      <div class="lesson-title">📌 學測文義選填破題公式</div>
-      <div style="font-size:13px;line-height:1.9;color:var(--text);">
-        <b style="color:var(--gold);">步驟一</b>：看空格前後有沒有 to / -ing / 冠詞 → 判斷詞性<br>
-        <b style="color:var(--gold);">步驟二</b>：看有沒有固定搭配（動詞＋名詞 / 形容詞＋名詞）<br>
-        <b style="color:var(--gold);">步驟三</b>：帶入句子，確認整句意思合理<br><br>
-        <span style="color:var(--text-dim);">近年（111–114）趨勢：步驟一越來越不夠，步驟二三更重要</span>
-      </div>
-    </div>
-    <button class="action-btn primary show" onclick="resetGame()" style="margin-top:20px;">🔄 再練一次</button>
+    <br>
+    <button class="act-btn primary on" onclick="goHome()">← 返回地圖</button>
+    <button class="act-btn ghost on" onclick="replayLesson()">🔄 再練一次</button>
   </div>
+</div>
+
+<!-- ████████████████████████████████████████
+     SCREEN: BATTLE (Unit 4-strategy + full passage)
+████████████████████████████████████████ -->
+<div id="s-battle" class="screen">
+  <button class="back-btn" onclick="goHome()">← 返回</button>
+  <div class="site-hd" style="padding-top:6px;">
+    <div class="eyebrow" id="battle-eyebrow">STAGE 4</div>
+    <h1 id="battle-title">實戰模式</h1>
+    <div class="sub" id="battle-sub"></div>
+  </div>
+  <div id="battle-area" style="width:100%;"></div>
 </div>
 
 <script>
-// ============================================================
-//  QUESTION DATA
-// ============================================================
-// Each question has:
-//   stage: string (displayed at top)
-//   stageTag: 'grammar' | 'colloc' | 'meaning'
-//   lesson: optional {title, content} shown before this question
-//   sentence: the sentence with __BLANK__ placeholder
-//   contextHint: optional Chinese hint about the sentence context
-//   answer: correct option key ('A','B','C','D')
-//   answerDisplay: the word/phrase that fills the blank
-//   guide: {question, options: [{key, text}], wrongKeys: [...wrong keys], wrongMsg}
-//     guide is shown after wrong first attempt
-//   mainQuestion: the actual fill question shown first
-//   mainOptions: [{key, text}]
-//   explanation: shown after correct answer
-// ============================================================
-
-const questions = [
-  // ── STAGE 1: 句型結構（詞性判斷）──────────────────────────
-  {
-    stage: 'STAGE 1 — 句型結構線索',
-    stageTag: 'grammar',
-    lesson: {
-      title: '🔍 線索一：句型結構',
-      content: '看空格前後的字，可以判斷需要什麼詞性。\n\n例如：<br>・空格前有 <b>to</b> → 通常填<b>動詞原形</b><br>・空格前有 <b>is / was</b> → 通常填<b>形容詞</b>或動詞進行式<br>・空格前有 <b>the / a</b> → 通常填<b>名詞</b><br><br>先找這些線索，就能排除不合詞性的選項。'
-    },
-    sentence: 'The doctor asked the patient to __BLANK__ more water every day.',
-    contextHint: '醫生叫病人每天____更多水。',
-    answer: 'B',
-    answerDisplay: 'drink',
-    mainQuestion: '空格前有「to」，這個位置需要什麼詞性？',
-    mainOptions: [
-      { key: 'A', text: '名詞' },
-      { key: 'B', text: '動詞' },
-      { key: 'C', text: '形容詞' },
-      { key: 'D', text: '副詞' }
-    ],
-    explanation: '🕵️ 正確！空格前是「to」，後面接<b>動詞原形</b>。四個詞性選項中只有動詞合理。這是最基本的句型線索。',
-    guide: {
-      question: '找找看：空格前面的那個字是什麼？',
-      options: [
-        { key: 'A', text: '是冠詞 the / a' },
-        { key: 'B', text: '是不定詞 to' },
-        { key: 'C', text: '是形容詞' },
-        { key: 'D', text: '是連接詞' }
-      ],
-      correctGuideKey: 'B',
-      guideExplain: '空格前是「to」，這個位置需要動詞原形，所以選 B（drink）。'
-    }
-  },
-  {
-    stage: 'STAGE 1 — 句型結構線索',
-    stageTag: 'grammar',
-    sentence: 'The weather in this city is very __BLANK__ during summer.',
-    contextHint: '這個城市夏天的天氣非常____。',
-    answer: 'C',
-    answerDisplay: 'hot',
-    mainQuestion: '空格前有「very」和「is」，這個位置需要什麼詞性？',
-    mainOptions: [
-      { key: 'A', text: '名詞' },
-      { key: 'B', text: '動詞' },
-      { key: 'C', text: '形容詞' },
-      { key: 'D', text: '副詞' }
-    ],
-    explanation: '🕵️ 正確！「is very ___」這個結構後面要接<b>形容詞</b>，用來描述主詞 the weather 的狀態。',
-    guide: {
-      question: '「very」這個字通常用來加強什麼詞性？',
-      options: [
-        { key: 'A', text: '名詞' },
-        { key: 'B', text: '動詞' },
-        { key: 'C', text: '形容詞或副詞' },
-        { key: 'D', text: '介系詞' }
-      ],
-      correctGuideKey: 'C',
-      guideExplain: '「very」是程度副詞，用來加強形容詞。所以「is very ___」後面接形容詞 hot。'
-    }
-  },
-
-  // ── STAGE 2: 搭配詞（Collocation）──────────────────────────
-  {
-    stage: 'STAGE 2 — 搭配詞線索',
-    stageTag: 'colloc',
-    lesson: {
-      title: '🔍 線索二：搭配詞',
-      content: '英文裡有很多字有固定的搭配組合，不能亂換。<br><br>常見動詞搭配：<br>・<b>make</b> a decision / a mistake / progress<br>・<b>take</b> action / a break / a risk<br>・<b>play</b> a role / a trick<br>・<b>show</b> interest / respect<br><br>看到這些名詞時，先想想它通常跟哪個動詞搭配。'
-    },
-    sentence: 'After months of discussion, the team finally decided to __BLANK__ action and launch the project.',
-    contextHint: '討論了幾個月後，團隊終於決定____行動，啟動這個計畫。',
-    answer: 'B',
-    answerDisplay: 'take',
-    mainQuestion: '「____ action」是常見的固定搭配，空格應該填哪個動詞？',
-    mainOptions: [
-      { key: 'A', text: 'make' },
-      { key: 'B', text: 'take' },
-      { key: 'C', text: 'do' },
-      { key: 'D', text: 'give' }
-    ],
-    explanation: '🕵️ 正確！「take action」是英文固定搭配，表示「採取行動」。make / do / give 都不能和 action 這樣搭配。',
-    guide: {
-      question: '想想看：「行動」的英文搭配通常是哪個？',
-      options: [
-        { key: 'A', text: 'make action' },
-        { key: 'B', text: 'take action' },
-        { key: 'C', text: 'do action' },
-        { key: 'D', text: 'have action' }
-      ],
-      correctGuideKey: 'B',
-      guideExplain: '「採取行動」的固定說法是 take action。這是學測最常考的搭配詞之一！'
-    }
-  },
-  {
-    stage: 'STAGE 2 — 搭配詞線索',
-    stageTag: 'colloc',
-    sentence: 'The new policy is expected to __BLANK__ a key role in reducing air pollution.',
-    contextHint: '這個新政策預期將在減少空氣汙染方面____重要角色。',
-    answer: 'C',
-    answerDisplay: 'play',
-    mainQuestion: '「____ a role」的固定搭配，空格應填哪個動詞？',
-    mainOptions: [
-      { key: 'A', text: 'make' },
-      { key: 'B', text: 'take' },
-      { key: 'C', text: 'play' },
-      { key: 'D', text: 'do' }
-    ],
-    explanation: '🕵️ 正確！「play a role」是固定搭配，表示「扮演角色、發揮作用」。這題的陷阱是 make / take 看起來也很像，但只有 play 和 role 搭配。',
-    guide: {
-      question: '「角色」的固定搭配是什麼？',
-      options: [
-        { key: 'A', text: 'make a role' },
-        { key: 'B', text: 'take a role' },
-        { key: 'C', text: 'play a role' },
-        { key: 'D', text: 'do a role' }
-      ],
-      correctGuideKey: 'C',
-      guideExplain: '「扮演角色」固定說 play a role，就像演員「play」角色一樣。'
-    }
-  },
-  {
-    stage: 'STAGE 2 — 搭配詞線索',
-    stageTag: 'colloc',
-    sentence: 'Students are encouraged to __BLANK__ notes during the lecture to help them remember.',
-    contextHint: '學生被鼓勵在課堂中____筆記，以幫助記憶。',
-    answer: 'A',
-    answerDisplay: 'take',
-    mainQuestion: '「____ notes」的固定搭配是？',
-    mainOptions: [
-      { key: 'A', text: 'take' },
-      { key: 'B', text: 'make' },
-      { key: 'C', text: 'write' },
-      { key: 'D', text: 'do' }
-    ],
-    explanation: '🕵️ 正確！「take notes」是「記筆記」的固定說法。這題有陷阱：write notes 感覺合理，但學術英文的標準說法是 take notes。',
-    guide: {
-      question: '「記筆記」的正確英文說法通常是？',
-      options: [
-        { key: 'A', text: 'take notes（記筆記）' },
-        { key: 'B', text: 'write notes（寫筆記）' },
-        { key: 'C', text: 'make notes（製作筆記）' },
-        { key: 'D', text: 'do notes（做筆記）' }
-      ],
-      correctGuideKey: 'A',
-      guideExplain: '英文習慣說 take notes（記筆記），這是固定用法，就像 take a photo（拍照）一樣。'
-    }
-  },
-
-  // ── STAGE 3: 語境判斷 ──────────────────────────────────────
-  {
-    stage: 'STAGE 3 — 語境判斷線索',
-    stageTag: 'meaning',
-    lesson: {
-      title: '🔍 線索三：語境判斷',
-      content: '有些題目詞性和搭配都差不多，這時要看整句的意思。<br><br>做法：<br>1. 先讀整句，抓住主旨<br>2. 把四個選項分別帶入<br>3. 看哪個最符合上下文<br><br>這是學測近年越來越常考的題型，光靠詞性或搭配無法解題。'
-    },
-    sentence: 'After the storm, the streets were completely __BLANK__, with fallen trees and broken glass everywhere.',
-    contextHint: '風暴過後，街道完全____，到處是倒下的樹木和碎玻璃。',
-    answer: 'D',
-    answerDisplay: 'damaged',
-    mainQuestion: '根據後半句「到處是倒下的樹木和碎玻璃」，空格應填哪個形容詞？',
-    mainOptions: [
-      { key: 'A', text: 'empty（空的）' },
-      { key: 'B', text: 'quiet（安靜的）' },
-      { key: 'C', text: 'clean（乾淨的）' },
-      { key: 'D', text: 'damaged（受損的）' }
-    ],
-    explanation: '🕵️ 正確！後半句說「到處是倒下的樹木和碎玻璃」，這是破壞的景象，所以填 damaged（受損的）。A、B、C 的意思都不符合這個描述。',
-    guide: {
-      question: '後半句的「倒下的樹木、碎玻璃」在描述什麼情況？',
-      options: [
-        { key: 'A', text: '街道空曠沒有人' },
-        { key: 'B', text: '環境很安靜' },
-        { key: 'C', text: '物品都被破壞了' },
-        { key: 'D', text: '地方很乾淨' }
-      ],
-      correctGuideKey: 'C',
-      guideExplain: '後半句提到「倒樹和碎玻璃」，這是破壞的景象，所以選 damaged（受損的）最合邏輯。'
-    }
-  },
-  {
-    stage: 'STAGE 3 — 語境判斷線索',
-    stageTag: 'meaning',
-    sentence: 'Although the task was difficult, he refused to give up and continued to __BLANK__ hard until he succeeded.',
-    contextHint: '雖然任務很困難，他拒絕放棄，繼續____直到成功。',
-    answer: 'B',
-    answerDisplay: 'try',
-    mainQuestion: '根據「refused to give up（拒絕放棄）」這個線索，空格應填哪個動詞？',
-    mainOptions: [
-      { key: 'A', text: 'rest（休息）' },
-      { key: 'B', text: 'try（努力嘗試）' },
-      { key: 'C', text: 'complain（抱怨）' },
-      { key: 'D', text: 'wait（等待）' }
-    ],
-    explanation: '🕵️ 正確！「拒絕放棄」表示他要繼續努力，所以填 try（努力嘗試）最符合語境。rest / complain / wait 都和「不放棄」的邏輯矛盾。',
-    guide: {
-      question: '「拒絕放棄 + 繼續____」這個邏輯，說明接下來他應該做什麼？',
-      options: [
-        { key: 'A', text: '去休息' },
-        { key: 'B', text: '繼續嘗試努力' },
-        { key: 'C', text: '開始抱怨' },
-        { key: 'D', text: '等待別人幫忙' }
-      ],
-      correctGuideKey: 'B',
-      guideExplain: '「不放棄 → 繼續努力」是最合理的邏輯，所以選 try。'
-    }
-  },
-
-  // ── STAGE 4: 綜合題（搭配 + 語境）─────────────────────────
-  {
-    stage: 'STAGE 4 — 綜合線索',
-    stageTag: 'colloc',
-    lesson: {
-      title: '🔍 進階：同時用多種線索',
-      content: '到了這個階段，一個線索通常不夠用。你需要同時考慮：<br><br>・<b>句型</b>：詞性對嗎？<br>・<b>搭配</b>：有沒有固定組合？<br>・<b>語境</b>：整句意思合理嗎？<br><br>學測近年（111–114）的題目大多需要同時用到兩種以上線索才能解題。'
-    },
-    sentence: 'Scientists have been working hard to __BLANK__ a solution to the plastic pollution problem.',
-    contextHint: '科學家一直在努力____解決塑膠污染問題的方法。',
-    answer: 'A',
-    answerDisplay: 'find',
-    mainQuestion: '這一題需要同時考慮搭配和語境。哪個動詞和 "a solution" 最搭，且符合句子意思？',
-    mainOptions: [
-      { key: 'A', text: 'find（找到）' },
-      { key: 'B', text: 'lose（失去）' },
-      { key: 'C', text: 'need（需要）' },
-      { key: 'D', text: 'avoid（避免）' }
-    ],
-    explanation: '🕵️ 正確！「find a solution」是固定搭配（找到解決方法），且語境是「努力解決問題」，find 最符合邏輯。',
-    guide: {
-      question: '「a solution（解決方法）」通常和哪個動詞搭配？',
-      options: [
-        { key: 'A', text: 'find a solution（找到解決方法）' },
-        { key: 'B', text: 'lose a solution（失去解決方法）' },
-        { key: 'C', text: 'avoid a solution（避免解決方法）' },
-        { key: 'D', text: 'need a solution（需要解決方法）' }
-      ],
-      correctGuideKey: 'A',
-      guideExplain: '「find a solution」是固定搭配，表示「找到解決方法」。need a solution 語法雖然可以，但搭配上 find 更自然，且語境「努力工作去____」也暗示是要「找到」。'
-    }
-  },
-  {
-    stage: 'STAGE 4 — 綜合線索',
-    stageTag: 'meaning',
-    sentence: 'The teacher was very __BLANK__ when explaining the difficult concept, making sure every student could follow.',
-    contextHint: '這位老師在解釋困難概念時非常____，確保每個學生都能跟上。',
-    answer: 'C',
-    answerDisplay: 'patient',
-    mainQuestion: '後半句說「確保每個學生都能跟上」，空格應填哪個形容詞？',
-    mainOptions: [
-      { key: 'A', text: 'strict（嚴格的）' },
-      { key: 'B', text: 'angry（生氣的）' },
-      { key: 'C', text: 'patient（有耐心的）' },
-      { key: 'D', text: 'tired（疲倦的）' }
-    ],
-    explanation: '🕵️ 正確！「確保每個學生都能跟上」這個細節說明老師願意花時間等學生理解，這是「有耐心」的表現。strict 是嚴格，不符合；angry / tired 和這個正面描述矛盾。',
-    guide: {
-      question: '「確保每個學生都能跟上」這個行為，反映了老師什麼特質？',
-      options: [
-        { key: 'A', text: '很嚴格' },
-        { key: 'B', text: '很生氣' },
-        { key: 'C', text: '很有耐心' },
-        { key: 'D', text: '很疲倦' }
-      ],
-      correctGuideKey: 'C',
-      guideExplain: '願意放慢速度、確保大家跟上，這是耐心的表現，所以選 patient。'
-    }
-  },
-
-  // ── STAGE 5: 真實學測題風格 ────────────────────────────────
-  {
-    stage: 'STAGE 5 — 學測真實題型',
-    stageTag: 'colloc',
-    lesson: {
-      title: '🔍 最後挑戰：真實學測題風格',
-      content: '這個階段的題目選項詞性相同，意思也很接近。<br>這是學測最常見的陷阱！<br><br>做法：<br>1. 先確認詞性（這步驟很快）<br>2. 重點放在搭配和語境<br>3. 把每個選項帶入，找最合理的'
-    },
-    sentence: 'The government decided to __BLANK__ strict measures to deal with the rising crime rate.',
-    contextHint: '政府決定____嚴格措施，以應對不斷上升的犯罪率。',
-    answer: 'B',
-    answerDisplay: 'take',
-    mainQuestion: '四個選項都是動詞，哪個和 "strict measures（嚴格措施）" 最搭？',
-    mainOptions: [
-      { key: 'A', text: 'make（製造/做）' },
-      { key: 'B', text: 'take（採取）' },
-      { key: 'C', text: 'give（給予）' },
-      { key: 'D', text: 'find（找到）' }
-    ],
-    explanation: '🕵️ 正確！「take measures」是固定搭配，表示「採取措施」。這是學測高頻搭配詞，make / give / find 都不和 measures 搭配。',
-    guide: {
-      question: '「採取措施」的固定英文說法是？',
-      options: [
-        { key: 'A', text: 'make measures' },
-        { key: 'B', text: 'take measures' },
-        { key: 'C', text: 'give measures' },
-        { key: 'D', text: 'do measures' }
-      ],
-      correctGuideKey: 'B',
-      guideExplain: '「採取措施」固定說 take measures，和 take action（採取行動）是同樣的搭配模式。'
-    }
-  },
-  {
-    stage: 'STAGE 5 — 學測真實題型',
-    stageTag: 'meaning',
-    sentence: 'Despite having very little money, she managed to __BLANK__ enough to buy a small gift for her mother.',
-    contextHint: '儘管幾乎沒有錢，她還是設法____足夠的錢買了一份小禮物給媽媽。',
-    answer: 'D',
-    answerDisplay: 'save',
-    mainQuestion: '「儘管幾乎沒有錢，卻還是能買禮物」——這個邏輯暗示她做了什麼？',
-    mainOptions: [
-      { key: 'A', text: 'spend（花費）' },
-      { key: 'B', text: 'borrow（借）' },
-      { key: 'C', text: 'lose（失去）' },
-      { key: 'D', text: 'save（存起來）' }
-    ],
-    explanation: '🕵️ 正確！句子說「幾乎沒有錢，但 managed to ____ enough」——能夠「存到足夠的錢」才能買禮物。spend 是花錢，方向相反；borrow 語感不符；lose 更不可能。',
-    guide: {
-      question: '「幾乎沒有錢，卻能____ enough（足夠）去買禮物」，她做了什麼？',
-      options: [
-        { key: 'A', text: '花掉更多錢' },
-        { key: 'B', text: '借錢' },
-        { key: 'C', text: '存了足夠的錢' },
-        { key: 'D', text: '失去了錢' }
-      ],
-      correctGuideKey: 'C',
-      guideExplain: '「幾乎沒錢但還是能買到」→ 她一點一點把錢存起來。所以 save（存錢）最合邏輯。'
-    }
-  },
-  {
-    stage: 'STAGE 5 — 學測真實題型',
-    stageTag: 'colloc',
-    sentence: 'The researchers have been trying to __BLANK__ light on the mystery of how ancient people built these large stone structures.',
-    contextHint: '研究人員一直試圖____古代人如何建造這些大型石造建築的謎。',
-    answer: 'A',
-    answerDisplay: 'shed',
-    mainQuestion: '「shed light on」是固定片語，意思是「揭開……的謎/闡明」。空格填哪個字？',
-    mainOptions: [
-      { key: 'A', text: 'shed（投射）' },
-      { key: 'B', text: 'put（放）' },
-      { key: 'C', text: 'bring（帶來）' },
-      { key: 'D', text: 'give（給）' }
-    ],
-    explanation: '🕵️ 正確！「shed light on something」是固定片語，表示「揭示/闡明某件事」。這是學測近年常出現的進階搭配，只有 shed 正確。',
-    guide: {
-      question: '看到「___ light on the mystery」——你有沒有印象這是哪個固定片語？',
-      options: [
-        { key: 'A', text: '是 shed light on（揭開謎題）' },
-        { key: 'B', text: '是 put light on（放光在上面）' },
-        { key: 'C', text: '是 bring light on（帶來光）' },
-        { key: 'D', text: '我沒有印象，不確定' }
-      ],
-      correctGuideKey: 'A',
-      guideExplain: '「shed light on」是固定片語，意思是「對某事提供新的見解或解釋」。這是學測高階搭配，建議記起來！'
-    }
-  }
+// ═══════════════════════════════════════════════════════
+//  LESSON METADATA
+// ═══════════════════════════════════════════════════════
+const LESSONS = [
+  // STAGE 1 — 詞性
+  { id:'1-1', stage:1, title:'名詞判定：冠詞、形容詞後',    desc:'a/an/the、形容詞之後 → 名詞',   tag:'g', unlock:null },
+  { id:'1-2', stage:1, title:'動詞原形：助動詞、to 後',      desc:'can/should/to 之後 → 動詞原形', tag:'g', unlock:'1-1' },
+  { id:'1-3', stage:1, title:'形容詞：系動詞、感官動詞後',   desc:'be/feel/look/seem → 形容詞',    tag:'g', unlock:'1-2' },
+  { id:'1-4', stage:1, title:'副詞：修飾動詞或 V-ed',        desc:'be + ___ + V-ed → 副詞(-ly)',  tag:'g', unlock:'1-3' },
+  // STAGE 2 — 搭配 + 介系詞
+  { id:'2-1', stage:2, title:'形容詞 + for 介系詞',           desc:'be responsible/noted for…',      tag:'c', unlock:'1-4' },
+  { id:'2-2', stage:2, title:'動詞/分詞 + with 介系詞',       desc:'associated with, comes with…',   tag:'c', unlock:'2-1' },
+  { id:'2-3', stage:2, title:'三字片語完整性',                desc:'regardless of, instead of…',     tag:'c', unlock:'2-2' },
+  { id:'2-4', stage:2, title:'名詞 + 介系詞固定結合',         desc:'risk of, solution to, cause of…',tag:'c', unlock:'2-3' },
+  // STAGE 3 — 邏輯
+  { id:'3-1', stage:3, title:'因果連結詞',                    desc:'Consequently, As a result…',     tag:'l', unlock:'2-4' },
+  { id:'3-2', stage:3, title:'對比與轉折連結詞',              desc:'However, Nevertheless, Instead…', tag:'l', unlock:'3-1' },
+  { id:'3-3', stage:3, title:'遞進與補充關係',                desc:'Furthermore, Similarly, As well…',tag:'l', unlock:'3-2' },
+  { id:'3-4', stage:3, title:'同義／反義上下文暗示',          desc:'上文 slow → 下文考 fast…',       tag:'l', unlock:'3-3' },
+  // STAGE 4 — 實戰
+  { id:'4-1', stage:4, title:'策略教學：四輪解題法',          desc:'秒殺→詞性→朗讀→消去',            tag:'b', unlock:'3-4' },
+  { id:'4-2', stage:4, title:'整段實戰 A（98年）',            desc:'The Tortoise and the Hare',       tag:'b', unlock:'4-1' },
+  { id:'4-3', stage:4, title:'整段實戰 B（108年）',           desc:'父親的記憶問題',                  tag:'b', unlock:'4-2' },
+  { id:'4-4', stage:4, title:'整段實戰 C（112年）',           desc:'喝水與補水的科學',                tag:'b', unlock:'4-3' },
 ];
 
-// ============================================================
-//  GAME STATE
-// ============================================================
-let currentQ = 0;
-let correctCount = 0;
-let wrongCount = 0;
-let wrongList = [];
-let waitingForGuide = false;
-let guideShown = false;
+const STAGE_META = {
+  1: { label:'Stage 1 — 詞性定位', color:'var(--s1)' },
+  2: { label:'Stage 2 — 搭配詞與介系詞', color:'var(--s2)' },
+  3: { label:'Stage 3 — 句間邏輯', color:'var(--s3)' },
+  4: { label:'Stage 4 — 實戰策略', color:'var(--s4)' },
+};
 
-function startGame() {
-  document.getElementById('screen-welcome').style.display = 'none';
-  document.getElementById('screen-game').style.display = 'flex';
-  renderQuestion();
+// ═══════════════════════════════════════════════════════
+//  localStorage PROGRESS
+// ═══════════════════════════════════════════════════════
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem('cloze_v3_progress') || '{}'); }
+  catch(e) { return {}; }
+}
+function setDone(lessonId) {
+  const p = getProgress(); p[lessonId] = true;
+  localStorage.setItem('cloze_v3_progress', JSON.stringify(p));
+}
+function isDone(lessonId) { return !!getProgress()[lessonId]; }
+function isUnlocked(lesson) {
+  if (!lesson.unlock) return true;
+  return isDone(lesson.unlock);
 }
 
-function renderQuestion() {
-  const q = questions[currentQ];
-  const total = questions.length;
-
-  // Progress
-  document.getElementById('prog-label').textContent = `關卡 ${currentQ + 1} / ${total}`;
-  document.getElementById('score-correct').textContent = correctCount;
-  document.getElementById('score-wrong').textContent = wrongCount;
-  document.getElementById('prog-fill').style.width = `${(currentQ / total) * 100}%`;
-
-  // Stage
-  document.getElementById('stage-label').textContent = q.stage;
-
-  // Lesson
-  const lBox = document.getElementById('lesson-box');
-  if (q.lesson && !guideShown) {
-    lBox.style.display = 'block';
-    document.getElementById('lesson-title').textContent = q.lesson.title;
-    document.getElementById('lesson-content').innerHTML = q.lesson.content;
-  } else {
-    lBox.style.display = 'none';
-  }
-
-  // Question meta
-  document.getElementById('q-meta').textContent = `CASE ${String(currentQ + 1).padStart(2, '0')}`;
-
-  // Sentence
-  const tagMap = { grammar: 'tag-grammar', colloc: 'tag-colloc', meaning: 'tag-meaning' };
-  const tagLabelMap = { grammar: '句型', colloc: '搭配', meaning: '語境' };
-  const tag = `<span class="tag ${tagMap[q.stageTag]}">${tagLabelMap[q.stageTag]}</span>`;
-  const sentHTML = q.sentence.replace('__BLANK__', `<span class="blank" id="blank-span">______</span>`);
-  document.getElementById('sentence-display').innerHTML = sentHTML + tag;
-
-  // Context hint
-  const ch = document.getElementById('context-hint');
-  ch.textContent = q.contextHint || '';
-
-  // Guide question / main question
-  document.getElementById('guide-question').innerHTML = q.mainQuestion;
-
-  // Options
-  renderOptions(q.mainOptions);
-
-  // Clear feedback
-  const fb = document.getElementById('feedback-box');
-  fb.className = 'feedback';
-  fb.style.display = 'none';
-
-  // Buttons
-  document.getElementById('next-btn').className = 'action-btn primary';
-  document.getElementById('next-btn').style.display = 'none';
-  document.getElementById('retry-btn').style.display = 'none';
-
-  waitingForGuide = false;
-}
-
-function renderOptions(opts) {
-  const container = document.getElementById('options-container');
+// ═══════════════════════════════════════════════════════
+//  HOME SCREEN
+// ═══════════════════════════════════════════════════════
+function buildHome() {
+  const container = document.getElementById('home-stages');
   container.innerHTML = '';
-  opts.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'opt-btn';
-    btn.innerHTML = `<span class="key">${opt.key}</span>${opt.text}`;
-    btn.onclick = () => handleAnswer(opt.key);
-    container.appendChild(btn);
-  });
-}
 
-function handleAnswer(chosen) {
-  const q = questions[currentQ];
-  disableOptions();
+  [1,2,3,4].forEach(s => {
+    const meta = STAGE_META[s];
+    const lessons = LESSONS.filter(l => l.stage === s);
+    const doneCount = lessons.filter(l => isDone(l.id)).length;
 
-  if (!waitingForGuide) {
-    // First attempt — main question
-    if (chosen === q.answer) {
-      markOption(chosen, true);
-      highlightBlank(true, q.answerDisplay);
-      showFeedback('good', '🕵️ 正確！', q.explanation);
-      document.getElementById('next-btn').style.display = 'block';
-      document.getElementById('next-btn').textContent = currentQ < questions.length - 1 ? '下一題 →' : '查看成績';
-      document.getElementById('next-btn').onclick = nextQuestion;
-      correctCount++;
-      document.getElementById('score-correct').textContent = correctCount;
-    } else {
-      markOption(chosen, false);
-      highlightBlank(false);
-      wrongCount++;
-      document.getElementById('score-wrong').textContent = wrongCount;
-      // Show guide question
-      showFeedback('bad', '🕵️ 再想想', '你選的答案不太對。讓我給你一個線索，重新想想看——');
-      setTimeout(() => {
-        showGuide(q);
-      }, 800);
-    }
-  } else {
-    // Guide attempt
-    if (chosen === q.guide.correctGuideKey) {
-      showFeedback('info', '🕵️ 找到線索了！', q.guide.guideExplain + '<br><br>現在回去選選看正確答案：');
-      // Re-render main options, allow retry
-      renderOptions(q.mainOptions);
-      waitingForGuide = false;
-      document.getElementById('guide-question').innerHTML = q.mainQuestion;
-      // Mark the blank as reset
-      const bl = document.getElementById('blank-span');
-      if (bl) { bl.className = 'blank'; bl.textContent = '______'; }
-    } else {
-      showFeedback('bad', '🕵️ 線索找錯了', '再看一下句子，重新觀察一次。');
-      document.getElementById('retry-btn').style.display = 'block';
-    }
-  }
-}
+    const sec = document.createElement('div');
+    sec.className = 'stage-section';
+    sec.innerHTML = `
+      <div class="stage-header">
+        <div class="stage-dot" style="background:${meta.color};"></div>
+        <div class="stage-title">${meta.label}</div>
+        <div class="stage-progress">${doneCount}/${lessons.length}</div>
+      </div>
+      <div class="lesson-grid" id="sg-${s}"></div>
+    `;
+    container.appendChild(sec);
 
-function showGuide(q) {
-  document.getElementById('guide-question').innerHTML = q.guide.question;
-  renderOptions(q.guide.options);
-  waitingForGuide = true;
-  document.getElementById('feedback-box').style.display = 'none';
-}
+    const grid = sec.querySelector(`#sg-${s}`);
+    lessons.forEach(l => {
+      const locked = !isUnlocked(l);
+      const done = isDone(l.id);
+      const tagClass = { g:'tag-g', c:'tag-c', l:'tag-l', b:'tag-b' }[l.tag];
+      const tagLabel = { g:'詞性', c:'搭配', l:'邏輯', b:'實戰' }[l.tag];
 
-function retryGuide() {
-  const q = questions[currentQ];
-  document.getElementById('retry-btn').style.display = 'none';
-  showGuide(q);
-  document.getElementById('feedback-box').style.display = 'none';
-}
-
-function showFeedback(type, title, content) {
-  const fb = document.getElementById('feedback-box');
-  fb.className = `feedback ${type} show`;
-  fb.style.display = 'block';
-  document.getElementById('fb-title').textContent = title;
-  document.getElementById('fb-content').innerHTML = content;
-}
-
-function markOption(key, correct) {
-  const btns = document.querySelectorAll('.opt-btn');
-  btns.forEach(btn => {
-    const k = btn.querySelector('.key').textContent;
-    if (k === key) {
-      btn.classList.add(correct ? 'correct-anim' : 'wrong-anim');
-    }
-  });
-}
-
-function highlightBlank(correct, word) {
-  const bl = document.getElementById('blank-span');
-  if (!bl) return;
-  if (correct) {
-    bl.className = 'blank correct';
-    bl.textContent = word;
-  } else {
-    bl.className = 'blank wrong';
-  }
-}
-
-function disableOptions() {
-  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
-}
-
-function nextQuestion() {
-  const q = questions[currentQ];
-  // Track wrong answers
-  const wasWrong = wrongCount > (questions.slice(0, currentQ).reduce((a) => a, 0));
-  // Simple: check if blank is red (wrong on first try)
-  const bl = document.getElementById('blank-span');
-  if (bl && bl.classList.contains('wrong')) {
-    wrongList.push({ q, answerDisplay: q.answerDisplay });
-  }
-
-  currentQ++;
-  guideShown = false;
-  if (currentQ >= questions.length) {
-    showResult();
-  } else {
-    renderQuestion();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-}
-
-function nextStep() {}
-
-function showResult() {
-  document.getElementById('screen-game').style.display = 'none';
-  document.getElementById('screen-result').style.display = 'flex';
-
-  document.getElementById('final-score').textContent = `${correctCount}/${questions.length}`;
-
-  let msg = '';
-  const pct = correctCount / questions.length;
-  if (pct >= 0.9) msg = '🏆 太厲害了！你已經掌握偵探解題法，繼續練習學測真題吧！';
-  else if (pct >= 0.7) msg = '🕵️ 做得很好！大部分的線索你都能抓到，再多練搭配詞就更穩了。';
-  else if (pct >= 0.5) msg = '💪 有進步空間！搭配詞和語境線索是你需要加強的重點，多練就會有感覺。';
-  else msg = '📖 基礎打穩最重要！建議先把三種線索的用法熟悉，再挑戰難題。';
-
-  document.getElementById('result-message').textContent = msg;
-
-  // Wrong review
-  const wr = document.getElementById('wrong-review');
-  if (wrongList.length > 0) {
-    let html = '<div style="font-family:Space Mono,monospace;font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;">需要複習的題目</div>';
-    wrongList.forEach((item, i) => {
-      const sentFormatted = item.q.sentence.replace('__BLANK__', `<b style="color:var(--green)">${item.answerDisplay}</b>`);
-      html += `<div class="wrong-item">
-        <div class="wi-label">複習 ${i + 1}</div>
-        <div style="font-size:13px;color:var(--text);line-height:1.8;">${sentFormatted}</div>
-        <div style="margin-top:6px;font-size:12px;color:var(--text-dim);">✓ 答案：<span class="wi-answer">${item.answerDisplay}</span></div>
-      </div>`;
+      const card = document.createElement('div');
+      card.className = 'lc' + (locked ? ' lc-locked' : '') + (done ? ' lc-done' : '');
+      card.innerHTML = `
+        <div class="lc-num">${l.id}</div>
+        <div class="lc-title">${l.title}</div>
+        <div class="lc-desc">${l.desc}</div>
+        <span class="lc-tag ${tagClass}">${tagLabel}</span>
+        ${locked ? `<div class="lc-lock-note">完成 ${l.unlock} 後解鎖</div>` : ''}
+      `;
+      if (!locked) card.onclick = () => startLesson(l.id);
+      grid.appendChild(card);
     });
-    wr.innerHTML = html;
+  });
+}
+
+function goHome() {
+  showScreen('s-home');
+  buildHome();
+}
+
+// ═══════════════════════════════════════════════════════
+//  PRACTICE ENGINE
+// ═══════════════════════════════════════════════════════
+let cur = { lessonId:null, qIdx:0, correct:0, wrong:0, wrongList:[], mode:null };
+// mode: 'clue' | 'main' | 'guide' | 'retry-main'
+
+function startLesson(id) {
+  // Special handling for stage 4
+  if (id === '4-1') { startStrategy(); return; }
+  if (id === '4-2') { startPassage(BATTLE_PASSAGE_98); return; }
+  if (id === '4-3') { startPassage(BATTLE_PASSAGE_108); return; }
+  if (id === '4-4') { startPassage(BATTLE_PASSAGE_112); return; }
+
+  const lesson = LESSONS.find(l => l.id === id);
+  const qs = QUESTION_DATA[id];
+  if (!qs) { alert('題目資料尚未載入'); return; }
+
+  cur = { lessonId:id, qIdx:0, correct:0, wrong:0, wrongList:[] };
+
+  document.getElementById('prac-eyebrow').textContent = id;
+  document.getElementById('prac-title').textContent = lesson.title;
+
+  // Build phase dots (5 questions)
+  const phaseLabels = ['示範','輔助','獨立①','獨立②','獨立③'];
+  const dotsEl = document.getElementById('prac-phase-dots');
+  dotsEl.innerHTML = phaseLabels.map((p,i) => `<span class="pd" id="pd-${i}">${p}</span>`).join('');
+
+  showScreen('s-practice');
+  renderQ();
+}
+
+function renderQ() {
+  const qs = QUESTION_DATA[cur.lessonId];
+  const q = qs[cur.qIdx];
+  const total = qs.length;
+
+  // progress
+  document.getElementById('prac-prog-lbl').textContent = `題目 ${cur.qIdx+1} / ${total}`;
+  document.getElementById('prac-c').textContent = cur.correct;
+  document.getElementById('prac-w').textContent = cur.wrong;
+  const stageColor = { demo:'var(--gold)', guided:'var(--blue)', solo:'var(--red)' };
+  document.getElementById('prac-prog-fill').style.background = stageColor[q.phase] || 'var(--gold)';
+  document.getElementById('prac-prog-fill').style.width = `${cur.qIdx/total*100}%`;
+
+  // phase dots
+  ['示範','輔助','獨立①','獨立②','獨立③'].forEach((_,i) => {
+    const dot = document.getElementById('pd-'+i);
+    if (!dot) return;
+    dot.className = 'pd' + (i < cur.qIdx ? ' pd-done' : i === cur.qIdx ? ' pd-active' : '');
+  });
+
+  // phase badge
+  const phaseLabel = { demo:'示範題', guided:'輔助題', solo:'獨立題' }[q.phase];
+  const phaseClass = { demo:'pb-demo', guided:'pb-guided', solo:'pb-solo' }[q.phase];
+  const pb = document.getElementById('prac-phase-badge');
+  pb.textContent = phaseLabel; pb.className = 'phase-badge ' + phaseClass;
+
+  // source tag
+  const st = document.getElementById('prac-source-tag');
+  st.textContent = q.source === 'real' ? '真題' : '自製';
+  st.className = 'source-tag ' + (q.source === 'real' ? 'src-real' : 'src-made');
+
+  document.getElementById('prac-case').textContent = `CASE ${String(cur.qIdx+1).padStart(2,'0')}`;
+
+  // lesson box (show on first q of this lesson, or if q has lesson)
+  const lb = document.getElementById('prac-lesson');
+  if (q.lesson) {
+    lb.style.display = 'block';
+    document.getElementById('prac-lesson-title').textContent = q.lesson.title;
+    document.getElementById('prac-lesson-body').innerHTML = q.lesson.body;
+  } else { lb.style.display = 'none'; }
+
+  // step indicator
+  document.getElementById('prac-step-ind').style.display = q.phase === 'demo' ? 'inline-block' : 'none';
+  document.getElementById('prac-step-ind').innerHTML = '<b>步驟一</b>：找線索 → <b>步驟二</b>：選答案';
+
+  // sentence
+  const sentHTML = q.sentence.replace('___', `<span class="blank" id="the-blank">______</span>`);
+  document.getElementById('prac-sentence').innerHTML = sentHTML;
+
+  // ctx hint (hide for solo)
+  const ctx = document.getElementById('prac-ctx');
+  ctx.textContent = (q.phase !== 'solo' && q.ctx) ? q.ctx : '';
+
+  // reset
+  cur.mode = q.phase === 'demo' ? 'clue' : 'main';
+  document.getElementById('prac-fb').className = 'fb';
+  document.getElementById('prac-next').style.display = 'none';
+  document.getElementById('prac-retry').style.display = 'none';
+
+  if (q.phase === 'demo') {
+    document.getElementById('prac-gq').innerHTML = q.clueQ;
+    renderOpts(q.clueOpts);
   } else {
-    wr.innerHTML = '';
+    document.getElementById('prac-gq').innerHTML = q.mainQ;
+    renderOpts(q.mainOpts);
   }
 }
 
-function resetGame() {
-  currentQ = 0;
-  correctCount = 0;
-  wrongCount = 0;
-  wrongList = [];
-  waitingForGuide = false;
-  guideShown = false;
-  document.getElementById('screen-result').style.display = 'none';
-  document.getElementById('screen-game').style.display = 'flex';
-  renderQuestion();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function renderOpts(opts) {
+  const wrap = document.getElementById('prac-opts');
+  wrap.innerHTML = '';
+  const longText = opts.some(o => o.t.length > 20);
+  wrap.className = 'opts' + (longText ? ' single-col' : '');
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="key">${o.k}</span><span>${o.t}</span>`;
+    btn.onclick = () => handleOpt(o.k);
+    wrap.appendChild(btn);
+  });
 }
+
+function handleOpt(chosen) {
+  const q = QUESTION_DATA[cur.lessonId][cur.qIdx];
+  disableOpts();
+
+  if (cur.mode === 'clue') {
+    if (chosen === q.clueKey) {
+      markOpt(chosen, true);
+      showFB('info', '🕵️ 線索找到了！', q.clueExplain);
+      setTimeout(() => {
+        hideFB();
+        document.getElementById('prac-step-ind').innerHTML = '→ <b>步驟二</b>：現在選答案';
+        document.getElementById('prac-gq').innerHTML = q.mainQ;
+        renderOpts(q.mainOpts);
+        cur.mode = 'main';
+      }, 900);
+    } else {
+      markOpt(chosen, false);
+      showFB('bad', '再仔細看句子', '線索選錯了，再找找看空格前後有什麼字。');
+      document.getElementById('prac-retry').style.display = 'block';
+      document.getElementById('prac-retry').onclick = () => {
+        document.getElementById('prac-retry').style.display = 'none';
+        hideFB(); renderOpts(q.clueOpts);
+      };
+    }
+  } else if (cur.mode === 'main') {
+    if (chosen === q.ans) {
+      markOpt(chosen, true); highlightBlank(true, q.ansWord); cur.correct++;
+      document.getElementById('prac-c').textContent = cur.correct;
+      showFB('good', '🕵️ 正確！', q.explain);
+      showNext(cur.qIdx < QUESTION_DATA[cur.lessonId].length - 1 ? '下一題 →' : '查看成績', pracNext);
+    } else {
+      markOpt(chosen, false); highlightBlank(false); cur.wrong++;
+      document.getElementById('prac-w').textContent = cur.wrong;
+      showFB('bad', '🕵️ 再想想', '答案不對。看一個引導線索：');
+      cur.mode = 'guide';
+      setTimeout(() => {
+        hideFB();
+        document.getElementById('prac-gq').innerHTML = q.guide.q;
+        renderOpts(q.guide.opts);
+      }, 700);
+    }
+  } else if (cur.mode === 'guide') {
+    if (chosen === q.guide.key) {
+      markOpt(chosen, true);
+      showFB('info', '🕵️ 找到了！', q.guide.explain + '<br><br>現在再選一次：');
+      setTimeout(() => {
+        hideFB();
+        document.getElementById('prac-gq').innerHTML = q.mainQ;
+        renderOpts(q.mainOpts);
+        const bl = document.getElementById('the-blank');
+        if (bl) { bl.className = 'blank'; bl.textContent = '______'; }
+        cur.mode = 'retry-main';
+      }, 1000);
+    } else {
+      markOpt(chosen, false);
+      showFB('bad', '線索找錯了', '再觀察一下。');
+      document.getElementById('prac-retry').style.display = 'block';
+      document.getElementById('prac-retry').onclick = () => {
+        document.getElementById('prac-retry').style.display = 'none';
+        hideFB(); renderOpts(q.guide.opts);
+      };
+    }
+  } else if (cur.mode === 'retry-main') {
+    if (chosen === q.ans) {
+      markOpt(chosen, true); highlightBlank(true, q.ansWord);
+      showFB('good', '🕵️ 正確！', q.explain);
+    } else {
+      markOpt(chosen, false);
+      cur.wrongList.push(q);
+      highlightBlank(true, q.ansWord);
+      showFB('info', '正確答案', `答案是 <b>${q.ans}. ${q.ansWord}</b>。<br>${q.explain}`);
+    }
+    showNext(cur.qIdx < QUESTION_DATA[cur.lessonId].length - 1 ? '下一題 →' : '查看成績', pracNext);
+  }
+}
+
+function pracNext() {
+  const q = QUESTION_DATA[cur.lessonId][cur.qIdx];
+  const bl = document.getElementById('the-blank');
+  if (bl && bl.classList.contains('no')) cur.wrongList.push(q);
+  cur.qIdx++;
+  if (cur.qIdx >= QUESTION_DATA[cur.lessonId].length) {
+    showDone();
+  } else {
+    renderQ();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+}
+
+function pracRetry() {} // handled inline
+
+function replayLesson() { startLesson(cur.lessonId); }
+
+function showDone() {
+  setDone(cur.lessonId);
+  const lesson = LESSONS.find(l => l.id === cur.lessonId);
+  const total = QUESTION_DATA[cur.lessonId].length;
+  const pct = cur.correct / total;
+
+  document.getElementById('done-eyebrow').textContent = cur.lessonId + ' 完成';
+  document.getElementById('done-big').textContent = `${cur.correct}/${total}`;
+  document.getElementById('done-stars').textContent = pct >= .9 ? '⭐⭐⭐' : pct >= .7 ? '⭐⭐' : '⭐';
+  document.getElementById('done-icon').textContent = pct >= .7 ? '🕵️' : '📖';
+  document.getElementById('done-msg').textContent = pct >= .9 ? '🏆 完美！這個技巧已經內化了。'
+    : pct >= .7 ? '🕵️ 很好！再多練幾次，這個技巧就會變成本能。'
+    : '💪 這個學習點需要多複習，建議再做一次。';
+
+  const uniqueWrong = [...new Map((cur.wrongList).map(q => [q.sentence, q])).values()];
+  const wr = document.getElementById('done-wrong');
+  if (uniqueWrong.length > 0) {
+    wr.innerHTML = '<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text-xs);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">需要複習</div>'
+      + uniqueWrong.map((q,i) => `<div class="wr-item">
+          <div class="wr-lbl">複習 ${i+1}</div>
+          <div>${q.sentence.replace('___', `<b style="color:var(--green)">${q.ansWord}</b>`)}</div>
+          <div style="margin-top:3px;font-size:11px;color:var(--text-dim);">✓ <span class="wr-ans">${q.ansWord}</span></div>
+        </div>`).join('');
+  } else { wr.innerHTML = ''; }
+
+  document.getElementById('done-formula').innerHTML = FORMULAS[cur.lessonId] || '';
+  showScreen('s-done');
+}
+
+// ── helpers ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+function disableOpts() { document.querySelectorAll('#prac-opts .opt').forEach(b => b.disabled = true); }
+function markOpt(key, ok) {
+  document.querySelectorAll('#prac-opts .opt').forEach(btn => {
+    if (btn.querySelector('.key').textContent === key) btn.classList.add(ok ? 'ok' : 'no');
+  });
+}
+function highlightBlank(ok, word) {
+  const bl = document.getElementById('the-blank');
+  if (!bl) return;
+  bl.className = 'blank ' + (ok ? 'ok' : 'no');
+  if (ok) bl.textContent = word;
+}
+function showFB(type, title, body) {
+  const fb = document.getElementById('prac-fb');
+  fb.className = 'fb ' + type + ' on';
+  document.getElementById('prac-fb-t').textContent = title;
+  document.getElementById('prac-fb-body').innerHTML = body;
+}
+function hideFB() { document.getElementById('prac-fb').className = 'fb'; }
+function showNext(label, fn) {
+  const nb = document.getElementById('prac-next');
+  nb.textContent = label; nb.className = 'act-btn primary on'; nb.onclick = fn;
+}
+
+// ═══════════════════════════════════════════════════════
+//  FORMULAS (shown at end of each lesson)
+// ═══════════════════════════════════════════════════════
+const FORMULAS = {
+  '1-1': '<b>a / an / the</b> + ___ → <b>名詞</b><br><b>形容詞</b> + ___ → <b>名詞</b><br>例：a <u>common</u> <b>device</b>、this <u>beautiful</u> <b>ring</b>',
+  '1-2': '<b>can / should / will / to</b> + ___ → <b>動詞原形</b><br>例：to <b>study</b>、may <b>delay</b>、should <b>remain</b>',
+  '1-3': '<b>be / feel / look / seem / become / taste / smell / sound</b> + ___ → <b>形容詞</b><br>例：feels <b>confident</b>、seemed <b>risky</b>',
+  '1-4': '<b>be + ___ + V-ed</b> → 副詞（通常 -ly 結尾）<br>例：was <b>securely</b> fixed、is <b>widely</b> used',
+  '2-1': '<b>be + ___ + for</b> → 記形容詞：<b>responsible</b> for、<b>noted</b> for、<b>known</b> for、<b>famous</b> for、<b>sorry</b> for',
+  '2-2': '<b>___ + with</b> → 記動詞/分詞：<b>associated</b> with、<b>comes</b> with、<b>charged</b> with、<b>filled</b> with',
+  '2-3': '三字片語整組要記：<b>regardless of</b>、<b>instead of</b>、<b>in spite of</b>、<b>as well as</b>、<b>due to</b>',
+  '2-4': '名詞 + 固定介系詞：<b>risk of</b>、<b>solution to</b>、<b>cause of</b>、<b>result in</b>、<b>contribute to</b>',
+  '3-1': '因果詞：<b>Consequently / As a result / Therefore / Thus</b> → 前因後果，方向一致',
+  '3-2': '轉折詞：<b>However / Nevertheless / Instead / Although / Despite</b> → 前後相反，找對比詞',
+  '3-3': '遞進詞：<b>Furthermore / Moreover / Similarly / In addition</b> → 前後補充，方向相同',
+  '3-4': '上下文暗示：找<b>對比詞</b>（fast↔slow）或<b>同義詞</b>（surprised≈shocked），這就是答案的方向',
+};
+
+// ═══════════════════════════════════════════════════════
+//  STRATEGY MODE (4-1)
+// ═══════════════════════════════════════════════════════
+function startStrategy() {
+  const lesson = LESSONS.find(l => l.id === '4-1');
+  document.getElementById('battle-eyebrow').textContent = '4-1 — 策略教學';
+  document.getElementById('battle-title').textContent = '四輪解題法';
+  document.getElementById('battle-sub').textContent = '學測文義選填實戰策略';
+  showScreen('s-battle');
+
+  document.getElementById('battle-area').innerHTML = `
+    <div class="card">
+      <div class="card-top-line"></div>
+      <div class="lesson-box">
+        <div class="lb-title">📋 學測文義選填：考場攻略</div>
+        拿到試卷後，不要馬上看空格。先用這個四輪流程，從「確定」做到「推測」。
+      </div>
+
+      <div class="strat-steps">
+        <div class="strat-step">
+          <div class="strat-num">①</div>
+          <div class="strat-body">
+            <div class="strat-title">秒殺輪：固定片語 & 搭配詞</div>
+            <div class="strat-desc">
+              先掃描所有空格，找你<b>認得的固定搭配</b>直接填入。<br>
+              例：看到 <code>play a ___ role</code> → 直接填 <b>key / major / vital</b>（搭配詞）<br>
+              例：看到 <code>be responsible ___</code> → 直接填 <b>for</b>
+            </div>
+          </div>
+        </div>
+        <div class="strat-step">
+          <div class="strat-num">②</div>
+          <div class="strat-body">
+            <div class="strat-title">詞性輪：句型結構分析</div>
+            <div class="strat-desc">
+              剩下的空格，看空格前後的句型線索：<br>
+              <code>to + ___</code> → 動詞原形　　<code>be/feel/look + ___</code> → 形容詞<br>
+              <code>a/the + ___</code> → 名詞　　　<code>be + ___ + V-ed</code> → 副詞
+            </div>
+          </div>
+        </div>
+        <div class="strat-step">
+          <div class="strat-num">③</div>
+          <div class="strat-body">
+            <div class="strat-title">邏輯輪：語境與轉折</div>
+            <div class="strat-desc">
+              還不確定的空格，看整句邏輯：<br>
+              看到 <code>although / however / despite</code> → 前後相反，找對比詞<br>
+              看到 <code>therefore / as a result</code> → 前因後果，方向一致<br>
+              看到 <code>similarly / furthermore</code> → 前後補充，方向相同
+            </div>
+          </div>
+        </div>
+        <div class="strat-step">
+          <div class="strat-num">④</div>
+          <div class="strat-body">
+            <div class="strat-title">消去法：最後兩題的處理</div>
+            <div class="strat-desc">
+              剩下最後幾個空格時，把<b>剩餘選項逐一代入</b>，大聲念出整句。<br>
+              感覺最「順」、最符合文章整體語氣的就是答案。<br>
+              注意：<b>時態一致性</b>（過去式文章 → 選過去式動詞）、<b>單複數</b>（a ___ → 單數名詞）
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.8;">
+        記住：這四輪不一定要按順序——遇到什麼線索就用什麼方法。<br>
+        <b style="color:var(--gold)">最重要的是：每一題都要找到線索，不能純猜。</b>
+      </div>
+      <button class="act-btn primary on" onclick="finishStrategy()">我懂了，去做整段實戰 →</button>
+    </div>
+  `;
+}
+
+function finishStrategy() {
+  setDone('4-1');
+  goHome();
+}
+
+// ═══════════════════════════════════════════════════════
+//  BATTLE PASSAGE ENGINE
+// ═══════════════════════════════════════════════════════
+let bp_cur = { passage:null, qIdx:0, correct:0, wrong:0, wrongList:[] };
+
+function startPassage(passageData) {
+  bp_cur = { passage:passageData, qIdx:0, correct:0, wrong:0, wrongList:[] };
+  document.getElementById('battle-eyebrow').textContent = passageData.lessonId;
+  document.getElementById('battle-title').textContent = passageData.title;
+  document.getElementById('battle-sub').textContent = passageData.year + ' · 完整文義選填';
+  showScreen('s-battle');
+  renderPassage();
+}
+
+function renderPassage() {
+  const p = bp_cur.passage;
+  const area = document.getElementById('battle-area');
+
+  // Build passage HTML, replacing [N] with clickable blank spans
+  let passHTML = p.text;
+  p.blanks.forEach(b => {
+    passHTML = passHTML.replace(`[${b.num}]`, `<span class="p-blank" id="pb${b.num}">(${b.num})</span>`);
+  });
+
+  area.innerHTML = `
+    <div class="card">
+      <div class="card-top-line"></div>
+      <div class="lesson-box">
+        <div class="lb-title">📖 閱讀整段文章，再逐題作答</div>
+        ${p.intro}
+      </div>
+      <div class="passage-box">${passHTML}</div>
+      <div id="bp-q-area"></div>
+    </div>
+  `;
+  renderBPQuestion();
+}
+
+function renderBPQuestion() {
+  const p = bp_cur.passage;
+  const b = p.blanks[bp_cur.qIdx];
+  const area = document.getElementById('bp-q-area');
+
+  area.innerHTML = `
+    <div class="divider"></div>
+    <div class="prog-wrap">
+      <div class="prog-meta">
+        <span>空格 (${b.num}) — ${bp_cur.qIdx+1}/${p.blanks.length}</span>
+        <div class="score-row">
+          <div class="sc">答對 <span>${bp_cur.correct}</span></div>
+          <div class="sc">答錯 <span>${bp_cur.wrong}</span></div>
+        </div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="bp-pf" style="width:${bp_cur.qIdx/p.blanks.length*100}%;background:var(--s4);"></div></div>
+    </div>
+    <div class="q-meta-row">
+      <span class="q-case">空格 (${b.num})</span>
+      <span class="phase-badge pb-battle">實戰</span>
+    </div>
+    <div class="guide-q">請從選項中選出最適合 (${b.num}) 的答案：</div>
+    <div class="opts" id="bp-opts"></div>
+    <div class="fb" id="bp-fb"><div class="fb-t" id="bp-fb-t"></div><div id="bp-fb-body"></div></div>
+    <button class="act-btn primary" id="bp-next" style="display:none;" onclick="bpNext()">
+      ${bp_cur.qIdx < p.blanks.length-1 ? '下一個空格 →' : '查看成績'}
+    </button>
+  `;
+
+  const wrap = document.getElementById('bp-opts');
+  // Show 5-6 options for this blank
+  b.opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="key">${o.k}</span><span>${o.t}</span>`;
+    btn.onclick = () => handleBP(o.k);
+    wrap.appendChild(btn);
+  });
+}
+
+function handleBP(chosen) {
+  const b = bp_cur.passage.blanks[bp_cur.qIdx];
+  document.querySelectorAll('#bp-opts .opt').forEach(btn => btn.disabled = true);
+
+  const pb = document.getElementById('pb'+b.num);
+  const fb = document.getElementById('bp-fb');
+
+  document.querySelectorAll('#bp-opts .opt').forEach(btn => {
+    const k = btn.querySelector('.key').textContent;
+    if (k === chosen) btn.classList.add(chosen === b.ans ? 'ok' : 'no');
+    if (k === b.ans) btn.classList.add('ok');
+  });
+
+  if (chosen === b.ans) {
+    pb.className = 'p-blank ok'; pb.textContent = b.ansWord;
+    bp_cur.correct++;
+    fb.className = 'fb good on';
+    document.getElementById('bp-fb-t').textContent = `🕵️ (${b.num}) 正確！`;
+    document.getElementById('bp-fb-body').innerHTML = b.explain;
+  } else {
+    pb.className = 'p-blank no'; pb.textContent = b.ansWord;
+    bp_cur.wrong++; bp_cur.wrongList.push(b);
+    fb.className = 'fb bad on';
+    document.getElementById('bp-fb-t').textContent = `🕵️ (${b.num}) 答錯了`;
+    document.getElementById('bp-fb-body').innerHTML = `正確答案是 <b>${b.ans}. ${b.ansWord}</b>。<br>${b.explain}`;
+  }
+  document.getElementById('bp-next').style.display = 'block';
+}
+
+function bpNext() {
+  bp_cur.qIdx++;
+  if (bp_cur.qIdx >= bp_cur.passage.blanks.length) {
+    showBPResult();
+  } else {
+    renderBPQuestion();
+    window.scrollTo({ top:200, behavior:'smooth' });
+  }
+}
+
+function showBPResult() {
+  setDone(bp_cur.passage.lessonId);
+  const total = bp_cur.passage.blanks.length;
+  const pct = bp_cur.correct / total;
+  const area = document.getElementById('battle-area');
+
+  const wrongHTML = bp_cur.wrongList.length > 0
+    ? '<div class="divider"></div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text-xs);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">需要複習的空格</div>'
+      + bp_cur.wrongList.map(b =>
+          `<div class="wr-item"><div class="wr-lbl">空格 (${b.num})</div><div style="font-size:11px;color:var(--text-dim);">${b.explain}</div></div>`
+        ).join('') : '';
+
+  area.innerHTML = `
+    <div class="card">
+      <div class="card-top-line"></div>
+      <div class="done-big">${bp_cur.correct}/${total}</div>
+      <div class="done-lbl">${bp_cur.passage.year} 成績</div>
+      <div class="done-msg">${pct>=.85 ? '🏆 優秀！你已經能獨立完成學測整段題了！'
+        : pct>=.6 ? '🕵️ 不錯！針對答錯的空格，思考是哪個線索沒抓到。'
+        : '📖 繼續練習！每次看解析都問自己：這屬於哪個學習點？'}</div>
+      ${wrongHTML}
+      <div class="divider"></div>
+      <div class="formula-box">
+        <div class="fb-head">📌 四輪解題法複習</div>
+        <div style="font-size:12px;line-height:1.9;color:var(--text);">
+          ① <b style="color:var(--gold)">秒殺</b>：固定搭配、介系詞片語直接填<br>
+          ② <b style="color:var(--gold)">詞性</b>：to/be/a → 判斷詞性<br>
+          ③ <b style="color:var(--gold)">邏輯</b>：however/therefore → 找方向<br>
+          ④ <b style="color:var(--gold)">消去</b>：代入朗讀，選最順的
+        </div>
+      </div>
+      <br>
+      <button class="act-btn primary on" onclick="goHome()">← 返回地圖</button>
+      <button class="act-btn ghost on" onclick="startPassage(bp_cur.passage)">🔄 再練一次</button>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+buildHome();
 </script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  QUESTION DATA — 16 學習點 × 5 題
+//
+//  題型結構：
+//  Q1: demo   (phase:'demo')   — 自製簡單句，兩步驟：找線索→選答案
+//  Q2: guided (phase:'guided') — 真題句，選項附中文，答錯有引導
+//  Q3: solo   (phase:'solo')   — 自製，純英文，無提示
+//  Q4: solo   (phase:'solo')   — 真題，純英文
+//  Q5: solo   (phase:'solo')   — 真題，純英文，最高難度
+//
+//  欄位說明：
+//  phase  : 'demo' | 'guided' | 'solo'
+//  source : 'made' | 'real'
+//  sentence : 空格用 ___ 表示
+//  ctx    : 中文提示（demo/guided 才顯示）
+//  lesson : 教學框（只有 Q1 有）
+//  clueQ / clueOpts / clueKey / clueExplain : demo 第一步
+//  mainQ / mainOpts / ans / ansWord / explain : 選答案步驟
+//  guide  : 答錯後的引導 { q, opts:[{k,t}], key, explain }
+// ═══════════════════════════════════════════════════════
+
+const QUESTION_DATA = {
+
+// ──────────────────────────────────────────────────────
+// 1-1  名詞判定：冠詞、形容詞後
+// ──────────────────────────────────────────────────────
+'1-1': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 1-1 名詞放在冠詞或形容詞後',
+      body:'空格前有以下任何一個，幾乎可以確定要填<b>名詞</b>：<br><br>'+
+           '・<b>冠詞</b>：a / an / the<br>'+
+           '・<b>形容詞</b>：beautiful、common、important…<br>'+
+           '・<b>所有格</b>：my / her / its / the company\'s<br>'+
+           '・<b>指示代名詞</b>：this / that / these / those<br><br>'+
+           '注意：有時候冠詞和形容詞一起出現：<code>a common ___</code> → 名詞。<br>'+
+           '陷阱：選項可能有同字根的動詞和名詞，要看清楚。' },
+    sentence:'This beautiful ___ is very expensive.',
+    ctx:'這個漂亮的____非常昂貴。',
+    clueQ:'步驟一：找線索。空格前有哪些字？',
+    clueOpts:[{k:'A',t:'只有動詞 is'},{k:'B',t:'形容詞 beautiful + 指示詞 This'},{k:'C',t:'副詞 very'},{k:'D',t:'冠詞 a'}],
+    clueKey:'B', clueExplain:'<b>This beautiful ___</b> → 指示詞 + 形容詞 + 空格，需要填<b>名詞</b>。現在選答案：',
+    mainQ:'「This beautiful ___」需要名詞，哪個選項是名詞？',
+    mainOpts:[{k:'A',t:'ring（戒指）— 名詞 ✓'},{k:'B',t:'sing（唱歌）— 動詞'},{k:'C',t:'shiny（閃亮的）— 形容詞'},{k:'D',t:'brightly（明亮地）— 副詞'}],
+    ans:'A', ansWord:'ring',
+    explain:'🕵️ 正確！This beautiful + <b>名詞</b>，選 ring（戒指）。',
+    guide:{ q:'「This beautiful ___」空格前有指示詞和形容詞，後面需要什麼詞性？',
+      opts:[{k:'A',t:'動詞'},{k:'B',t:'名詞'},{k:'C',t:'形容詞'},{k:'D',t:'副詞'}],
+      key:'B', explain:'指示詞 + 形容詞 + 空格 = 需要名詞。' }
+  },
+  // Q2 guided (104年真題)
+  { phase:'guided', source:'real',
+    sentence:'This common ___ is a wonder of simplicity and function.',
+    ctx:'這個常見的____是簡單和功能的奇跡。（104年，答案是 device）',
+    mainQ:'「This common ___」需要名詞。根據句意（簡單和功能的奇跡），哪個最合適？',
+    mainOpts:[{k:'A',t:'device（裝置）— 名詞 ✓'},{k:'B',t:'common（普通的）— 形容詞，已有了'},{k:'C',t:'function（功能）— 已在句子裡'},{k:'D',t:'wonder（奇跡）— 已在句子裡'}],
+    ans:'A', ansWord:'device',
+    explain:'🕵️ 正確！This common <b>device</b>（這個常見的裝置）= 名詞位置，是描述「迴紋針」的句子（104年學測）。',
+    guide:{ q:'「This common ___」空格前有指示詞 this + 形容詞 common，空格需要什麼？',
+      opts:[{k:'A',t:'形容詞'},{k:'B',t:'名詞'},{k:'C',t:'動詞'},{k:'D',t:'副詞'}],
+      key:'B', explain:'this + 形容詞 → 名詞。答案是 device（裝置）。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The government announced an important ___ to fight climate change.',
+    mainQ:'What word fits "an important ___"?',
+    mainOpts:[{k:'A',t:'initiative'},{k:'B',t:'initiate'},{k:'C',t:'initiated'},{k:'D',t:'initiating'}],
+    ans:'A', ansWord:'initiative',
+    explain:'🕵️ "an important ___" → article + adjective → noun. "initiative"（倡議）is the noun form.',
+    guide:{ q:'「an important ___」中，冠詞 an + 形容詞 important 後面需要什麼？',
+      opts:[{k:'A',t:'名詞（initiative）'},{k:'B',t:'動詞（initiate）'},{k:'C',t:'過去式（initiated）'},{k:'D',t:'動名詞（initiating）'}],
+      key:'A', explain:'冠詞 + 形容詞 → 需要名詞，所以選 initiative。' }
+  },
+  // Q4 solo (真題改編，98年)
+  { phase:'solo', source:'real',
+    sentence:'The ___ and consistent will always beat slow and steady.',
+    mainQ:'Which word fits "The ___ and consistent"? (98年學測)',
+    mainOpts:[{k:'A',t:'fast'},{k:'B',t:'fastly'},{k:'C',t:'fasten'},{k:'D',t:'fastness'}],
+    ans:'A', ansWord:'fast',
+    explain:'🕵️ "The ___ and consistent" — "The" precedes a noun or adjective functioning as a noun. "fast"（快的）here parallels "consistent"（穩定的）as an adjective used as a noun phrase. (98年)',
+    guide:{ q:'「The ___ and consistent」— consistent 是形容詞，空格也需要相同詞性的什麼？',
+      opts:[{k:'A',t:'形容詞（fast）'},{k:'B',t:'副詞（fastly）'},{k:'C',t:'動詞（fasten）'},{k:'D',t:'名詞（fastness）'}],
+      key:'A', explain:'consistent 是形容詞，前面的空格也要填形容詞 fast，兩者並列。' }
+  },
+  // Q5 solo (真題，104年)
+  { phase:'solo', source:'real',
+    sentence:'The name most frequently associated with the paperclip ___ is Johan Vaaler.',
+    mainQ:'Which word fits "the paperclip ___"? (104年學測)',
+    mainOpts:[{k:'A',t:'invention'},{k:'B',t:'invent'},{k:'C',t:'inventive'},{k:'D',t:'invented'}],
+    ans:'A', ansWord:'invention',
+    explain:'🕵️ "the paperclip ___" → "the" + noun already established (paperclip) modifying the blank → noun needed. "invention"（發明）is correct. (104年)',
+    guide:{ q:'「the paperclip ___」— the 後面加一個名詞 paperclip，空格是第二個名詞位置，需要？',
+      opts:[{k:'A',t:'名詞（invention）'},{k:'B',t:'動詞（invent）'},{k:'C',t:'形容詞（inventive）'},{k:'D',t:'過去分詞（invented）'}],
+      key:'A', explain:'the + 名詞 paperclip + 空格（名詞）= 複合名詞 paperclip invention（迴紋針的發明）。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 1-2  動詞原形：助動詞、to 後
+// ──────────────────────────────────────────────────────
+'1-2': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 1-2 動詞原形放在助動詞或 to 後',
+      body:'空格前出現以下任何一個，後面必須接<b>動詞原形</b>（不加 -s / -ed / -ing）：<br><br>'+
+           '・<b>助動詞</b>：can、could、may、might、will、would、should、must<br>'+
+           '・<b>不定詞 to</b>：want to ___、decide to ___、need to ___<br>'+
+           '・<b>使役動詞</b>：make / let / have + 受詞 + ___（動詞原形）<br><br>'+
+           '陷阱：不要填 -ing 或 -ed 形式！<br>'+
+           '例：should <b>remain</b>（✓）　should <s>remaining</s>（✗）' },
+    sentence:'Students should ___ hard to achieve their goals.',
+    ctx:'學生應該努力____以達成目標。',
+    clueQ:'步驟一：空格前面那個字是什麼？',
+    clueOpts:[{k:'A',t:'介系詞 to'},{k:'B',t:'助動詞 should'},{k:'C',t:'形容詞 hard'},{k:'D',t:'連接詞 to'}],
+    clueKey:'B', clueExplain:'空格前是助動詞 <b>should</b>，後面必須接<b>動詞原形</b>。現在選答案：',
+    mainQ:'「should ___」後面需要動詞原形，哪個選項正確？',
+    mainOpts:[{k:'A',t:'study（動詞原形）✓'},{k:'B',t:'student（名詞）'},{k:'C',t:'studious（形容詞）'},{k:'D',t:'studying（動名詞）'}],
+    ans:'A', ansWord:'study',
+    explain:'🕵️ 正確！should + 動詞原形，選 study（讀書）。',
+    guide:{ q:'助動詞 should 後面接什麼形式的動詞？',
+      opts:[{k:'A',t:'動詞原形（study）'},{k:'B',t:'動名詞（studying）'},{k:'C',t:'過去式（studied）'},{k:'D',t:'名詞（student）'}],
+      key:'A', explain:'助動詞後面固定接動詞原形。' }
+  },
+  // Q2 guided (113年真題)
+  { phase:'guided', source:'real',
+    sentence:'Napping may significantly ___ age-related brain shrinkage in older adults.',
+    ctx:'打盹可能顯著地____老年人與年齡相關的大腦萎縮。（113年）',
+    mainQ:'「may significantly ___」— may 是助動詞，後面需要動詞原形。哪個選項正確？',
+    mainOpts:[{k:'A',t:'delay（延緩）— 動詞原形 ✓'},{k:'B',t:'delayed（延緩了）— 過去式'},{k:'C',t:'delaying（正在延緩）— 動名詞'},{k:'D',t:'delays（第三人稱單數）'}],
+    ans:'A', ansWord:'delay',
+    explain:'🕵️ 正確！may + 動詞原形，選 delay（延緩）。研究顯示打盹可能延緩大腦萎縮（113年學測）。',
+    guide:{ q:'「may ___」— may 是助動詞，後面接什麼？',
+      opts:[{k:'A',t:'動詞原形（delay）'},{k:'B',t:'過去式（delayed）'},{k:'C',t:'動名詞（delaying）'},{k:'D',t:'名詞'}],
+      key:'A', explain:'助動詞 may 後面固定接動詞原形 delay。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The company decided to ___ its headquarters to a larger city.',
+    mainQ:'Which word fits "decided to ___"?',
+    mainOpts:[{k:'A',t:'relocated'},{k:'B',t:'relocating'},{k:'C',t:'relocate'},{k:'D',t:'relocation'}],
+    ans:'C', ansWord:'relocate',
+    explain:'🕵️ "decided to ___" → to + verb base form. "relocate"（遷移）is the correct form.',
+    guide:{ q:'「decided to ___」— to 後面接什麼？',
+      opts:[{k:'A',t:'過去式（relocated）'},{k:'B',t:'動名詞（relocating）'},{k:'C',t:'動詞原形（relocate）'},{k:'D',t:'名詞（relocation）'}],
+      key:'C', explain:'to 後面接動詞原形，所以選 relocate。' }
+  },
+  // Q4 solo (真題 90年)
+  { phase:'solo', source:'real',
+    sentence:'I had always thought it was more securely ___ in place.',
+    mainQ:'Which word fits "more securely ___"? (90年學測)',
+    mainOpts:[{k:'A',t:'fix'},{k:'B',t:'fixing'},{k:'C',t:'fixed'},{k:'D',t:'fixes'}],
+    ans:'C', ansWord:'fixed',
+    explain:'🕵️ "securely ___" — here the blank follows an adverb (securely) modifying a past participle. "fixed"（固定的）completes "securely fixed in place". (90年)',
+    guide:{ q:'「securely ___」— securely 是副詞，修飾後面的過去分詞，這裡是 be + 副詞 + V-ed 的結構，空格填？',
+      opts:[{k:'A',t:'動詞原形（fix）'},{k:'B',t:'動名詞（fixing）'},{k:'C',t:'過去分詞（fixed）'},{k:'D',t:'第三人稱（fixes）'}],
+      key:'C', explain:'be + 副詞 + 過去分詞 = 被動語態，所以填 fixed。' }
+  },
+  // Q5 solo (真題 112年改編)
+  { phase:'solo', source:'real',
+    sentence:'Researchers suggest that people should ___ at least eight glasses of water daily.',
+    mainQ:'Which word fits "should ___"?',
+    mainOpts:[{k:'A',t:'drank'},{k:'B',t:'drinking'},{k:'C',t:'drink'},{k:'D',t:'drunk'}],
+    ans:'C', ansWord:'drink',
+    explain:'🕵️ "should ___" → modal verb + base form. "drink"（喝）is the verb base form.',
+    guide:{ q:'「should ___」— should 是助動詞，後面接什麼？',
+      opts:[{k:'A',t:'過去式（drank）'},{k:'B',t:'動名詞（drinking）'},{k:'C',t:'動詞原形（drink）'},{k:'D',t:'過去分詞（drunk）'}],
+      key:'C', explain:'助動詞 should 後面固定接動詞原形 drink。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 1-3  形容詞：系動詞、感官動詞後
+// ──────────────────────────────────────────────────────
+'1-3': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 1-3 形容詞接在系動詞、感官動詞後',
+      body:'這些動詞後面接<b>形容詞</b>，描述主詞的狀態（不是副詞！）：<br><br>'+
+           '・<b>系動詞</b>：be、become、get、remain、stay、turn<br>'+
+           '・<b>感官動詞</b>：feel、look、seem、appear、sound、taste、smell<br><br>'+
+           '例：She <b>feels</b> <u>confident</u>. ✓　　　She feels <s>confidently</s>. ✗<br><br>'+
+           '<b>陷阱：</b>-ly 結尾的副詞看起來很像「答案」，但系動詞後要填形容詞！<br>'+
+           '例：The soup <b>smells</b> good（✓）不是 smells <s>well</s>（副詞）' },
+    sentence:'After the long meeting, everyone felt very ___.',
+    ctx:'漫長的會議結束後，每個人都感到非常____。',
+    clueQ:'步驟一：「felt very ___」是什麼結構？',
+    clueOpts:[{k:'A',t:'felt 是動作動詞 → 後面填副詞'},{k:'B',t:'felt 是感官/系動詞 + very → 後面填形容詞'},{k:'C',t:'felt 後面填名詞'},{k:'D',t:'felt 後面填動詞原形'}],
+    clueKey:'B', clueExplain:'felt（感覺）是感官動詞，very 加強程度，後面填<b>形容詞</b>。現在選答案：',
+    mainQ:'「felt very ___」後面需要形容詞，哪個選項正確？',
+    mainOpts:[{k:'A',t:'tired（疲倦的）— 形容詞 ✓'},{k:'B',t:'tiredly（疲倦地）— 副詞'},{k:'C',t:'tire（輪胎/使疲倦）— 名詞或動詞'},{k:'D',t:'tiredness（疲倦）— 名詞'}],
+    ans:'A', ansWord:'tired',
+    explain:'🕵️ 正確！felt + 形容詞，選 tired（疲倦的）。漫長會議後大家很疲倦，邏輯也合理。',
+    guide:{ q:'feel / look / seem 後面接什麼詞性？',
+      opts:[{k:'A',t:'副詞（tiredly）'},{k:'B',t:'形容詞（tired）'},{k:'C',t:'名詞（tiredness）'},{k:'D',t:'動詞（tire）'}],
+      key:'B', explain:'感官動詞後接形容詞描述主詞狀態，所以選 tired。' }
+  },
+  // Q2 guided (100年真題)
+  { phase:'guided', source:'real',
+    sentence:'This substance, when inhaled, is ___ for some serious lung diseases.',
+    ctx:'這種物質吸入後，對某些嚴重的肺部疾病____。（100年）',
+    mainQ:'「is ___ for some serious lung diseases」— is 是系動詞，空格填形容詞。哪個最符合句意？',
+    mainOpts:[{k:'A',t:'responsible（造成…的）— 形容詞 ✓'},{k:'B',t:'responsibility（責任）— 名詞'},{k:'C',t:'responsibly（負責地）— 副詞'},{k:'D',t:'respond（回應）— 動詞'}],
+    ans:'A', ansWord:'responsible',
+    explain:'🕵️ 正確！be + 形容詞：<b>be responsible for</b>（是…的原因）。這是一個重要的搭配詞，後面我們在 2-1 還會練習！（100年學測）',
+    guide:{ q:'「is ___ for」— is 是系動詞，後面接什麼詞性？',
+      opts:[{k:'A',t:'名詞（responsibility）'},{k:'B',t:'形容詞（responsible）'},{k:'C',t:'副詞（responsibly）'},{k:'D',t:'動詞（respond）'}],
+      key:'B', explain:'系動詞 is 後接形容詞，所以選 responsible。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The new policy remains ___ despite strong opposition from the public.',
+    mainQ:'Which word fits "remains ___"?',
+    mainOpts:[{k:'A',t:'controversy'},{k:'B',t:'controversially'},{k:'C',t:'controversial'},{k:'D',t:'controversialize'}],
+    ans:'C', ansWord:'controversial',
+    explain:'🕵️ "remains ___" → linking verb → adjective. "controversial"（有爭議的）.',
+    guide:{ q:'remain（保持）是系動詞，後面接什麼詞性？',
+      opts:[{k:'A',t:'名詞（controversy）'},{k:'B',t:'副詞（controversially）'},{k:'C',t:'形容詞（controversial）'},{k:'D',t:'動詞'}],
+      key:'C', explain:'系動詞 remain 後接形容詞 controversial（有爭議的）。' }
+  },
+  // Q4 solo (真題 108年)
+  { phase:'solo', source:'real',
+    sentence:'My father\'s poor memory gave him certain advantages, though. He seemed ___ to many people.',
+    mainQ:'Which word fits "seemed ___"?',
+    mainOpts:[{k:'A',t:'trustworthily'},{k:'B',t:'trustworthy'},{k:'C',t:'trustworthiness'},{k:'D',t:'trust'}],
+    ans:'B', ansWord:'trustworthy',
+    explain:'🕵️ "seemed ___" → linking verb → adjective. "trustworthy"（值得信賴的）describes how the father appeared to people. (108年)',
+    guide:{ q:'seem（似乎）是感官動詞，後面接什麼詞性？',
+      opts:[{k:'A',t:'副詞（trustworthily）'},{k:'B',t:'形容詞（trustworthy）'},{k:'C',t:'名詞（trustworthiness）'},{k:'D',t:'動詞（trust）'}],
+      key:'B', explain:'感官動詞 seem 後接形容詞 trustworthy（值得信賴的）。' }
+  },
+  // Q5 solo (真題改編)
+  { phase:'solo', source:'real',
+    sentence:'The discovery of the new drug turned out to be ___ for millions of patients worldwide.',
+    mainQ:'Which word fits "turned out to be ___"?',
+    mainOpts:[{k:'A',t:'life-savingly'},{k:'B',t:'life-saving'},{k:'C',t:'life-saved'},{k:'D',t:'life-saver'}],
+    ans:'B', ansWord:'life-saving',
+    explain:'🕵️ "turned out to be ___" → "be" is a linking verb → adjective needed. "life-saving"（救命的）is the adjective.',
+    guide:{ q:'「turned out to be ___」中，be 是系動詞，後面接什麼詞性？',
+      opts:[{k:'A',t:'副詞（life-savingly）'},{k:'B',t:'形容詞（life-saving）'},{k:'C',t:'過去分詞（life-saved）'},{k:'D',t:'名詞（life-saver）'}],
+      key:'B', explain:'be 是系動詞，後接形容詞 life-saving（救命的）。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 1-4  副詞：修飾動詞或 V-ed
+// ──────────────────────────────────────────────────────
+'1-4': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 1-4 副詞修飾動詞或過去分詞',
+      body:'副詞（通常是 <b>-ly</b> 結尾）出現在兩個地方：<br><br>'+
+           '1. <b>be + ___ + V-ed</b>（被動語態中間）：<br>'+
+           '&nbsp;&nbsp;例：was <b>widely</b> used、is <b>commonly</b> known<br><br>'+
+           '2. <b>動詞 + ___</b>（動詞後面修飾動作）：<br>'+
+           '&nbsp;&nbsp;例：speaks <b>fluently</b>、reacted <b>quickly</b><br><br>'+
+           '陷阱：be + ___ + 形容詞 → 是系動詞後的形容詞（Unit 1-3）<br>'+
+           'be + ___ + V-ed → 是被動語態中間的<b>副詞</b>（本節重點）' },
+    sentence:'The door was ___ closed by the security guard.',
+    ctx:'門被保全____關上了。',
+    clueQ:'步驟一：「was ___ closed」是什麼結構？',
+    clueOpts:[{k:'A',t:'was + 形容詞 + 名詞 → 填形容詞'},{k:'B',t:'was + ___ + V-ed（被動語態）→ 空格填副詞'},{k:'C',t:'was + 動詞原形 → 填動詞'},{k:'D',t:'was + 名詞 → 填名詞'}],
+    clueKey:'B', clueExplain:'<b>was + ___ + closed（V-ed）</b> = 被動語態，空格在動詞前修飾，需要填<b>副詞</b>。現在選答案：',
+    mainQ:'「was ___ closed」需要副詞，哪個選項正確？',
+    mainOpts:[{k:'A',t:'tight（緊的）— 形容詞'},{k:'B',t:'tightly（緊緊地）— 副詞 ✓'},{k:'C',t:'tightness（緊繃）— 名詞'},{k:'D',t:'tighten（拉緊）— 動詞'}],
+    ans:'B', ansWord:'tightly',
+    explain:'🕵️ 正確！was ___ closed = 被動語態，空格填副詞 tightly（緊緊地）。',
+    guide:{ q:'「was ___ closed」— be + ___ + V-ed 結構，空格填什麼詞性？',
+      opts:[{k:'A',t:'形容詞（tight）'},{k:'B',t:'副詞（tightly）'},{k:'C',t:'名詞（tightness）'},{k:'D',t:'動詞（tighten）'}],
+      key:'B', explain:'被動語態 be + V-ed 中間填副詞，所以選 tightly。' }
+  },
+  // Q2 guided (90年真題)
+  { phase:'guided', source:'real',
+    sentence:'I had always thought it was more ___ fixed in place.',
+    ctx:'我一直以為它被更____地固定在原位。（90年）',
+    mainQ:'「was more ___ fixed」— 這是被動語態結構，空格修飾 fixed，需要副詞。哪個正確？',
+    mainOpts:[{k:'A',t:'secure（安全的）— 形容詞'},{k:'B',t:'securely（安全地）— 副詞 ✓'},{k:'C',t:'security（安全）— 名詞'},{k:'D',t:'secure（動詞）— 動詞'}],
+    ans:'B', ansWord:'securely',
+    explain:'🕵️ 正確！be + <b>securely</b>（副詞）+ fixed（V-ed）= 被動語態，副詞修飾過去分詞。（90年學測）',
+    guide:{ q:'「was more ___ fixed」— V-ed 前面的空格需要什麼詞性？',
+      opts:[{k:'A',t:'形容詞（secure）'},{k:'B',t:'副詞（securely）'},{k:'C',t:'名詞（security）'},{k:'D',t:'動詞（secure）'}],
+      key:'B', explain:'be + ___ + V-ed 中，空格填副詞修飾動詞，選 securely。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The new treatment is ___ regarded as a breakthrough in cancer research.',
+    mainQ:'Which word fits "is ___ regarded"?',
+    mainOpts:[{k:'A',t:'wide'},{k:'B',t:'widely'},{k:'C',t:'wideness'},{k:'D',t:'widen'}],
+    ans:'B', ansWord:'widely',
+    explain:'🕵️ "is ___ regarded" → be + ___ + V-ed (passive) → adverb needed. "widely"（廣泛地）.',
+    guide:{ q:'「is ___ regarded」— 被動語態 be + V-ed，中間空格需要什麼？',
+      opts:[{k:'A',t:'形容詞（wide）'},{k:'B',t:'副詞（widely）'},{k:'C',t:'名詞（wideness）'},{k:'D',t:'動詞（widen）'}],
+      key:'B', explain:'be + V-ed 中間填副詞，所以選 widely（廣泛地）。' }
+  },
+  // Q4 solo (真題 95年)
+  { phase:'solo', source:'real',
+    sentence:'Our relationships are ___ filled with unnecessary disagreements and conflicts.',
+    mainQ:'Which word fits "are ___ filled"? (95年學測)',
+    mainOpts:[{k:'A',t:'necessary'},{k:'B',t:'unnecessarily'},{k:'C',t:'unnecessary'},{k:'D',t:'unnecessariness'}],
+    ans:'B', ansWord:'unnecessarily',
+    explain:'🕵️ "are ___ filled" → be + ___ + V-ed (passive) → adverb. "unnecessarily"（不必要地）. (95年)',
+    guide:{ q:'「are ___ filled」— 被動語態，空格需要什麼詞性？',
+      opts:[{k:'A',t:'形容詞（unnecessary）'},{k:'B',t:'副詞（unnecessarily）'},{k:'C',t:'名詞'},{k:'D',t:'動詞'}],
+      key:'B', explain:'be + V-ed 中間填副詞，選 unnecessarily（不必要地）。' }
+  },
+  // Q5 solo (真題改編)
+  { phase:'solo', source:'real',
+    sentence:'This technology is ___ used in hospitals around the world.',
+    mainQ:'Which word fits "is ___ used"?',
+    mainOpts:[{k:'A',t:'common'},{k:'B',t:'commons'},{k:'C',t:'commonly'},{k:'D',t:'commonness'}],
+    ans:'C', ansWord:'commonly',
+    explain:'🕵️ "is ___ used" → be + ___ + V-ed → adverb. "commonly"（普遍地）.',
+    guide:{ q:'「is ___ used」的被動語態，空格需要副詞，哪個是副詞？',
+      opts:[{k:'A',t:'形容詞（common）'},{k:'B',t:'名詞（commons）'},{k:'C',t:'副詞（commonly）'},{k:'D',t:'名詞（commonness）'}],
+      key:'C', explain:'be + V-ed 中間填副詞 commonly（普遍地）。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 2-1  形容詞 + for 介系詞
+// ──────────────────────────────────────────────────────
+'2-1': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 2-1 形容詞 + for 搭配',
+      body:'介系詞是答題的超強線索！看到 <code>for</code>，<br>馬上聯想這些<b>形容詞 + for</b> 的固定搭配：<br><br>'+
+           '・<b>responsible for</b>（負責；導致）<br>'+
+           '・<b>noted / known / famous for</b>（以…著名）<br>'+
+           '・<b>sorry for</b>（為…道歉）<br>'+
+           '・<b>ready for</b>（為…準備好）<br>'+
+           '・<b>grateful for</b>（為…感謝）<br>'+
+           '・<b>eligible for</b>（有資格獲得）<br><br>'+
+           '做法：看到空格後面有 <code>for</code>，先想「哪個形容詞 + for」最符合句意。' },
+    sentence:'Who is ___ for cleaning the classroom today?',
+    ctx:'今天誰____打掃教室？',
+    clueQ:'步驟一：空格後面有什麼介系詞？',
+    clueOpts:[{k:'A',t:'介系詞 with'},{k:'B',t:'介系詞 for'},{k:'C',t:'介系詞 in'},{k:'D',t:'介系詞 to'}],
+    clueKey:'B', clueExplain:'空格後有介系詞 <b>for</b>，聯想「哪個形容詞 + for」搭配。現在選答案：',
+    mainQ:'「be ___ for cleaning」哪個形容詞與 for 搭配且符合句意？',
+    mainOpts:[{k:'A',t:'responsible（負責的）— be responsible for ✓'},{k:'B',t:'famous（著名的）— be famous for（但說掃地不合）'},{k:'C',t:'ready（準備好的）— be ready for（語意不合）'},{k:'D',t:'sorry（抱歉的）— be sorry for（語意不合）'}],
+    ans:'A', ansWord:'responsible',
+    explain:'🕵️ 正確！<b>be responsible for</b>（負責）是最符合「誰負責打掃」的句意。',
+    guide:{ q:'「be ___ for + 做某件事」，最常見的"負責"搭配是？',
+      opts:[{k:'A',t:'be responsible for'},{k:'B',t:'be famous for'},{k:'C',t:'be ready for'},{k:'D',t:'be sorry for'}],
+      key:'A', explain:'be responsible for = 負責（做某事），是最常見的考試搭配。' }
+  },
+  // Q2 guided (100年真題)
+  { phase:'guided', source:'real',
+    sentence:'This substance, when inhaled, is ___ for some serious lung diseases.',
+    ctx:'這種物質吸入後，是某些嚴重肺部疾病的原因。（100年）',
+    mainQ:'「is ___ for some serious lung diseases」— for 在後，哪個形容詞最符合「導致疾病」的句意？',
+    mainOpts:[{k:'A',t:'responsible（導致；造成）— be responsible for ✓'},{k:'B',t:'famous（著名的）— be famous for'},{k:'C',t:'sorry（抱歉的）— be sorry for'},{k:'D',t:'ready（準備好的）— be ready for'}],
+    ans:'A', ansWord:'responsible',
+    explain:'🕵️ 正確！<b>be responsible for</b> 在這裡意思是「導致（疾病）」，是 100 年學測的關鍵搭配。',
+    guide:{ q:'「is ___ for some lung diseases」— 哪個形容詞 + for 表示「導致某事」？',
+      opts:[{k:'A',t:'responsible for（導致）'},{k:'B',t:'famous for（以…著名）'},{k:'C',t:'sorry for（為…道歉）'},{k:'D',t:'ready for（準備好）'}],
+      key:'A', explain:'be responsible for = 是…的原因/導致，選 responsible。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The organization is widely ___ for its work in protecting endangered animals.',
+    mainQ:'Which word fits "is widely ___ for its work"?',
+    mainOpts:[{k:'A',t:'known'},{k:'B',t:'knowledge'},{k:'C',t:'knowing'},{k:'D',t:'knowledgeable'}],
+    ans:'A', ansWord:'known',
+    explain:'🕵️ "be ___ for" → adjective/past participle needed. "known for"（以…著名）is the fixed collocation.',
+    guide:{ q:'「be ___ for」— for 在後，哪個詞和 for 搭配表示「以…著名」？',
+      opts:[{k:'A',t:'known for（以…著名）'},{k:'B',t:'knowledge（名詞）'},{k:'C',t:'knowing（動名詞）'},{k:'D',t:'knowledgeable for（不常見）'}],
+      key:'A', explain:'be known for = 以…著名，是固定搭配。' }
+  },
+  // Q4 solo (真題 104年)
+  { phase:'solo', source:'real',
+    sentence:'Johan Vaaler was ___ for his invention of the paperclip in 1899.',
+    mainQ:'Which word fits "was ___ for his invention"? (104年)',
+    mainOpts:[{k:'A',t:'noted'},{k:'B',t:'note'},{k:'C',t:'noting'},{k:'D',t:'notably'}],
+    ans:'A', ansWord:'noted',
+    explain:'🕵️ "was ___ for" → be + adjective + for. "noted for"（以…著名）is the collocation. (104年)',
+    guide:{ q:'「was ___ for his invention」— for 在後，哪個形容詞/分詞和 for 搭配表示「以…著名」？',
+      opts:[{k:'A',t:'noted for（著名於）'},{k:'B',t:'note（動詞/名詞）'},{k:'C',t:'noting（動名詞）'},{k:'D',t:'notably（副詞）'}],
+      key:'A', explain:'noted for = 以…著名，和 known for、famous for 同義。' }
+  },
+  // Q5 solo (真題 98年改編)
+  { phase:'solo', source:'real',
+    sentence:'The slow and steady tortoise was ___ for never giving up.',
+    mainQ:'Which word fits "was ___ for never giving up"?',
+    mainOpts:[{k:'A',t:'admired'},{k:'B',t:'admire'},{k:'C',t:'admiring'},{k:'D',t:'admiration'}],
+    ans:'A', ansWord:'admired',
+    explain:'🕵️ "was ___ for" → be + past participle/adjective + for. "admired for"（因…而受到欽佩）.',
+    guide:{ q:'「was ___ for never giving up」— for 在後，哪個詞和 for 搭配表示「因…受欽佩」？',
+      opts:[{k:'A',t:'admired for（因…而受欽佩）'},{k:'B',t:'admire（動詞原形）'},{k:'C',t:'admiring（動名詞）'},{k:'D',t:'admiration（名詞）'}],
+      key:'A', explain:'be admired for = 因…而受到欽佩，是 be + V-ed + for 的搭配。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 2-2  動詞/分詞 + with
+// ──────────────────────────────────────────────────────
+'2-2': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 2-2 動詞/分詞 + with 搭配',
+      body:'看到 <code>with</code>，聯想這些固定搭配：<br><br>'+
+           '・<b>associated with</b>（與…相關）<br>'+
+           '・<b>comes with</b>（附帶；配備）<br>'+
+           '・<b>charged with</b>（被控以；充滿）<br>'+
+           '・<b>filled with</b>（充滿）<br>'+
+           '・<b>deal with</b>（處理）<br>'+
+           '・<b>compared with</b>（與…相比）<br><br>'+
+           '注意：<code>associated with</code> 是學測超高頻搭配，幾乎每幾年出現一次！' },
+    sentence:'The new laptop ___ with a one-year warranty.',
+    ctx:'這台新筆電____一年保固。',
+    clueQ:'步驟一：空格後面有哪個介系詞？',
+    clueOpts:[{k:'A',t:'介系詞 for'},{k:'B',t:'介系詞 with'},{k:'C',t:'介系詞 in'},{k:'D',t:'介系詞 to'}],
+    clueKey:'B', clueExplain:'空格後有 <b>with</b>，聯想「哪個動詞/分詞 + with」。現在選答案：',
+    mainQ:'「___ with a one-year warranty（保固）」哪個動詞最合句意？',
+    mainOpts:[{k:'A',t:'comes（附帶）— comes with ✓'},{k:'B',t:'associated（相關）— 通常用被動 is associated with'},{k:'C',t:'filled（充滿）— 通常是 be filled with'},{k:'D',t:'charged（被控）— 語意不符'}],
+    ans:'A', ansWord:'comes',
+    explain:'🕵️ 正確！<b>comes with</b>（附帶；配備）是日常英文常用搭配，例如「The phone comes with free earbuds.」',
+    guide:{ q:'「___ with a one-year warranty」— 哪個動詞 + with 表示「附帶保固」？',
+      opts:[{k:'A',t:'comes with（附帶）'},{k:'B',t:'associated with（相關）'},{k:'C',t:'filled with（充滿）'},{k:'D',t:'charged with（被控）'}],
+      key:'A', explain:'comes with = 附帶；配備，是最符合「產品附保固」的搭配。' }
+  },
+  // Q2 guided (104年真題)
+  { phase:'guided', source:'real',
+    sentence:'The name most frequently ___ with the paperclip invention is Johan Vaaler.',
+    ctx:'最常與迴紋針發明____在一起的名字是 Johan Vaaler。（104年）',
+    mainQ:'「most frequently ___ with the paperclip」哪個分詞最符合「與…相連/相關」的意思？',
+    mainOpts:[{k:'A',t:'associated（相關的）— be associated with ✓'},{k:'B',t:'comes（附帶）— 通常不用被動'},{k:'C',t:'filled（充滿）— be filled with，語意不符'},{k:'D',t:'compared（比較）— be compared with，語意不符'}],
+    ans:'A', ansWord:'associated',
+    explain:'🕵️ 正確！<b>be associated with</b>（與…相關/連結）是 104 年學測的關鍵搭配。',
+    guide:{ q:'「___ with the paperclip invention」— 哪個分詞 + with 表示「與…相關聯」？',
+      opts:[{k:'A',t:'associated with（相關聯）'},{k:'B',t:'comes with（附帶）'},{k:'C',t:'filled with（充滿）'},{k:'D',t:'charged with（被控/充滿）'}],
+      key:'A', explain:'be associated with = 與…相關，是學測最常考的 with 搭配之一。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The researchers found that stress is closely ___ with a higher risk of heart disease.',
+    mainQ:'Which word fits "is closely ___ with"?',
+    mainOpts:[{k:'A',t:'associates'},{k:'B',t:'association'},{k:'C',t:'associated'},{k:'D',t:'associating'}],
+    ans:'C', ansWord:'associated',
+    explain:'🕵️ "is closely ___ with" → be + past participle + with. "associated with"（與…相關）.',
+    guide:{ q:'「is closely ___ with」— be + ___ + with，空格填什麼形式？',
+      opts:[{k:'A',t:'第三人稱（associates）'},{k:'B',t:'名詞（association）'},{k:'C',t:'過去分詞（associated）'},{k:'D',t:'動名詞（associating）'}],
+      key:'C', explain:'be + 過去分詞 + with = 被動搭配，選 associated。' }
+  },
+  // Q4 solo (真題改編)
+  { phase:'solo', source:'real',
+    sentence:'The risks ___ with extreme sports should not be underestimated.',
+    mainQ:'Which word fits "The risks ___ with extreme sports"?',
+    mainOpts:[{k:'A',t:'associate'},{k:'B',t:'associating'},{k:'C',t:'associated'},{k:'D',t:'association'}],
+    ans:'C', ansWord:'associated',
+    explain:'🕵️ "The risks ___ with" → the noun "risks" is modified by a past participle phrase. "associated with"（與…相關的）.',
+    guide:{ q:'「The risks ___ with extreme sports」— risks 是名詞，後面跟著一個修飾詞組，空格填什麼？',
+      opts:[{k:'A',t:'動詞原形（associate）'},{k:'B',t:'動名詞（associating）'},{k:'C',t:'過去分詞（associated）'},{k:'D',t:'名詞（association）'}],
+      key:'C', explain:'名詞後跟過去分詞片語 associated with 作後置修飾，就像「the risk associated with…」（與…相關的風險）。' }
+  },
+  // Q5 solo (真題改編)
+  { phase:'solo', source:'real',
+    sentence:'Her bag was ___ with books, notebooks, and stationery.',
+    mainQ:'Which word fits "was ___ with books"?',
+    mainOpts:[{k:'A',t:'filling'},{k:'B',t:'fill'},{k:'C',t:'filled'},{k:'D',t:'fills'}],
+    ans:'C', ansWord:'filled',
+    explain:'🕵️ "was ___ with" → be + past participle + with. "filled with"（充滿）.',
+    guide:{ q:'「was ___ with books」— be + ___ + with，空格填什麼形式？',
+      opts:[{k:'A',t:'動名詞（filling）'},{k:'B',t:'動詞原形（fill）'},{k:'C',t:'過去分詞（filled）'},{k:'D',t:'第三人稱（fills）'}],
+      key:'C', explain:'be + 過去分詞 = 被動語態，filled with = 充滿，選 filled。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 2-3  三字片語完整性
+// ──────────────────────────────────────────────────────
+'2-3': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 2-3 三字片語要整組記',
+      body:'學測常考「三個字組成的固定片語」，缺一個字意思就不對：<br><br>'+
+           '・<b>regardless of</b>（不管；無論）<br>'+
+           '・<b>instead of</b>（代替；而不是）<br>'+
+           '・<b>in spite of</b>（儘管）= despite<br>'+
+           '・<b>as well as</b>（以及；還有）<br>'+
+           '・<b>due to</b>（由於）<br>'+
+           '・<b>according to</b>（根據）<br>'+
+           '・<b>as a result of</b>（由於…的結果）<br><br>'+
+           '做法：看到空格前後已有兩個字，想想它們組成哪個三字片語。' },
+    sentence:'___ playing video games all day, he chose to study.',
+    ctx:'____整天打電動，他選擇去讀書。',
+    clueQ:'步驟一：「___ playing video games」後面是「he chose to study」，這兩部分是什麼關係？',
+    clueOpts:[{k:'A',t:'因果：因為打電動，所以讀書'},{k:'B',t:'對比：不打電動，而是讀書'},{k:'C',t:'補充：打電動而且讀書'},{k:'D',t:'時間：打電動之後讀書'}],
+    clueKey:'B', clueExplain:'「不做 A（打電動），而是做 B（讀書）」→ 這是<b>替代/對比</b>的關係，應用「instead of」。現在選答案：',
+    mainQ:'「___ playing video games, he chose to study」哪個三字片語最符合？',
+    mainOpts:[{k:'A',t:'Instead of（而不是）— 不打電動，而是讀書 ✓'},{k:'B',t:'Regardless of（不管）— 語意不符'},{k:'C',t:'As well as（還有）— 語意相反'},{k:'D',t:'Due to（由於）— 語意不符'}],
+    ans:'A', ansWord:'Instead of',
+    explain:'🕵️ 正確！<b>instead of + V-ing</b>（而不是做…）→「不打電動，而是讀書」。',
+    guide:{ q:'「不做 A（打電動），而做 B（讀書）」的三字片語是？',
+      opts:[{k:'A',t:'Instead of（而不是）'},{k:'B',t:'Regardless of（不管）'},{k:'C',t:'As well as（還有）'},{k:'D',t:'Due to（由於）'}],
+      key:'A', explain:'instead of = 而不是；代替，後面接 V-ing。' }
+  },
+  // Q2 guided (94年真題)
+  { phase:'guided', source:'real',
+    sentence:'___ taking time to understand and respect each other, we become demanding.',
+    ctx:'____花時間互相理解和尊重，我們變得太苛求。（94年）',
+    mainQ:'「___ taking time to understand each other, we become demanding」— 不理解對方，反而苛求，選哪個片語？',
+    mainOpts:[{k:'A',t:'Instead of（而不是）— 不花時間，而是苛求 ✓'},{k:'B',t:'Regardless of（不管）— 語意不符'},{k:'C',t:'In addition to（除了）— 語意相反'},{k:'D',t:'As a result of（由於）— 語意不符'}],
+    ans:'A', ansWord:'Instead of',
+    explain:'🕵️ 正確！<b>Instead of</b>（而不是）：「不花時間理解對方，反而變得苛求」。（94年學測）',
+    guide:{ q:'「不做 A（理解對方），反而做 B（苛求）」應選哪個片語？',
+      opts:[{k:'A',t:'Instead of（而不是）'},{k:'B',t:'Regardless of（不管）'},{k:'C',t:'In addition to（除了）'},{k:'D',t:'As a result of（由於）'}],
+      key:'A', explain:'instead of = 而不是，表示選擇 B 而不選 A。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'___ the bad weather, the outdoor event was held as scheduled.',
+    mainQ:'Which phrase fits the blank?',
+    mainOpts:[{k:'A',t:'In spite of'},{k:'B',t:'As a result of'},{k:'C',t:'Due to'},{k:'D',t:'According to'}],
+    ans:'A', ansWord:'In spite of',
+    explain:'🕵️ "In spite of the bad weather... was held as scheduled" → contrast: bad weather (negative) but event happened (positive). "In spite of"（儘管）= despite.',
+    guide:{ q:'「___ the bad weather, the event was held」— 天氣不好但活動照常，這是什麼邏輯？',
+      opts:[{k:'A',t:'對比/讓步（in spite of 儘管）'},{k:'B',t:'因果（as a result of 由於）'},{k:'C',t:'原因（due to 由於）'},{k:'D',t:'依據（according to 根據）'}],
+      key:'A', explain:'天氣不好但活動照常 = 對比/讓步，用 in spite of（儘管）。' }
+  },
+  // Q4 solo (真題改編 95年)
+  { phase:'solo', source:'real',
+    sentence:'___ what they say, actions speak louder than words.',
+    mainQ:'Which phrase fits? (改編)',
+    mainOpts:[{k:'A',t:'Regardless of'},{k:'B',t:'Instead of'},{k:'C',t:'As well as'},{k:'D',t:'Due to'}],
+    ans:'A', ansWord:'Regardless of',
+    explain:'🕵️ "Regardless of what they say" → "regardless of"（不管；無論）= no matter what.',
+    guide:{ q:'「___ what they say（不管他們說什麼）」哪個片語表示「不管」？',
+      opts:[{k:'A',t:'Regardless of（不管）'},{k:'B',t:'Instead of（而不是）'},{k:'C',t:'As well as（還有）'},{k:'D',t:'Due to（由於）'}],
+      key:'A', explain:'regardless of = 不管；無論，後面接名詞或 wh- 子句。' }
+  },
+  // Q5 solo (真題改編 112年)
+  { phase:'solo', source:'real',
+    sentence:'___ climate change, many coastal cities face the threat of rising sea levels.',
+    mainQ:'Which phrase best fits?',
+    mainOpts:[{k:'A',t:'Instead of'},{k:'B',t:'Due to'},{k:'C',t:'Regardless of'},{k:'D',t:'In spite of'}],
+    ans:'B', ansWord:'Due to',
+    explain:'🕵️ "Due to climate change, cities face threats" → cause and effect. "Due to"（由於）= because of.',
+    guide:{ q:'「___ climate change, cities face threats」— 氣候變遷是原因，城市面臨威脅是結果，用哪個片語？',
+      opts:[{k:'A',t:'對比（instead of）'},{k:'B',t:'原因（due to 由於）'},{k:'C',t:'不管（regardless of）'},{k:'D',t:'讓步（in spite of 儘管）'}],
+      key:'B', explain:'due to = 由於，表示原因，後面接名詞（climate change）。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 2-4  名詞 + 介系詞固定結合
+// ──────────────────────────────────────────────────────
+'2-4': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 2-4 名詞 + 固定介系詞',
+      body:'有些名詞後面固定跟著特定介系詞，這也是答題線索：<br><br>'+
+           '・<b>risk of</b>（…的風險）<br>'+
+           '・<b>solution to</b>（…的解決方法）<br>'+
+           '・<b>cause of</b>（…的原因）<br>'+
+           '・<b>result in</b>（導致…）動詞<br>'+
+           '・<b>contribute to</b>（貢獻；導致）動詞<br>'+
+           '・<b>key to</b>（…的關鍵）<br>'+
+           '・<b>effect on</b>（對…的影響）<br><br>'+
+           '做法：看到空格前後各有一個名詞，想想「名詞 + 介系詞 + 名詞」的固定組合。' },
+    sentence:'Scientists are trying to find a ___ to the problem of plastic pollution.',
+    ctx:'科學家們試圖找到解決塑膠污染問題的____。',
+    clueQ:'步驟一：「a ___ to the problem」— 空格後面有什麼介系詞？',
+    clueOpts:[{k:'A',t:'介系詞 for'},{k:'B',t:'介系詞 to'},{k:'C',t:'介系詞 with'},{k:'D',t:'介系詞 of'}],
+    clueKey:'B', clueExplain:'空格後有介系詞 <b>to</b>，聯想「名詞 + to」的固定搭配。現在選答案：',
+    mainQ:'「a ___ to the problem」哪個名詞 + to 搭配表示「解決方法」？',
+    mainOpts:[{k:'A',t:'solution（解決方法）— solution to ✓'},{k:'B',t:'risk（風險）— risk of（後面應該是 of）'},{k:'C',t:'key（關鍵）— key to（也可以，但 solution 更直接）'},{k:'D',t:'cause（原因）— cause of（後面是 of）'}],
+    ans:'A', ansWord:'solution',
+    explain:'🕵️ 正確！<b>solution to</b>（解決…的方法）是固定搭配，a solution to the problem = 問題的解決方法。',
+    guide:{ q:'「a ___ to the problem（問題的____）」哪個名詞 + to 表示「解決方法」？',
+      opts:[{k:'A',t:'solution to（解決方法）'},{k:'B',t:'risk of（風險）'},{k:'C',t:'cause of（原因）'},{k:'D',t:'effect on（影響）'}],
+      key:'A', explain:'solution to = 解決…的方法，是 to 的固定搭配名詞。' }
+  },
+  // Q2 guided (真題改編)
+  { phase:'guided', source:'real',
+    sentence:'Smoking is one of the leading ___ of lung cancer worldwide.',
+    ctx:'吸菸是全球肺癌的主要____之一。',
+    mainQ:'「one of the leading ___ of lung cancer」— of 在後，哪個名詞 + of 最符合句意？',
+    mainOpts:[{k:'A',t:'causes（原因）— cause of ✓'},{k:'B',t:'solutions（解決方法）— solution to（應是 to）'},{k:'C',t:'risks（風險）— 也可以，但 cause 更精準'},{k:'D',t:'effects（影響）— effect on（應是 on）'}],
+    ans:'A', ansWord:'causes',
+    explain:'🕵️ 正確！<b>cause of</b>（…的原因）：smoking is a cause of lung cancer（吸菸是肺癌的原因）。',
+    guide:{ q:'「the leading ___ of lung cancer」— 空格後有 of，哪個名詞 + of 表示「原因」？',
+      opts:[{k:'A',t:'cause of（原因）'},{k:'B',t:'solution to（解決方法，搭配 to）'},{k:'C',t:'key to（關鍵，搭配 to）'},{k:'D',t:'effect on（影響，搭配 on）'}],
+      key:'A', explain:'cause of = …的原因，後面接 of，選 causes。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'Regular exercise has a significant ___ on both physical and mental health.',
+    mainQ:'Which word fits "a significant ___ on"?',
+    mainOpts:[{k:'A',t:'affect'},{k:'B',t:'effect'},{k:'C',t:'effective'},{k:'D',t:'effectively'}],
+    ans:'B', ansWord:'effect',
+    explain:'🕵️ "a significant ___ on" → "effect on"（對…的影響）. Note: "affect" is a verb; "effect" is the noun.',
+    guide:{ q:'「a significant ___ on health」— a + ___ + on，空格需要名詞，哪個是名詞？',
+      opts:[{k:'A',t:'affect（動詞）'},{k:'B',t:'effect（名詞）'},{k:'C',t:'effective（形容詞）'},{k:'D',t:'effectively（副詞）'}],
+      key:'B', explain:'effect（名詞）+ on = 對…的影響。affect 是動詞，不是名詞。' }
+  },
+  // Q4 solo (真題改編)
+  { phase:'solo', source:'real',
+    sentence:'Lack of sleep can ___ in poor concentration and decreased productivity.',
+    mainQ:'Which word fits "can ___ in poor concentration"?',
+    mainOpts:[{k:'A',t:'result'},{k:'B',t:'cause'},{k:'C',t:'lead'},{k:'D',t:'contribute'}],
+    ans:'A', ansWord:'result',
+    explain:'🕵️ "result in"（導致）is the fixed verb-preposition collocation with "in". "lead to" also works but requires "to" not "in".',
+    guide:{ q:'「can ___ in poor concentration」— 空格後面是介系詞 in，哪個動詞 + in 表示「導致」？',
+      opts:[{k:'A',t:'result in（導致）✓'},{k:'B',t:'cause（通常不加 in）'},{k:'C',t:'lead（搭配 to，不是 in）'},{k:'D',t:'contribute（通常搭配 to）'}],
+      key:'A', explain:'result in = 導致，固定搭配介系詞 in。' }
+  },
+  // Q5 solo (真題 112年改編)
+  { phase:'solo', source:'real',
+    sentence:'The research found that drinking sufficient water is the ___ to maintaining good health.',
+    mainQ:'Which word fits "is the ___ to maintaining good health"?',
+    mainOpts:[{k:'A',t:'solution'},{k:'B',t:'key'},{k:'C',t:'cause'},{k:'D',t:'risk'}],
+    ans:'B', ansWord:'key',
+    explain:'🕵️ "the ___ to" + gerund → "key to"（…的關鍵）is the most natural collocation here: "the key to maintaining good health".',
+    guide:{ q:'「the ___ to maintaining good health」— to 在後，哪個名詞 + to 表示「關鍵」？',
+      opts:[{k:'A',t:'solution to（解決方法）'},{k:'B',t:'key to（關鍵）'},{k:'C',t:'cause of（原因，搭配 of）'},{k:'D',t:'risk of（風險，搭配 of）'}],
+      key:'B', explain:'key to = …的關鍵，固定搭配介系詞 to。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 3-1  因果連結詞
+// ──────────────────────────────────────────────────────
+'3-1': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 3-1 因果連結詞',
+      body:'看到這些詞，代表前後有<b>因果邏輯</b>：<br><br>'+
+           '<b>前因後果（因此…）：</b><br>'+
+           '・<b>Consequently / As a result / Therefore / Thus / Hence</b><br>'+
+           '&nbsp;&nbsp;→ 前半是原因，後半是結果<br><br>'+
+           '<b>表達原因（因為…）：</b><br>'+
+           '・<b>because / since / as / due to / owing to</b><br>'+
+           '&nbsp;&nbsp;→ 後半說明原因<br><br>'+
+           '<b>導致（lead to / result in / cause）：</b><br>'+
+           '&nbsp;&nbsp;→ 直接說明因果鏈<br><br>'+
+           '做法：找到因果詞，確認哪邊是「因」哪邊是「果」，選符合邏輯方向的答案。' },
+    sentence:'She practiced every day. ___, her piano skills improved greatly.',
+    ctx:'她每天練習。____，她的鋼琴技巧大為進步。',
+    clueQ:'步驟一：第二句開頭的空格，和第一句（每天練習）是什麼邏輯？',
+    clueOpts:[{k:'A',t:'轉折：雖然每天練習，但技巧沒進步'},{k:'B',t:'因果：每天練習（因）→ 技巧進步（果）'},{k:'C',t:'補充：不只練習，還做了別的事'},{k:'D',t:'沒有特別邏輯，只是順序'}],
+    clueKey:'B', clueExplain:'每天練習（原因）→ 技巧進步（結果），這是<b>因果</b>邏輯，空格應填因果連結詞。現在選答案：',
+    mainQ:'哪個因果連結詞最適合放在這裡？',
+    mainOpts:[{k:'A',t:'Consequently（因此）✓'},{k:'B',t:'However（然而）— 轉折詞，不是因果'},{k:'C',t:'Furthermore（此外）— 補充，不是因果'},{k:'D',t:'Instead（代替）— 替代，不是因果'}],
+    ans:'A', ansWord:'Consequently',
+    explain:'🕵️ 正確！<b>Consequently</b>（因此）連結前因（每天練習）和後果（技巧進步）。',
+    guide:{ q:'「每天練習（因）→ ___，技巧進步（果）」應填哪類連結詞？',
+      opts:[{k:'A',t:'因果詞（consequently, therefore）'},{k:'B',t:'轉折詞（however, but）'},{k:'C',t:'補充詞（furthermore, also）'},{k:'D',t:'替代詞（instead, rather）'}],
+      key:'A', explain:'前因後果 = 因果詞，選 consequently（因此）。' }
+  },
+  // Q2 guided (95年真題)
+  { phase:'guided', source:'real',
+    sentence:'___, our relationships are filled with unnecessary disagreements and conflicts.',
+    ctx:'____，我們的關係充滿了不必要的爭執和衝突。（95年）',
+    mainQ:'「___，our relationships are filled with... disagreements」— 前文說人們不願意理解對方，這句話是結果，應填哪個連結詞？',
+    mainOpts:[{k:'A',t:'Consequently（因此）— 前因導致後果 ✓'},{k:'B',t:'Nevertheless（儘管如此）— 轉折'},{k:'C',t:'Furthermore（此外）— 補充'},{k:'D',t:'Instead（代替）— 替代'}],
+    ans:'A', ansWord:'Consequently',
+    explain:'🕵️ 正確！前文描述人們不互相理解的原因，<b>Consequently</b>（因此）引出結果：關係充滿爭執。（95年學測）',
+    guide:{ q:'前文是原因，這句話是結果，應填哪類連結詞？',
+      opts:[{k:'A',t:'因果（Consequently）'},{k:'B',t:'轉折（Nevertheless）'},{k:'C',t:'補充（Furthermore）'},{k:'D',t:'替代（Instead）'}],
+      key:'A', explain:'前因後果 = Consequently（因此）。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The company lost a major contract; ___, it had to lay off 200 workers.',
+    mainQ:'Which word fits the blank?',
+    mainOpts:[{k:'A',t:'therefore'},{k:'B',t:'however'},{k:'C',t:'moreover'},{k:'D',t:'instead'}],
+    ans:'A', ansWord:'therefore',
+    explain:'🕵️ "Lost a major contract (cause) → ___, laid off workers (effect)." Therefore（因此）connects cause and effect.',
+    guide:{ q:'「失去合約（因）→ ___，裁員（果）」應填哪類連結詞？',
+      opts:[{k:'A',t:'因果（therefore 因此）'},{k:'B',t:'轉折（however 然而）'},{k:'C',t:'補充（moreover 此外）'},{k:'D',t:'替代（instead 代替）'}],
+      key:'A', explain:'前因後果 = 因果詞，選 therefore（因此）。' }
+  },
+  // Q4 solo (真題改編 108年)
+  { phase:'solo', source:'real',
+    sentence:'My father often forgot his shopping list; ___, he would return home with the wrong items.',
+    mainQ:'Which word fits? (改編自 108年語境)',
+    mainOpts:[{k:'A',t:'as a result'},{k:'B',t:'in contrast'},{k:'C',t:'on the other hand'},{k:'D',t:'nevertheless'}],
+    ans:'A', ansWord:'as a result',
+    explain:'🕵️ "forgot the list (cause) → ___, returned with wrong items (effect)." "As a result"（因此）.',
+    guide:{ q:'「忘了清單（因）→ ___，買錯東西（果）」應填哪類連結詞？',
+      opts:[{k:'A',t:'因果（as a result）'},{k:'B',t:'對比（in contrast）'},{k:'C',t:'另一方面（on the other hand）'},{k:'D',t:'轉折（nevertheless）'}],
+      key:'A', explain:'忘了清單導致買錯，前因後果 = as a result（因此）。' }
+  },
+  // Q5 solo (真題 112年改編)
+  { phase:'solo', source:'real',
+    sentence:'Drinking more water can improve concentration and energy levels; ___, it helps maintain a healthy weight.',
+    mainQ:'Which word fits? (112年語境改編)',
+    mainOpts:[{k:'A',t:'however'},{k:'B',t:'in addition'},{k:'C',t:'as a result'},{k:'D',t:'instead'}],
+    ans:'C', ansWord:'as a result',
+    explain:'🕵️ "Drinking water improves concentration (cause) → ___, helps maintain weight (effect)." "As a result"（因此）shows the causal relationship.',
+    guide:{ q:'「喝水改善專注力（因）→ ___，維持體重（果）」應填哪類連結詞？',
+      opts:[{k:'A',t:'轉折（however）'},{k:'B',t:'補充（in addition）'},{k:'C',t:'因果（as a result）'},{k:'D',t:'替代（instead）'}],
+      key:'C', explain:'前因後果 = as a result（因此）。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 3-2  對比與轉折連結詞
+// ──────────────────────────────────────────────────────
+'3-2': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 3-2 對比與轉折連結詞',
+      body:'看到這些詞，代表前後<b>意思相反或出乎意料</b>：<br><br>'+
+           '・<b>However / Nevertheless / Nonetheless</b>（然而）— 句首或句中<br>'+
+           '・<b>although / though / even though</b>（雖然）— 連接子句<br>'+
+           '・<b>despite / in spite of</b>（儘管）— 後接名詞或動名詞<br>'+
+           '・<b>while / whereas</b>（雖然；相比之下）— 對照兩件事<br>'+
+           '・<b>Instead</b>（反而；代替）— 做 B 而不是 A<br><br>'+
+           '<b>做法：看到轉折詞 → 找「相反」的方向</b><br>'+
+           '前半正面 → 後半（空格）填負面<br>'+
+           '前半負面 → 後半（空格）填正面' },
+    sentence:'Although it was raining heavily, the children were ___ to play outside.',
+    ctx:'雖然下著大雨，孩子們仍然____想到外面玩。',
+    clueQ:'步驟一：「Although it was raining heavily」預告什麼邏輯？',
+    clueOpts:[{k:'A',t:'因果：因為下雨，所以孩子想出去'},{k:'B',t:'轉折：下雨是障礙，但孩子們仍然____'},{k:'C',t:'補充：不只下雨，還有其他情況'},{k:'D',t:'沒有特別邏輯'}],
+    clueKey:'B', clueExplain:'although = 雖然，帶出轉折。下雨是<b>負面障礙</b>，後半應填<b>正面情緒</b>（仍然想出去）。現在選答案：',
+    mainQ:'「Although 下大雨（負面）... 孩子們仍然____想出去」空格填正面情緒：',
+    mainOpts:[{k:'A',t:'eager（迫不及待）— 正面 ✓'},{k:'B',t:'afraid（害怕）— 負面，方向反了'},{k:'C',t:'bored（無聊）— 無法呼應「想出去」'},{k:'D',t:'tired（疲倦）— 和「想出去玩」矛盾'}],
+    ans:'A', ansWord:'eager',
+    explain:'🕵️ 正確！although 轉折：大雨（障礙）→ 仍然 <b>eager</b>（迫不及待）想出去。',
+    guide:{ q:'although 轉折：前半負面（下雨），後半空格應填正面還是負面？',
+      opts:[{k:'A',t:'正面（eager 迫不及待）'},{k:'B',t:'負面（afraid, bored, tired）'},{k:'C',t:'中性'},{k:'D',t:'和前半相同方向'}],
+      key:'A', explain:'although 轉折 = 前後相反，前半負面 → 後半填正面詞 eager。' }
+  },
+  // Q2 guided (真題改編)
+  { phase:'guided', source:'real',
+    sentence:'Despite having a limited budget, they created an ___ film.',
+    ctx:'儘管預算有限，他們製作了一部____的電影。',
+    mainQ:'「Despite 預算有限（負面），they created an ___ film」— despite 轉折，電影應是正面的，哪個形容詞最符合？',
+    mainOpts:[{k:'A',t:'impressive（令人印象深刻的）— 正面 ✓'},{k:'B',t:'disappointing（令人失望的）— 負面，和 despite 後應是正面矛盾'},{k:'C',t:'expensive（昂貴的）— 描述預算不符'},{k:'D',t:'ordinary（普通的）— 弱，無法呼應 despite 的對比'}],
+    ans:'A', ansWord:'impressive',
+    explain:'🕵️ 正確！despite 轉折：預算有限（負面限制）→ 仍然製作了 <b>impressive</b>（令人印象深刻的）電影（正面結果）。',
+    guide:{ q:'despite 轉折：前半「預算有限（負面）」，後半電影是____的，方向是？',
+      opts:[{k:'A',t:'正面（impressive）'},{k:'B',t:'負面（disappointing）'},{k:'C',t:'中性'},{k:'D',t:'和預算有關的詞'}],
+      key:'A', explain:'despite 轉折 = 前後相反，預算有限（負）→ 電影 impressive（正）。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The report was long and complex; however, the main conclusion was surprisingly ___.',
+    mainQ:'Which word fits? (however signals contrast)',
+    mainOpts:[{k:'A',t:'confusing'},{k:'B',t:'clear'},{k:'C',t:'lengthy'},{k:'D',t:'difficult'}],
+    ans:'B', ansWord:'clear',
+    explain:'🕵️ "however" contrast: report was complex (negative) → conclusion was surprisingly clear（清楚的）(positive).',
+    guide:{ q:'however 轉折：報告很複雜（負面）→ 結論是____的，方向是？',
+      opts:[{k:'A',t:'負面（confusing, difficult）'},{k:'B',t:'正面（clear, simple）'},{k:'C',t:'中性'},{k:'D',t:'和報告相同方向'}],
+      key:'B', explain:'however 轉折 → 前負後正，報告複雜（負）→ 結論 clear（清楚，正）。' }
+  },
+  // Q4 solo (真題改編 94年)
+  { phase:'solo', source:'real',
+    sentence:'Instead of taking time to understand each other, people often become too ___ in their demands.',
+    mainQ:'Which word fits "become too ___ in their demands"? (94年語境)',
+    mainOpts:[{k:'A',t:'patient'},{k:'B',t:'understanding'},{k:'C',t:'demanding'},{k:'D',t:'flexible'}],
+    ans:'C', ansWord:'demanding',
+    explain:'🕵️ "Instead of understanding each other → become too demanding（苛求）." "Instead of" = not A, but B. Not understanding → become demanding.',
+    guide:{ q:'「Instead of 理解對方，反而變得太____」— instead of 引導"不做 A 而做 B"，空格填與理解相反的態度：',
+      opts:[{k:'A',t:'patient（有耐心）— 和理解相同方向'},{k:'B',t:'understanding（有理解心）— 重複了'},{k:'C',t:'demanding（苛求的）— 和理解相反 ✓'},{k:'D',t:'flexible（彈性的）— 方向不夠強烈'}],
+      key:'C', explain:'instead of = 而不是；反而，不理解 → 變得 demanding（苛求），是對比關係。' }
+  },
+  // Q5 solo (真題 112年改編)
+  { phase:'solo', source:'real',
+    sentence:'While some people find it easy to stay hydrated, others ___ struggle to drink enough water.',
+    mainQ:'Which word fits "others ___ struggle"?',
+    mainOpts:[{k:'A',t:'instead'},{k:'B',t:'genuinely'},{k:'C',t:'however'},{k:'D',t:'whereas'}],
+    ans:'B', ansWord:'genuinely',
+    explain:'🕵️ "While some find it easy... others genuinely（真的）struggle" — "genuinely" here is an adverb modifying "struggle" to emphasize the contrast.',
+    guide:{ q:'「While 有些人覺得容易，其他人____感到困難」— 空格修飾 struggle，需要什麼詞性？',
+      opts:[{k:'A',t:'替代詞（instead）'},{k:'B',t:'副詞（genuinely 真的）'},{k:'C',t:'轉折詞（however）'},{k:'D',t:'對比連接詞（whereas）'}],
+      key:'B', explain:'空格在 others 和 struggle 之間，修飾動詞，需要副詞 genuinely（真的）。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 3-3  遞進與補充關係
+// ──────────────────────────────────────────────────────
+'3-3': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 3-3 遞進與補充連結詞',
+      body:'這些連結詞表示前後<b>方向相同</b>，補充或強化前面的意思：<br><br>'+
+           '・<b>Furthermore / Moreover / In addition / Besides</b>（此外；而且）<br>'+
+           '・<b>Similarly</b>（同樣地；類似地）<br>'+
+           '・<b>As well as</b>（不只…還有）<br>'+
+           '・<b>Not only... but also</b>（不只…而且）<br>'+
+           '・<b>In fact / Indeed</b>（事實上；確實）— 強調/深化<br><br>'+
+           '做法：看到這些詞 → 前後<b>方向一致</b>，選與上文<b>同性質</b>的答案。' },
+    sentence:'The new app is easy to use. ___, it saves a lot of time.',
+    ctx:'這個新應用程式很好用。____，它還節省很多時間。',
+    clueQ:'步驟一：「The new app is easy to use」和「it saves a lot of time」是什麼關係？',
+    clueOpts:[{k:'A',t:'轉折：雖然好用，但浪費時間'},{k:'B',t:'因果：因為好用，所以節省時間'},{k:'C',t:'補充：不只好用，還節省時間'},{k:'D',t:'對比：好用但費時'}],
+    clueKey:'C', clueExplain:'好用（優點1）→ 節省時間（優點2），這是<b>補充/遞進</b>關係，前後方向相同。現在選答案：',
+    mainQ:'哪個補充連結詞最適合連接兩個優點？',
+    mainOpts:[{k:'A',t:'Furthermore（此外）✓'},{k:'B',t:'However（然而）— 轉折'},{k:'C',t:'Therefore（因此）— 因果'},{k:'D',t:'Instead（代替）— 替代'}],
+    ans:'A', ansWord:'Furthermore',
+    explain:'🕵️ 正確！<b>Furthermore</b>（此外）補充說明第二個優點（節省時間），方向和第一個優點（好用）相同。',
+    guide:{ q:'前後都是「優點」，方向相同，應填哪類連結詞？',
+      opts:[{k:'A',t:'補充（furthermore, moreover）'},{k:'B',t:'轉折（however）'},{k:'C',t:'因果（therefore）'},{k:'D',t:'替代（instead）'}],
+      key:'A', explain:'前後方向相同 = 補充詞，選 Furthermore（此外）。' }
+  },
+  // Q2 guided (真題改編)
+  { phase:'guided', source:'real',
+    sentence:'Regular exercise improves physical health. ___, it also has significant benefits for mental wellbeing.',
+    ctx:'定期運動改善身體健康。____，它對心理健康也有顯著益處。',
+    mainQ:'「改善身體健康 → ___ → 對心理健康也有益」— 兩句都是正面補充，選哪個連結詞？',
+    mainOpts:[{k:'A',t:'Moreover（此外）— 補充第二個正面效益 ✓'},{k:'B',t:'However（然而）— 轉折，方向相反'},{k:'C',t:'Therefore（因此）— 因果，但兩句並非因果'},{k:'D',t:'Instead（代替）— 替代，方向不符'}],
+    ans:'A', ansWord:'Moreover',
+    explain:'🕵️ 正確！<b>Moreover</b>（此外）補充第二個好處（心理健康），方向和第一句（身體健康）相同。',
+    guide:{ q:'兩句都說「運動的好處」，方向相同，應填哪類連結詞？',
+      opts:[{k:'A',t:'補充（moreover）'},{k:'B',t:'轉折（however）'},{k:'C',t:'因果（therefore）'},{k:'D',t:'替代（instead）'}],
+      key:'A', explain:'前後方向相同（都是好處）= 補充詞 moreover（此外）。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The new library offers a wide range of books. ___, it provides free access to academic databases.',
+    mainQ:'Which word fits?',
+    mainOpts:[{k:'A',t:'In addition'},{k:'B',t:'Nevertheless'},{k:'C',t:'As a result'},{k:'D',t:'On the contrary'}],
+    ans:'A', ansWord:'In addition',
+    explain:'🕵️ Both sentences describe benefits of the library. "In addition"（此外）adds a second benefit in the same direction.',
+    guide:{ q:'兩句都說「圖書館的好處」，方向相同，應填哪類連結詞？',
+      opts:[{k:'A',t:'補充（in addition 此外）'},{k:'B',t:'轉折（nevertheless）'},{k:'C',t:'因果（as a result）'},{k:'D',t:'對比（on the contrary）'}],
+      key:'A', explain:'兩個優點 = 補充詞 in addition（此外）。' }
+  },
+  // Q4 solo (真題 95年改編)
+  { phase:'solo', source:'real',
+    sentence:'Not only do we misunderstand each other, but we also fail to ___ with each other respectfully.',
+    mainQ:'Which word fits "fail to ___ with each other respectfully"?',
+    mainOpts:[{k:'A',t:'disagree'},{k:'B',t:'communicate'},{k:'C',t:'compete'},{k:'D',t:'ignore'}],
+    ans:'B', ansWord:'communicate',
+    explain:'🕵️ "Not only... but also" adds to the idea of misunderstanding. Failing to "communicate"（溝通）respectfully matches the context of relationship problems. (95年 語境)',
+    guide:{ q:'「不只誤解對方，還無法____地互相對待」— 說的是人際關係的問題，空格填什麼動詞？',
+      opts:[{k:'A',t:'disagree（不同意）'},{k:'B',t:'communicate（溝通）'},{k:'C',t:'compete（競爭）'},{k:'D',t:'ignore（忽視）'}],
+      key:'B', explain:'not only... but also 補充：不只誤解，還無法 communicate（溝通），兩個都是人際關係的問題。' }
+  },
+  // Q5 solo (真題改編)
+  { phase:'solo', source:'real',
+    sentence:'The documentary was informative. ___, it was beautifully filmed and emotionally moving.',
+    mainQ:'Which word fits?',
+    mainOpts:[{k:'A',t:'In contrast'},{k:'B',t:'As a result'},{k:'C',t:'Similarly'},{k:'D',t:'However'}],
+    ans:'C', ansWord:'Similarly',
+    explain:'🕵️ "Similarly"（同樣地）adds a parallel positive quality (beautifully filmed) to the first positive quality (informative).',
+    guide:{ q:'「紀錄片很有教育性（優點1）→ ___ 拍攝精美且感人（優點2）」— 兩個優點並列，應填哪類詞？',
+      opts:[{k:'A',t:'對比（in contrast）'},{k:'B',t:'因果（as a result）'},{k:'C',t:'類比/補充（similarly 同樣地）'},{k:'D',t:'轉折（however）'}],
+      key:'C', explain:'两個優點並列 = 補充/類比，similarly（同樣地）連接兩個相同性質的優點。' }
+  },
+],
+
+// ──────────────────────────────────────────────────────
+// 3-4  同義 / 反義上下文暗示
+// ──────────────────────────────────────────────────────
+'3-4': [
+  // Q1 demo
+  { phase:'demo', source:'made',
+    lesson:{ title:'🔍 3-4 上下文同義與反義暗示',
+      body:'有些空格不靠句型或搭配詞，而是靠<b>上下文中的對比或同義詞</b>來推測：<br><br>'+
+           '<b>反義暗示</b>（前後對比）：<br>'+
+           '上文說 <b>slow</b> → 下文空格考 <b>fast</b><br>'+
+           '上文說 <b>simple</b> → 下文空格考 <b>complex</b><br><br>'+
+           '<b>同義暗示</b>（重複說明）：<br>'+
+           '上文說 <b>surprised</b> → 下文空格考 <b>shocked / astonished</b><br>'+
+           '上文說 <b>happy</b> → 下文空格考 <b>delighted / joyful</b><br><br>'+
+           '<b>做法：先讀全句，找出「暗示詞」，推測空格方向。</b>' },
+    sentence:'He is usually very slow, but today he was quite ___.',
+    ctx:'他通常非常慢，但今天他相當____。',
+    clueQ:'步驟一：「usually very slow」和「today he was quite ___」是什麼關係？',
+    clueOpts:[{k:'A',t:'補充：通常慢，今天也慢'},{k:'B',t:'反義：通常慢（A），今天（B）→ B 和 A 相反'},{k:'C',t:'因果：因為慢，所以____'},{k:'D',t:'沒有特別關係'}],
+    clueKey:'B', clueExplain:'「but（但是）」是轉折詞，通常慢（負面）→ 今天是相反的，空格應填<b>速度快</b>的詞。現在選答案：',
+    mainQ:'「usually slow, but today quite ___」— but 轉折，空格填與 slow 相反的意思：',
+    mainOpts:[{k:'A',t:'fast（快的）— slow 的反義詞 ✓'},{k:'B',t:'lazy（懶的）— 和 slow 同性質'},{k:'C',t:'careful（小心的）— 和速度無關'},{k:'D',t:'quiet（安靜的）— 和速度無關'}],
+    ans:'A', ansWord:'fast',
+    explain:'🕵️ 正確！but 轉折 + slow → 空格填反義詞 <b>fast</b>（快的）。這是最直接的上下文反義暗示。',
+    guide:{ q:'「usually slow + but（轉折）→ today quite ___」空格應填 slow 的什麼？',
+      opts:[{k:'A',t:'同義詞（slow 的同類）'},{k:'B',t:'反義詞（fast, quick）'},{k:'C',t:'相關詞（lazy, careful）'},{k:'D',t:'中性詞'}],
+      key:'B', explain:'but 轉折 = 相反方向，slow 的反義詞是 fast。' }
+  },
+  // Q2 guided (98年真題)
+  { phase:'guided', source:'real',
+    sentence:'The moral lesson is that ___ and consistent will always beat slow and steady.',
+    ctx:'寓意是：____且持續的總是會打敗緩慢且穩定的。（98年）',
+    mainQ:'「___ and consistent」和「slow and steady」構成對比。slow 的反義詞是？',
+    mainOpts:[{k:'A',t:'fast（快的）— slow 的直接反義詞 ✓'},{k:'B',t:'lazy（懶的）— 和 slow 同性質'},{k:'C',t:'careful（小心的）— 和速度無關'},{k:'D',t:'steady（穩定）— 已在對比的另一邊'}],
+    ans:'A', ansWord:'fast',
+    explain:'🕵️ 正確！「___ and consistent」對比「slow and steady」— slow 的反義詞是 <b>fast</b>，consistent 對應 steady。（98年學測）',
+    guide:{ q:'「___ and consistent」和「slow and steady」形成對比，slow 的反義是？',
+      opts:[{k:'A',t:'fast（快）'},{k:'B',t:'lazy（懶）'},{k:'C',t:'careful（小心）'},{k:'D',t:'steady（穩定）'}],
+      key:'A', explain:'slow 的反義詞是 fast，consistent 對應 steady，兩組形成對比。' }
+  },
+  // Q3 solo (自製)
+  { phase:'solo', source:'made',
+    sentence:'The first chapter was simple and easy to follow, but the later chapters became increasingly ___.',
+    mainQ:'Which word fits? ("simple" suggests the opposite)',
+    mainOpts:[{k:'A',t:'boring'},{k:'B',t:'short'},{k:'C',t:'complex'},{k:'D',t:'readable'}],
+    ans:'C', ansWord:'complex',
+    explain:'🕵️ "simple" (positive, easy) → contrast with "increasingly ___" (negative, harder). "complex"（複雜的）is the antonym of "simple".',
+    guide:{ q:'「前面 simple（簡單），但後面越來越____」— simple 的反義詞是？',
+      opts:[{k:'A',t:'boring（無聊，非反義）'},{k:'B',t:'short（短，非反義）'},{k:'C',t:'complex（複雜，simple 的反義）'},{k:'D',t:'readable（好讀，非反義）'}],
+      key:'C', explain:'simple 的反義詞是 complex（複雜的）。' }
+  },
+  // Q4 solo (真題 108年改編)
+  { phase:'solo', source:'real',
+    sentence:'His memory was ___ when it came to grocery shopping, but never failed when dinner time approached.',
+    mainQ:'Which word fits? (contrast with "never failed")',
+    mainOpts:[{k:'A',t:'excellent'},{k:'B',t:'reliable'},{k:'C',t:'unreliable'},{k:'D',t:'sharp'}],
+    ans:'C', ansWord:'unreliable',
+    explain:'🕵️ Contrast: "never failed (reliable) when dinner time approached" vs. "___ when grocery shopping." The blank needs the opposite: "unreliable"（不可靠的）.',
+    guide:{ q:'「____（買菜時）但從不失敗（吃飯時）」— "never failed" 暗示空格填什麼？',
+      opts:[{k:'A',t:'正面（excellent, reliable）'},{k:'B',t:'負面（unreliable 不可靠）'},{k:'C',t:'和 never failed 相同方向'},{k:'D',t:'描述記憶力很好'}],
+      key:'B', explain:'never failed（從不失敗 = 可靠）的反義是 unreliable（不可靠），買菜時記憶不可靠。' }
+  },
+  // Q5 solo (真題 112年改編)
+  { phase:'solo', source:'real',
+    sentence:'While sports drinks claim to ___ hydration, water remains the most natural and effective choice.',
+    mainQ:'Which word fits "claim to ___ hydration"?',
+    mainOpts:[{k:'A',t:'reduce'},{k:'B',t:'eliminate'},{k:'C',t:'boost'},{k:'D',t:'ignore'}],
+    ans:'C', ansWord:'boost',
+    explain:'🕵️ Sports drinks "claim to ___ hydration" (positive claim) while water is "effective." The context implies a positive claim: "boost"（提升）hydration.',
+    guide:{ q:'「運動飲料宣稱能____補水」— sports drinks 在做正面的宣傳，空格應填正面還是負面動詞？',
+      opts:[{k:'A',t:'負面（reduce 減少, eliminate 消除）'},{k:'B',t:'正面（boost 提升, enhance 增強）'},{k:'C',t:'中性'},{k:'D',t:'和水有關的詞'}],
+      key:'B', explain:'飲料宣傳自己能提升補水效果，所以填正面動詞 boost（提升）。' }
+  },
+],
+
+};
+
+// ═══════════════════════════════════════════════════════
+//  BATTLE PASSAGE DATA
+// ═══════════════════════════════════════════════════════
+
+const BATTLE_PASSAGE_98 = {
+  lessonId: '4-2',
+  title: '整段實戰 A',
+  year: '98年學測',
+  intro: '以下改編自 98 年學測文義選填。先閱讀整段文章，再逐題作答。',
+  text: `Once upon a time, a hare challenged a tortoise to a race. Everyone laughed, for it seemed [31] that the slow tortoise had any chance. The hare ran [32] ahead, so confident of winning that he lay down to take a nap. Meanwhile, the tortoise continued to move [33], never stopping. When the hare awoke and rushed to the finish line, he was [34] to find the tortoise already there. The [35] lesson is that fast and consistent will always beat slow and steady. In other words, it's not about how [36] you start but how you [37] the race.`,
+  blanks: [
+    { num:31, ans:'A', ansWord:'unlikely',
+      opts:[{k:'A',t:'unlikely'},{k:'B',t:'likely'},{k:'C',t:'certain'},{k:'D',t:'possible'},{k:'E',t:'obvious'}],
+      explain:'「it seemed ___ that the tortoise had any chance」— 搭配詞 seem + adjective。上文說大家都笑了，所以 unlikely（不太可能）最合邏輯。' },
+    { num:32, ans:'B', ansWord:'far',
+      opts:[{k:'A',t:'slowly'},{k:'B',t:'far'},{k:'C',t:'back'},{k:'D',t:'barely'},{k:'E',t:'hard'}],
+      explain:'「ran ___ ahead」— 兔子跑得遠遠地在前面，far（遠遠地）修飾 ahead，是副詞用法。' },
+    { num:33, ans:'C', ansWord:'steadily',
+      opts:[{k:'A',t:'fast'},{k:'B',t:'rarely'},{k:'C',t:'steadily'},{k:'D',t:'carelessly'},{k:'E',t:'suddenly'}],
+      explain:'「continued to move ___」— 副詞位置，修飾動詞 move。烏龜的特質是穩定，steadily（穩定地）最符合 slow and steady 的主題。' },
+    { num:34, ans:'D', ansWord:'shocked',
+      opts:[{k:'A',t:'excited'},{k:'B',t:'prepared'},{k:'C',t:'bored'},{k:'D',t:'shocked'},{k:'E',t:'pleased'}],
+      explain:'「was ___ to find the tortoise already there」— 系動詞 was + 形容詞。兔子以為自己贏，卻發現烏龜已到了，是令人震驚的結果，shocked（震驚的）最合邏輯。' },
+    { num:35, ans:'E', ansWord:'moral',
+      opts:[{k:'A',t:'hidden'},{k:'B',t:'final'},{k:'C',t:'basic'},{k:'D',t:'important'},{k:'E',t:'moral'}],
+      explain:'「the ___ lesson」— the ___ of a fable = moral（寓言的道德寓意）。the moral lesson = 寓意/教訓，這是固定搭配。' },
+    { num:36, ans:'A', ansWord:'fast',
+      opts:[{k:'A',t:'fast'},{k:'B',t:'slow'},{k:'C',t:'early'},{k:'D',t:'well'},{k:'E',t:'far'}],
+      explain:'「not about how ___ you start」— 和後面 how you finish the race 對比。fast（快）對應文章主題（快 vs 穩），且 how fast you start = 開始速度。' },
+    { num:37, ans:'B', ansWord:'finish',
+      opts:[{k:'A',t:'begin'},{k:'B',t:'finish'},{k:'C',t:'enjoy'},{k:'D',t:'approach'},{k:'E',t:'run'}],
+      explain:'「how you ___ the race」— 前面說「不在於你開始有多快」，呼應是「在於你如何_____比賽」，finish（完成）才能和 start（開始）形成完整的對比。' },
+  ]
+};
+
+const BATTLE_PASSAGE_108 = {
+  lessonId: '4-3',
+  title: '整段實戰 B',
+  year: '108年學測',
+  intro: '以下改編自 108 年學測文義選填。先閱讀整段文章，再逐題作答。',
+  text: `My father started to suffer from memory loss right after his marriage. She said they were married on May 26, while my dad's memory told him it was June 25. This often [31] their anniversary celebration, for his rose bouquet always came one month late. Mom seldom asked Dad to go shopping for her. But whenever Dad [32] on going, she made sure that he brought a shopping list. Dad certainly had the list [33] when he left for the market, but he would somehow forget it. My father's poor memory gave him certain advantages, though. He was [34] with many secrets. Because of his poor memory, he had the [35] of hearing everyone's private matters. They believed the secrets would never be [36]. They were quite right, for my father [37] cared about who did what to whom.`,
+  blanks: [
+    { num:31, ans:'B', ansWord:'ruined',
+      opts:[{k:'A',t:'saved'},{k:'B',t:'ruined'},{k:'C',t:'planned'},{k:'D',t:'celebrated'},{k:'E',t:'started'}],
+      explain:'「This often ___ their anniversary」— 搭配詞，花束晚一個月到，毀了週年紀念，ruined（毀了）最符合邏輯。' },
+    { num:32, ans:'C', ansWord:'insisted',
+      opts:[{k:'A',t:'relied'},{k:'B',t:'agreed'},{k:'C',t:'insisted'},{k:'D',t:'decided'},{k:'E',t:'called'}],
+      explain:'「whenever Dad ___ on going」— 搭配詞：insist on + V-ing（堅持要做某事）。媽媽不常叫爸爸去，但每當爸爸「堅持」要去時…。' },
+    { num:33, ans:'A', ansWord:'ready',
+      opts:[{k:'A',t:'ready'},{k:'B',t:'lost'},{k:'C',t:'written'},{k:'D',t:'missing'},{k:'E',t:'prepared'}],
+      explain:'「had the list ___ when he left」— 搭配詞：have sth. ready = 把某東西準備好。出發前有把清單準備好，但後來還是忘了。' },
+    { num:34, ans:'D', ansWord:'trusted',
+      opts:[{k:'A',t:'bored'},{k:'B',t:'associated'},{k:'C',t:'compared'},{k:'D',t:'trusted'},{k:'E',t:'filled'}],
+      explain:'「He was ___ with many secrets」— 被動搭配：be trusted with sth. = 被信任保管某東西（秘密）。' },
+    { num:35, ans:'E', ansWord:'privilege',
+      opts:[{k:'A',t:'habit'},{k:'B',t:'chance'},{k:'C',t:'problem'},{k:'D',t:'risk'},{k:'E',t:'privilege'}],
+      explain:'「had the ___ of hearing everyone\'s private matters」— 語境：因為記性差，反而有特殊優勢，privilege（特權；殊榮）最符合這個諷刺意味。' },
+    { num:36, ans:'A', ansWord:'revealed',
+      opts:[{k:'A',t:'revealed'},{k:'B',t:'forgotten'},{k:'C',t:'shared'},{k:'D',t:'discovered'},{k:'E',t:'kept'}],
+      explain:'「secrets would never be ___」— 被動語態，秘密永遠不會被「揭露」，revealed（揭露）最符合邏輯。' },
+    { num:37, ans:'C', ansWord:'little',
+      opts:[{k:'A',t:'often'},{k:'B',t:'always'},{k:'C',t:'little'},{k:'D',t:'rarely'},{k:'E',t:'hardly'}],
+      explain:'「my father ___ cared about who did what」— 上文說他的記性很差，所以他幾乎「不在乎」誰對誰做了什麼，little（幾乎不）最符合邏輯，且 little cared = 很少在乎。' },
+  ]
+};
+
+const BATTLE_PASSAGE_112 = {
+  lessonId: '4-4',
+  title: '整段實戰 C',
+  year: '112年學測',
+  intro: '以下改編自 112 年學測文義選填，主題為喝水的科學。先閱讀整段文章，再逐題作答。',
+  text: `Water is essential for life, yet many people do not drink [31] of it. Experts recommend drinking about eight glasses of water per day to stay [32]. This amount can vary, however, depending on factors such as physical activity, climate, and overall health. People who exercise [33] need more water to replace the fluids lost through sweat. In hot weather, the body also loses water at a faster [34]. It is therefore important to increase water intake during summer months. Contrary to popular belief, coffee and tea do not [35] dehydration as much as was once thought. While they do have mild [36] effects, they still contribute to daily fluid intake. The key [37] staying healthy is to listen to your body and drink water throughout the day.`,
+  blanks: [
+    { num:31, ans:'A', ansWord:'enough',
+      opts:[{k:'A',t:'enough'},{k:'B',t:'much'},{k:'C',t:'plenty'},{k:'D',t:'little'},{k:'E',t:'more'}],
+      explain:'「do not drink ___ of it」— 搭配詞：enough of（足夠的）。前文說很多人喝水不足，enough 最符合語境。' },
+    { num:32, ans:'C', ansWord:'hydrated',
+      opts:[{k:'A',t:'active'},{k:'B',t:'healthy'},{k:'C',t:'hydrated'},{k:'D',t:'energized'},{k:'E',t:'fit'}],
+      explain:'「drink water... to stay ___」— 系動詞 stay + 形容詞；主題是喝水，hydrated（保持補水狀態）最直接符合文章主題。' },
+    { num:33, ans:'B', ansWord:'regularly',
+      opts:[{k:'A',t:'rarely'},{k:'B',t:'regularly'},{k:'C',t:'slowly'},{k:'D',t:'hardly'},{k:'E',t:'quietly'}],
+      explain:'「people who exercise ___ need more water」— 副詞修飾 exercise；定期運動的人需要更多水，regularly（定期地）最合邏輯。' },
+    { num:34, ans:'D', ansWord:'rate',
+      opts:[{k:'A',t:'speed'},{k:'B',t:'time'},{k:'C',t:'level'},{k:'D',t:'rate'},{k:'E',t:'pace'}],
+      explain:'「loses water at a faster ___」— 搭配詞：at a ___ rate = 以某個速率。at a faster rate（以更快的速率）是固定搭配。' },
+    { num:35, ans:'E', ansWord:'cause',
+      opts:[{k:'A',t:'prevent'},{k:'B',t:'worsen'},{k:'C',t:'increase'},{k:'D',t:'affect'},{k:'E',t:'cause'}],
+      explain:'「coffee and tea do not ___ dehydration as much as once thought」— 語境：以前認為咖啡和茶會「導致」脫水，但研究發現沒有那麼嚴重，cause（導致）最符合。' },
+    { num:36, ans:'A', ansWord:'diuretic',
+      opts:[{k:'A',t:'diuretic'},{k:'B',t:'energetic'},{k:'C',t:'dramatic'},{k:'D',t:'realistic'},{k:'E',t:'organic'}],
+      explain:'「they do have mild ___ effects」— 搭配詞；咖啡和茶有輕微的「利尿」效果，diuretic（利尿的）是最符合科學語境的專業詞彙。' },
+    { num:37, ans:'B', ansWord:'to',
+      opts:[{k:'A',t:'for'},{k:'B',t:'to'},{k:'C',t:'of'},{k:'D',t:'in'},{k:'E',t:'at'}],
+      explain:'「The key ___ staying healthy」— 搭配詞：the key to（…的關鍵）固定搭配介系詞 to，後接動名詞。' },
+  ]
+};
+</script>
+
 </body>
 </html>
