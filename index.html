@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文義選填偵探 Cloze Detective</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #0f0e0b;
+    --surface: #1a1814;
+    --card: #221f1a;
+    --border: #3a3428;
+    --gold: #c9a84c;
+    --gold-dim: #7a6128;
+    --text: #e8dcc8;
+    --text-dim: #8a7d6a;
+    --green: #4caf72;
+    --red: #e05555;
+    --blue: #5588cc;
+    --accent: #c9a84c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 60px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 32px 0 24px;
+    width: 100%;
+    max-width: 720px;
+  }
+  .header .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 24px;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* Main card */
+  .card {
+    width: 100%;
+    max-width: 720px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 28px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.6;
+  }
+
+  /* Stage label */
+  .stage-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stage-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Lesson / hint box */
+  .lesson-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .lesson-box .lesson-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  /* Question label */
+  .q-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  /* Sentence */
+  .sentence {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(15px, 3.5vw, 18px);
+    line-height: 1.9;
+    color: var(--text);
+    margin-bottom: 10px;
+    background: var(--surface);
+    padding: 18px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+    padding: 0 6px;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .blank.correct { color: var(--green); border-color: var(--green); }
+  .blank.wrong { color: var(--red); border-color: var(--red); }
+
+  /* Context hint */
+  .context-hint {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 18px;
+    padding-left: 4px;
+    font-style: italic;
+  }
+
+  /* Guide question */
+  .guide-q {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 16px;
+    line-height: 1.7;
+    font-weight: 500;
+  }
+
+  /* Options */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 480px) {
+    .options { grid-template-columns: 1fr; }
+  }
+  .opt-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+    background: #2a2620;
+  }
+  .opt-btn .key {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    min-width: 20px;
+    font-weight: 700;
+  }
+  .opt-btn.correct-anim {
+    border-color: var(--green);
+    background: #1a2e1e;
+    color: var(--green);
+  }
+  .opt-btn.correct-anim .key { color: var(--green); }
+  .opt-btn.wrong-anim {
+    border-color: var(--red);
+    background: #2e1a1a;
+    color: var(--red);
+  }
+  .opt-btn.wrong-anim .key { color: var(--red); }
+  .opt-btn:disabled { cursor: default; opacity: 0.7; }
+
+  /* Feedback */
+  .feedback {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.good {
+    background: #1a2e1e;
+    border: 1px solid #2e5a3a;
+    color: #7dcf95;
+  }
+  .feedback.bad {
+    background: #2e1a1a;
+    border: 1px solid #5a2e2e;
+    color: #e08888;
+  }
+  .feedback.info {
+    background: #1a2030;
+    border: 1px solid #2e4060;
+    color: #88aae0;
+  }
+  .feedback .fb-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  /* Action buttons */
+  .action-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    display: none;
+  }
+  .action-btn.show { display: block; }
+  .action-btn.primary {
+    background: var(--gold);
+    color: var(--bg);
+  }
+  .action-btn.primary:hover { background: #d4b060; }
+  .action-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    margin-top: 10px;
+  }
+  .action-btn.secondary:hover { border-color: var(--gold-dim); color: var(--text); }
+
+  /* Score bar */
+  .score-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 6px;
+  }
+  .score-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .score-item span { color: var(--gold); font-size: 14px; font-weight: 700; }
+
+  /* Skill tip cards */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  @media(max-width:480px){ .skill-grid{grid-template-columns:1fr;} }
+  .skill-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .skill-card .sk-title {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Welcome screen */
+  #screen-welcome { display: block; }
+  #screen-game { display: none; }
+  #screen-result { display: none; }
+
+  .welcome-icon {
+    font-size: 48px;
+    text-align: center;
+    margin: 24px 0 16px;
+  }
+  .welcome-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+  .strategy-list {
+    list-style: none;
+    padding: 0;
+  }
+  .strategy-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .strategy-list li:last-child { border-bottom: none; }
+  .s-num {
+    font-family: 'Space Mono', monospace;
+    color: var(--gold);
+    font-size: 12px;
+    min-width: 24px;
+    margin-top: 2px;
+  }
+
+  /* Result screen */
+  .result-score {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .result-big {
+    font-family: 'Space Mono', monospace;
+    font-size: 60px;
+    color: var(--gold);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .result-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+  .result-message {
+    font-size: 15px;
+    color: var(--text);
+    margin: 20px 0;
+    line-height: 1.8;
+    padding: 16px;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .wrong-review {
+    margin-top: 20px;
+  }
+  .wrong-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .wrong-item .wi-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .wi-answer {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .tag-colloc { background: #2a2010; color: var(--gold); }
+  .tag-meaning { background: #102028; color: var(--blue); }
+  .tag-grammar { background: #102018; color: var(--green); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- WELCOME SCREEN -->
+<div id="screen-welcome">
+  <div class="header">
+    <div class="badge">🔍 GSAT English Training</div>
+    <h1>文義選填偵探</h1>
+    <div class="subtitle">Cloze Detective — 學測攻略特訓</div>
+  </div>
+
+  <div class="card" style="max-width:720px;width:100%;">
+    <div class="welcome-icon">🕵️</div>
+    <div class="welcome-desc">
+      學測文義選填最常見的錯誤是「靠感覺猜意思」。<br>
+      真正高分的做法是像偵探一樣——先找線索，再填答案。<br><br>
+      這個訓練會一步步教你辨認三種核心線索，讓你不再靠猜的。
+    </div>
+
+    <div class="lesson-box">
+      <div class="lesson-title">🎯 三種破案線索</div>
+      <div class="skill-grid">
+        <div class="skill-card">
+          <div class="sk-title">線索一</div>
+          搭配詞<br>
+          <span style="color:var(--text);font-size:13px;">某些動詞/名詞有固定搭配，例如 <em>take action、make a decision</em></span>
+        </div>
+        <div class="skill-card">
+          <div class="sk-title">線索二</div>
+          句型結構<br>
+          <span style="color:var(--text);font-size:13px;">空格前後的 to / ing / 冠詞等，決定填什麼詞性</span>
+        </div>
+        <div class="skill-card">
+          <div class="sk-title">線索三</div>
+          句子語境<br>
+          <span style="color:var(--text);font-size:13px;">整句或上下文的意思，決定填哪個字最合理</span>
+        </div>
+      </div>
+    </div>
+
+    <ul class="strategy-list">
+      <li>
+        <span class="s-num">01</span>
+        <span>從簡單題開始，每一關只練一種線索，慢慢疊加</span>
+      </li>
+      <li>
+        <span class="s-num">02</span>
+        <span>答錯不會直接公布答案，而是給你引導線索再試一次</span>
+      </li>
+      <li>
+        <span class="s-num">03</span>
+        <span>每題都用真實的學測風格出題，高頻搭配詞優先練習</span>
+      </li>
+    </ul>
+
+    <br>
+    <button class="action-btn primary show" onclick="startGame()">🕵️ 開始偵探訓練</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="screen-game" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+  <div class="header">
+    <div class="badge">🔍 GSAT English Training</div>
+    <h1>文義選填偵探</h1>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span id="prog-label">關卡 1 / 12</span>
+      <div class="score-row">
+        <div class="score-item">答對 <span id="score-correct">0</span></div>
+        <div class="score-item">答錯 <span id="score-wrong">0</span></div>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="card" id="game-card">
+    <div class="stage-label" id="stage-label">STAGE 1 — 句型結構</div>
+
+    <div class="lesson-box" id="lesson-box" style="display:none;">
+      <div class="lesson-title" id="lesson-title">偵探提示</div>
+      <div id="lesson-content"></div>
+    </div>
+
+    <div class="q-meta" id="q-meta">CASE 01</div>
+    <div class="sentence" id="sentence-display"></div>
+    <div class="context-hint" id="context-hint"></div>
+
+    <div class="guide-q" id="guide-question"></div>
+
+    <div class="options" id="options-container"></div>
+
+    <div class="feedback" id="feedback-box">
+      <div class="fb-title" id="fb-title"></div>
+      <div id="fb-content"></div>
+    </div>
+
+    <button class="action-btn primary" id="next-btn" onclick="nextStep()"></button>
+    <button class="action-btn secondary" id="retry-btn" onclick="retryGuide()" style="display:none;">↩ 再想想</button>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="screen-result" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+  <div class="header">
+    <div class="badge">🔍 訓練完成</div>
+    <h1>偵探報告</h1>
+  </div>
+  <div class="card" style="max-width:720px;width:100%;">
+    <div class="result-score">
+      <div class="result-big" id="final-score">0/12</div>
+      <div class="result-label">本次答題成績</div>
+    </div>
+    <div class="result-message" id="result-message"></div>
+
+    <div class="wrong-review" id="wrong-review"></div>
+
+    <hr class="divider">
+    <div class="lesson-box">
+      <div class="lesson-title">📌 學測文義選填破題公式</div>
+      <div style="font-size:13px;line-height:1.9;color:var(--text);">
+        <b style="color:var(--gold);">步驟一</b>：看空格前後有沒有 to / -ing / 冠詞 → 判斷詞性<br>
+        <b style="color:var(--gold);">步驟二</b>：看有沒有固定搭配（動詞＋名詞 / 形容詞＋名詞）<br>
+        <b style="color:var(--gold);">步驟三</b>：帶入句子，確認整句意思合理<br><br>
+        <span style="color:var(--text-dim);">近年（111–114）趨勢：步驟一越來越不夠，步驟二三更重要</span>
+      </div>
+    </div>
+    <button class="action-btn primary show" onclick="resetGame()" style="margin-top:20px;">🔄 再練一次</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  QUESTION DATA
+// ============================================================
+// Each question has:
+//   stage: string (displayed at top)
+//   stageTag: 'grammar' | 'colloc' | 'meaning'
+//   lesson: optional {title, content} shown before this question
+//   sentence: the sentence with __BLANK__ placeholder
+//   contextHint: optional Chinese hint about the sentence context
+//   answer: correct option key ('A','B','C','D')
+//   answerDisplay: the word/phrase that fills the blank
+//   guide: {question, options: [{key, text}], wrongKeys: [...wrong keys], wrongMsg}
+//     guide is shown after wrong first attempt
+//   mainQuestion: the actual fill question shown first
+//   mainOptions: [{key, text}]
+//   explanation: shown after correct answer
+// ============================================================
+
+const questions = [
+  // ── STAGE 1: 句型結構（詞性判斷）──────────────────────────
+  {
+    stage: 'STAGE 1 — 句型結構線索',
+    stageTag: 'grammar',
+    lesson: {
+      title: '🔍 線索一：句型結構',
+      content: '看空格前後的字，可以判斷需要什麼詞性。\n\n例如：<br>・空格前有 <b>to</b> → 通常填<b>動詞原形</b><br>・空格前有 <b>is / was</b> → 通常填<b>形容詞</b>或動詞進行式<br>・空格前有 <b>the / a</b> → 通常填<b>名詞</b><br><br>先找這些線索，就能排除不合詞性的選項。'
+    },
+    sentence: 'The doctor asked the patient to __BLANK__ more water every day.',
+    contextHint: '醫生叫病人每天____更多水。',
+    answer: 'B',
+    answerDisplay: 'drink',
+    mainQuestion: '空格前有「to」，這個位置需要什麼詞性？',
+    mainOptions: [
+      { key: 'A', text: '名詞' },
+      { key: 'B', text: '動詞' },
+      { key: 'C', text: '形容詞' },
+      { key: 'D', text: '副詞' }
+    ],
+    explanation: '🕵️ 正確！空格前是「to」，後面接<b>動詞原形</b>。四個詞性選項中只有動詞合理。這是最基本的句型線索。',
+    guide: {
+      question: '找找看：空格前面的那個字是什麼？',
+      options: [
+        { key: 'A', text: '是冠詞 the / a' },
+        { key: 'B', text: '是不定詞 to' },
+        { key: 'C', text: '是形容詞' },
+        { key: 'D', text: '是連接詞' }
+      ],
+      correctGuideKey: 'B',
+      guideExplain: '空格前是「to」，這個位置需要動詞原形，所以選 B（drink）。'
+    }
+  },
+  {
+    stage: 'STAGE 1 — 句型結構線索',
+    stageTag: 'grammar',
+    sentence: 'The weather in this city is very __BLANK__ during summer.',
+    contextHint: '這個城市夏天的天氣非常____。',
+    answer: 'C',
+    answerDisplay: 'hot',
+    mainQuestion: '空格前有「very」和「is」，這個位置需要什麼詞性？',
+    mainOptions: [
+      { key: 'A', text: '名詞' },
+      { key: 'B', text: '動詞' },
+      { key: 'C', text: '形容詞' },
+      { key: 'D', text: '副詞' }
+    ],
+    explanation: '🕵️ 正確！「is very ___」這個結構後面要接<b>形容詞</b>，用來描述主詞 the weather 的狀態。',
+    guide: {
+      question: '「very」這個字通常用來加強什麼詞性？',
+      options: [
+        { key: 'A', text: '名詞' },
+        { key: 'B', text: '動詞' },
+        { key: 'C', text: '形容詞或副詞' },
+        { key: 'D', text: '介系詞' }
+      ],
+      correctGuideKey: 'C',
+      guideExplain: '「very」是程度副詞，用來加強形容詞。所以「is very ___」後面接形容詞 hot。'
+    }
+  },
+
+  // ── STAGE 2: 搭配詞（Collocation）──────────────────────────
+  {
+    stage: 'STAGE 2 — 搭配詞線索',
+    stageTag: 'colloc',
+    lesson: {
+      title: '🔍 線索二：搭配詞',
+      content: '英文裡有很多字有固定的搭配組合，不能亂換。<br><br>常見動詞搭配：<br>・<b>make</b> a decision / a mistake / progress<br>・<b>take</b> action / a break / a risk<br>・<b>play</b> a role / a trick<br>・<b>show</b> interest / respect<br><br>看到這些名詞時，先想想它通常跟哪個動詞搭配。'
+    },
+    sentence: 'After months of discussion, the team finally decided to __BLANK__ action and launch the project.',
+    contextHint: '討論了幾個月後，團隊終於決定____行動，啟動這個計畫。',
+    answer: 'B',
+    answerDisplay: 'take',
+    mainQuestion: '「____ action」是常見的固定搭配，空格應該填哪個動詞？',
+    mainOptions: [
+      { key: 'A', text: 'make' },
+      { key: 'B', text: 'take' },
+      { key: 'C', text: 'do' },
+      { key: 'D', text: 'give' }
+    ],
+    explanation: '🕵️ 正確！「take action」是英文固定搭配，表示「採取行動」。make / do / give 都不能和 action 這樣搭配。',
+    guide: {
+      question: '想想看：「行動」的英文搭配通常是哪個？',
+      options: [
+        { key: 'A', text: 'make action' },
+        { key: 'B', text: 'take action' },
+        { key: 'C', text: 'do action' },
+        { key: 'D', text: 'have action' }
+      ],
+      correctGuideKey: 'B',
+      guideExplain: '「採取行動」的固定說法是 take action。這是學測最常考的搭配詞之一！'
+    }
+  },
+  {
+    stage: 'STAGE 2 — 搭配詞線索',
+    stageTag: 'colloc',
+    sentence: 'The new policy is expected to __BLANK__ a key role in reducing air pollution.',
+    contextHint: '這個新政策預期將在減少空氣汙染方面____重要角色。',
+    answer: 'C',
+    answerDisplay: 'play',
+    mainQuestion: '「____ a role」的固定搭配，空格應填哪個動詞？',
+    mainOptions: [
+      { key: 'A', text: 'make' },
+      { key: 'B', text: 'take' },
+      { key: 'C', text: 'play' },
+      { key: 'D', text: 'do' }
+    ],
+    explanation: '🕵️ 正確！「play a role」是固定搭配，表示「扮演角色、發揮作用」。這題的陷阱是 make / take 看起來也很像，但只有 play 和 role 搭配。',
+    guide: {
+      question: '「角色」的固定搭配是什麼？',
+      options: [
+        { key: 'A', text: 'make a role' },
+        { key: 'B', text: 'take a role' },
+        { key: 'C', text: 'play a role' },
+        { key: 'D', text: 'do a role' }
+      ],
+      correctGuideKey: 'C',
+      guideExplain: '「扮演角色」固定說 play a role，就像演員「play」角色一樣。'
+    }
+  },
+  {
+    stage: 'STAGE 2 — 搭配詞線索',
+    stageTag: 'colloc',
+    sentence: 'Students are encouraged to __BLANK__ notes during the lecture to help them remember.',
+    contextHint: '學生被鼓勵在課堂中____筆記，以幫助記憶。',
+    answer: 'A',
+    answerDisplay: 'take',
+    mainQuestion: '「____ notes」的固定搭配是？',
+    mainOptions: [
+      { key: 'A', text: 'take' },
+      { key: 'B', text: 'make' },
+      { key: 'C', text: 'write' },
+      { key: 'D', text: 'do' }
+    ],
+    explanation: '🕵️ 正確！「take notes」是「記筆記」的固定說法。這題有陷阱：write notes 感覺合理，但學術英文的標準說法是 take notes。',
+    guide: {
+      question: '「記筆記」的正確英文說法通常是？',
+      options: [
+        { key: 'A', text: 'take notes（記筆記）' },
+        { key: 'B', text: 'write notes（寫筆記）' },
+        { key: 'C', text: 'make notes（製作筆記）' },
+        { key: 'D', text: 'do notes（做筆記）' }
+      ],
+      correctGuideKey: 'A',
+      guideExplain: '英文習慣說 take notes（記筆記），這是固定用法，就像 take a photo（拍照）一樣。'
+    }
+  },
+
+  // ── STAGE 3: 語境判斷 ──────────────────────────────────────
+  {
+    stage: 'STAGE 3 — 語境判斷線索',
+    stageTag: 'meaning',
+    lesson: {
+      title: '🔍 線索三：語境判斷',
+      content: '有些題目詞性和搭配都差不多，這時要看整句的意思。<br><br>做法：<br>1. 先讀整句，抓住主旨<br>2. 把四個選項分別帶入<br>3. 看哪個最符合上下文<br><br>這是學測近年越來越常考的題型，光靠詞性或搭配無法解題。'
+    },
+    sentence: 'After the storm, the streets were completely __BLANK__, with fallen trees and broken glass everywhere.',
+    contextHint: '風暴過後，街道完全____，到處是倒下的樹木和碎玻璃。',
+    answer: 'D',
+    answerDisplay: 'damaged',
+    mainQuestion: '根據後半句「到處是倒下的樹木和碎玻璃」，空格應填哪個形容詞？',
+    mainOptions: [
+      { key: 'A', text: 'empty（空的）' },
+      { key: 'B', text: 'quiet（安靜的）' },
+      { key: 'C', text: 'clean（乾淨的）' },
+      { key: 'D', text: 'damaged（受損的）' }
+    ],
+    explanation: '🕵️ 正確！後半句說「到處是倒下的樹木和碎玻璃」，這是破壞的景象，所以填 damaged（受損的）。A、B、C 的意思都不符合這個描述。',
+    guide: {
+      question: '後半句的「倒下的樹木、碎玻璃」在描述什麼情況？',
+      options: [
+        { key: 'A', text: '街道空曠沒有人' },
+        { key: 'B', text: '環境很安靜' },
+        { key: 'C', text: '物品都被破壞了' },
+        { key: 'D', text: '地方很乾淨' }
+      ],
+      correctGuideKey: 'C',
+      guideExplain: '後半句提到「倒樹和碎玻璃」，這是破壞的景象，所以選 damaged（受損的）最合邏輯。'
+    }
+  },
+  {
+    stage: 'STAGE 3 — 語境判斷線索',
+    stageTag: 'meaning',
+    sentence: 'Although the task was difficult, he refused to give up and continued to __BLANK__ hard until he succeeded.',
+    contextHint: '雖然任務很困難，他拒絕放棄，繼續____直到成功。',
+    answer: 'B',
+    answerDisplay: 'try',
+    mainQuestion: '根據「refused to give up（拒絕放棄）」這個線索，空格應填哪個動詞？',
+    mainOptions: [
+      { key: 'A', text: 'rest（休息）' },
+      { key: 'B', text: 'try（努力嘗試）' },
+      { key: 'C', text: 'complain（抱怨）' },
+      { key: 'D', text: 'wait（等待）' }
+    ],
+    explanation: '🕵️ 正確！「拒絕放棄」表示他要繼續努力，所以填 try（努力嘗試）最符合語境。rest / complain / wait 都和「不放棄」的邏輯矛盾。',
+    guide: {
+      question: '「拒絕放棄 + 繼續____」這個邏輯，說明接下來他應該做什麼？',
+      options: [
+        { key: 'A', text: '去休息' },
+        { key: 'B', text: '繼續嘗試努力' },
+        { key: 'C', text: '開始抱怨' },
+        { key: 'D', text: '等待別人幫忙' }
+      ],
+      correctGuideKey: 'B',
+      guideExplain: '「不放棄 → 繼續努力」是最合理的邏輯，所以選 try。'
+    }
+  },
+
+  // ── STAGE 4: 綜合題（搭配 + 語境）─────────────────────────
+  {
+    stage: 'STAGE 4 — 綜合線索',
+    stageTag: 'colloc',
+    lesson: {
+      title: '🔍 進階：同時用多種線索',
+      content: '到了這個階段，一個線索通常不夠用。你需要同時考慮：<br><br>・<b>句型</b>：詞性對嗎？<br>・<b>搭配</b>：有沒有固定組合？<br>・<b>語境</b>：整句意思合理嗎？<br><br>學測近年（111–114）的題目大多需要同時用到兩種以上線索才能解題。'
+    },
+    sentence: 'Scientists have been working hard to __BLANK__ a solution to the plastic pollution problem.',
+    contextHint: '科學家一直在努力____解決塑膠污染問題的方法。',
+    answer: 'A',
+    answerDisplay: 'find',
+    mainQuestion: '這一題需要同時考慮搭配和語境。哪個動詞和 "a solution" 最搭，且符合句子意思？',
+    mainOptions: [
+      { key: 'A', text: 'find（找到）' },
+      { key: 'B', text: 'lose（失去）' },
+      { key: 'C', text: 'need（需要）' },
+      { key: 'D', text: 'avoid（避免）' }
+    ],
+    explanation: '🕵️ 正確！「find a solution」是固定搭配（找到解決方法），且語境是「努力解決問題」，find 最符合邏輯。',
+    guide: {
+      question: '「a solution（解決方法）」通常和哪個動詞搭配？',
+      options: [
+        { key: 'A', text: 'find a solution（找到解決方法）' },
+        { key: 'B', text: 'lose a solution（失去解決方法）' },
+        { key: 'C', text: 'avoid a solution（避免解決方法）' },
+        { key: 'D', text: 'need a solution（需要解決方法）' }
+      ],
+      correctGuideKey: 'A',
+      guideExplain: '「find a solution」是固定搭配，表示「找到解決方法」。need a solution 語法雖然可以，但搭配上 find 更自然，且語境「努力工作去____」也暗示是要「找到」。'
+    }
+  },
+  {
+    stage: 'STAGE 4 — 綜合線索',
+    stageTag: 'meaning',
+    sentence: 'The teacher was very __BLANK__ when explaining the difficult concept, making sure every student could follow.',
+    contextHint: '這位老師在解釋困難概念時非常____，確保每個學生都能跟上。',
+    answer: 'C',
+    answerDisplay: 'patient',
+    mainQuestion: '後半句說「確保每個學生都能跟上」，空格應填哪個形容詞？',
+    mainOptions: [
+      { key: 'A', text: 'strict（嚴格的）' },
+      { key: 'B', text: 'angry（生氣的）' },
+      { key: 'C', text: 'patient（有耐心的）' },
+      { key: 'D', text: 'tired（疲倦的）' }
+    ],
+    explanation: '🕵️ 正確！「確保每個學生都能跟上」這個細節說明老師願意花時間等學生理解，這是「有耐心」的表現。strict 是嚴格，不符合；angry / tired 和這個正面描述矛盾。',
+    guide: {
+      question: '「確保每個學生都能跟上」這個行為，反映了老師什麼特質？',
+      options: [
+        { key: 'A', text: '很嚴格' },
+        { key: 'B', text: '很生氣' },
+        { key: 'C', text: '很有耐心' },
+        { key: 'D', text: '很疲倦' }
+      ],
+      correctGuideKey: 'C',
+      guideExplain: '願意放慢速度、確保大家跟上，這是耐心的表現，所以選 patient。'
+    }
+  },
+
+  // ── STAGE 5: 真實學測題風格 ────────────────────────────────
+  {
+    stage: 'STAGE 5 — 學測真實題型',
+    stageTag: 'colloc',
+    lesson: {
+      title: '🔍 最後挑戰：真實學測題風格',
+      content: '這個階段的題目選項詞性相同，意思也很接近。<br>這是學測最常見的陷阱！<br><br>做法：<br>1. 先確認詞性（這步驟很快）<br>2. 重點放在搭配和語境<br>3. 把每個選項帶入，找最合理的'
+    },
+    sentence: 'The government decided to __BLANK__ strict measures to deal with the rising crime rate.',
+    contextHint: '政府決定____嚴格措施，以應對不斷上升的犯罪率。',
+    answer: 'B',
+    answerDisplay: 'take',
+    mainQuestion: '四個選項都是動詞，哪個和 "strict measures（嚴格措施）" 最搭？',
+    mainOptions: [
+      { key: 'A', text: 'make（製造/做）' },
+      { key: 'B', text: 'take（採取）' },
+      { key: 'C', text: 'give（給予）' },
+      { key: 'D', text: 'find（找到）' }
+    ],
+    explanation: '🕵️ 正確！「take measures」是固定搭配，表示「採取措施」。這是學測高頻搭配詞，make / give / find 都不和 measures 搭配。',
+    guide: {
+      question: '「採取措施」的固定英文說法是？',
+      options: [
+        { key: 'A', text: 'make measures' },
+        { key: 'B', text: 'take measures' },
+        { key: 'C', text: 'give measures' },
+        { key: 'D', text: 'do measures' }
+      ],
+      correctGuideKey: 'B',
+      guideExplain: '「採取措施」固定說 take measures，和 take action（採取行動）是同樣的搭配模式。'
+    }
+  },
+  {
+    stage: 'STAGE 5 — 學測真實題型',
+    stageTag: 'meaning',
+    sentence: 'Despite having very little money, she managed to __BLANK__ enough to buy a small gift for her mother.',
+    contextHint: '儘管幾乎沒有錢，她還是設法____足夠的錢買了一份小禮物給媽媽。',
+    answer: 'D',
+    answerDisplay: 'save',
+    mainQuestion: '「儘管幾乎沒有錢，卻還是能買禮物」——這個邏輯暗示她做了什麼？',
+    mainOptions: [
+      { key: 'A', text: 'spend（花費）' },
+      { key: 'B', text: 'borrow（借）' },
+      { key: 'C', text: 'lose（失去）' },
+      { key: 'D', text: 'save（存起來）' }
+    ],
+    explanation: '🕵️ 正確！句子說「幾乎沒有錢，但 managed to ____ enough」——能夠「存到足夠的錢」才能買禮物。spend 是花錢，方向相反；borrow 語感不符；lose 更不可能。',
+    guide: {
+      question: '「幾乎沒有錢，卻能____ enough（足夠）去買禮物」，她做了什麼？',
+      options: [
+        { key: 'A', text: '花掉更多錢' },
+        { key: 'B', text: '借錢' },
+        { key: 'C', text: '存了足夠的錢' },
+        { key: 'D', text: '失去了錢' }
+      ],
+      correctGuideKey: 'C',
+      guideExplain: '「幾乎沒錢但還是能買到」→ 她一點一點把錢存起來。所以 save（存錢）最合邏輯。'
+    }
+  },
+  {
+    stage: 'STAGE 5 — 學測真實題型',
+    stageTag: 'colloc',
+    sentence: 'The researchers have been trying to __BLANK__ light on the mystery of how ancient people built these large stone structures.',
+    contextHint: '研究人員一直試圖____古代人如何建造這些大型石造建築的謎。',
+    answer: 'A',
+    answerDisplay: 'shed',
+    mainQuestion: '「shed light on」是固定片語，意思是「揭開……的謎/闡明」。空格填哪個字？',
+    mainOptions: [
+      { key: 'A', text: 'shed（投射）' },
+      { key: 'B', text: 'put（放）' },
+      { key: 'C', text: 'bring（帶來）' },
+      { key: 'D', text: 'give（給）' }
+    ],
+    explanation: '🕵️ 正確！「shed light on something」是固定片語，表示「揭示/闡明某件事」。這是學測近年常出現的進階搭配，只有 shed 正確。',
+    guide: {
+      question: '看到「___ light on the mystery」——你有沒有印象這是哪個固定片語？',
+      options: [
+        { key: 'A', text: '是 shed light on（揭開謎題）' },
+        { key: 'B', text: '是 put light on（放光在上面）' },
+        { key: 'C', text: '是 bring light on（帶來光）' },
+        { key: 'D', text: '我沒有印象，不確定' }
+      ],
+      correctGuideKey: 'A',
+      guideExplain: '「shed light on」是固定片語，意思是「對某事提供新的見解或解釋」。這是學測高階搭配，建議記起來！'
+    }
+  }
+];
+
+// ============================================================
+//  GAME STATE
+// ============================================================
+let currentQ = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let wrongList = [];
+let waitingForGuide = false;
+let guideShown = false;
+
+function startGame() {
+  document.getElementById('screen-welcome').style.display = 'none';
+  document.getElementById('screen-game').style.display = 'flex';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  const total = questions.length;
+
+  // Progress
+  document.getElementById('prog-label').textContent = `關卡 ${currentQ + 1} / ${total}`;
+  document.getElementById('score-correct').textContent = correctCount;
+  document.getElementById('score-wrong').textContent = wrongCount;
+  document.getElementById('prog-fill').style.width = `${(currentQ / total) * 100}%`;
+
+  // Stage
+  document.getElementById('stage-label').textContent = q.stage;
+
+  // Lesson
+  const lBox = document.getElementById('lesson-box');
+  if (q.lesson && !guideShown) {
+    lBox.style.display = 'block';
+    document.getElementById('lesson-title').textContent = q.lesson.title;
+    document.getElementById('lesson-content').innerHTML = q.lesson.content;
+  } else {
+    lBox.style.display = 'none';
+  }
+
+  // Question meta
+  document.getElementById('q-meta').textContent = `CASE ${String(currentQ + 1).padStart(2, '0')}`;
+
+  // Sentence
+  const tagMap = { grammar: 'tag-grammar', colloc: 'tag-colloc', meaning: 'tag-meaning' };
+  const tagLabelMap = { grammar: '句型', colloc: '搭配', meaning: '語境' };
+  const tag = `<span class="tag ${tagMap[q.stageTag]}">${tagLabelMap[q.stageTag]}</span>`;
+  const sentHTML = q.sentence.replace('__BLANK__', `<span class="blank" id="blank-span">______</span>`);
+  document.getElementById('sentence-display').innerHTML = sentHTML + tag;
+
+  // Context hint
+  const ch = document.getElementById('context-hint');
+  ch.textContent = q.contextHint || '';
+
+  // Guide question / main question
+  document.getElementById('guide-question').innerHTML = q.mainQuestion;
+
+  // Options
+  renderOptions(q.mainOptions);
+
+  // Clear feedback
+  const fb = document.getElementById('feedback-box');
+  fb.className = 'feedback';
+  fb.style.display = 'none';
+
+  // Buttons
+  document.getElementById('next-btn').className = 'action-btn primary';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('retry-btn').style.display = 'none';
+
+  waitingForGuide = false;
+}
+
+function renderOptions(opts) {
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="key">${opt.key}</span>${opt.text}`;
+    btn.onclick = () => handleAnswer(opt.key);
+    container.appendChild(btn);
+  });
+}
+
+function handleAnswer(chosen) {
+  const q = questions[currentQ];
+  disableOptions();
+
+  if (!waitingForGuide) {
+    // First attempt — main question
+    if (chosen === q.answer) {
+      markOption(chosen, true);
+      highlightBlank(true, q.answerDisplay);
+      showFeedback('good', '🕵️ 正確！', q.explanation);
+      document.getElementById('next-btn').style.display = 'block';
+      document.getElementById('next-btn').textContent = currentQ < questions.length - 1 ? '下一題 →' : '查看成績';
+      document.getElementById('next-btn').onclick = nextQuestion;
+      correctCount++;
+      document.getElementById('score-correct').textContent = correctCount;
+    } else {
+      markOption(chosen, false);
+      highlightBlank(false);
+      wrongCount++;
+      document.getElementById('score-wrong').textContent = wrongCount;
+      // Show guide question
+      showFeedback('bad', '🕵️ 再想想', '你選的答案不太對。讓我給你一個線索，重新想想看——');
+      setTimeout(() => {
+        showGuide(q);
+      }, 800);
+    }
+  } else {
+    // Guide attempt
+    if (chosen === q.guide.correctGuideKey) {
+      showFeedback('info', '🕵️ 找到線索了！', q.guide.guideExplain + '<br><br>現在回去選選看正確答案：');
+      // Re-render main options, allow retry
+      renderOptions(q.mainOptions);
+      waitingForGuide = false;
+      document.getElementById('guide-question').innerHTML = q.mainQuestion;
+      // Mark the blank as reset
+      const bl = document.getElementById('blank-span');
+      if (bl) { bl.className = 'blank'; bl.textContent = '______'; }
+    } else {
+      showFeedback('bad', '🕵️ 線索找錯了', '再看一下句子，重新觀察一次。');
+      document.getElementById('retry-btn').style.display = 'block';
+    }
+  }
+}
+
+function showGuide(q) {
+  document.getElementById('guide-question').innerHTML = q.guide.question;
+  renderOptions(q.guide.options);
+  waitingForGuide = true;
+  document.getElementById('feedback-box').style.display = 'none';
+}
+
+function retryGuide() {
+  const q = questions[currentQ];
+  document.getElementById('retry-btn').style.display = 'none';
+  showGuide(q);
+  document.getElementById('feedback-box').style.display = 'none';
+}
+
+function showFeedback(type, title, content) {
+  const fb = document.getElementById('feedback-box');
+  fb.className = `feedback ${type} show`;
+  fb.style.display = 'block';
+  document.getElementById('fb-title').textContent = title;
+  document.getElementById('fb-content').innerHTML = content;
+}
+
+function markOption(key, correct) {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(btn => {
+    const k = btn.querySelector('.key').textContent;
+    if (k === key) {
+      btn.classList.add(correct ? 'correct-anim' : 'wrong-anim');
+    }
+  });
+}
+
+function highlightBlank(correct, word) {
+  const bl = document.getElementById('blank-span');
+  if (!bl) return;
+  if (correct) {
+    bl.className = 'blank correct';
+    bl.textContent = word;
+  } else {
+    bl.className = 'blank wrong';
+  }
+}
+
+function disableOptions() {
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+}
+
+function nextQuestion() {
+  const q = questions[currentQ];
+  // Track wrong answers
+  const wasWrong = wrongCount > (questions.slice(0, currentQ).reduce((a) => a, 0));
+  // Simple: check if blank is red (wrong on first try)
+  const bl = document.getElementById('blank-span');
+  if (bl && bl.classList.contains('wrong')) {
+    wrongList.push({ q, answerDisplay: q.answerDisplay });
+  }
+
+  currentQ++;
+  guideShown = false;
+  if (currentQ >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function nextStep() {}
+
+function showResult() {
+  document.getElementById('screen-game').style.display = 'none';
+  document.getElementById('screen-result').style.display = 'flex';
+
+  document.getElementById('final-score').textContent = `${correctCount}/${questions.length}`;
+
+  let msg = '';
+  const pct = correctCount / questions.length;
+  if (pct >= 0.9) msg = '🏆 太厲害了！你已經掌握偵探解題法，繼續練習學測真題吧！';
+  else if (pct >= 0.7) msg = '🕵️ 做得很好！大部分的線索你都能抓到，再多練搭配詞就更穩了。';
+  else if (pct >= 0.5) msg = '💪 有進步空間！搭配詞和語境線索是你需要加強的重點，多練就會有感覺。';
+  else msg = '📖 基礎打穩最重要！建議先把三種線索的用法熟悉，再挑戰難題。';
+
+  document.getElementById('result-message').textContent = msg;
+
+  // Wrong review
+  const wr = document.getElementById('wrong-review');
+  if (wrongList.length > 0) {
+    let html = '<div style="font-family:Space Mono,monospace;font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;">需要複習的題目</div>';
+    wrongList.forEach((item, i) => {
+      const sentFormatted = item.q.sentence.replace('__BLANK__', `<b style="color:var(--green)">${item.answerDisplay}</b>`);
+      html += `<div class="wrong-item">
+        <div class="wi-label">複習 ${i + 1}</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.8;">${sentFormatted}</div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text-dim);">✓ 答案：<span class="wi-answer">${item.answerDisplay}</span></div>
+      </div>`;
+    });
+    wr.innerHTML = html;
+  } else {
+    wr.innerHTML = '';
+  }
+}
+
+function resetGame() {
+  currentQ = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  wrongList = [];
+  waitingForGuide = false;
+  guideShown = false;
+  document.getElementById('screen-result').style.display = 'none';
+  document.getElementById('screen-game').style.display = 'flex';
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
