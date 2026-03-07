@@ -474,7 +474,7 @@ const LESSONS = [
   // STAGE 1 — 詞性
   { id:'1-1', stage:1, title:'名詞判定：冠詞、形容詞後',    desc:'a/an/the、形容詞之後 → 名詞',   tag:'g', unlock:null },
   { id:'1-2', stage:1, title:'動詞原形：助動詞、to 後',      desc:'can/should/to 之後 → 動詞原形', tag:'g', unlock:'1-1' },
-  { id:'1-3', stage:1, title:'形容詞：系動詞、感官動詞後',   desc:'be/feel/look/seem → 形容詞',    tag:'g', unlock:'1-2' },
+  { id:'1-3', stage:1, title:'形容詞：連綴動詞、感官動詞後',   desc:'be/feel/look/seem → 形容詞',    tag:'g', unlock:'1-2' },
   { id:'1-4', stage:1, title:'副詞：修飾動詞或 V-ed',        desc:'be + ___ + V-ed → 副詞(-ly)',  tag:'g', unlock:'1-3' },
   // STAGE 2 — 搭配 + 介系詞
   { id:'2-1', stage:2, title:'形容詞 + for 介系詞',           desc:'be responsible/noted for…',      tag:'c', unlock:'1-4' },
@@ -712,8 +712,9 @@ function handleOpt(chosen) {
       highlightBlank(true, q.ansWord);
       cur.correct++;
       document.getElementById('prac-c').textContent = cur.correct;
-      // 加上年度標示
-      const yearTag = q.year ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-xs);margin-left:6px;">(${q.year})</span>` : '';
+      // 加年度標示（如果 explain 裡沒有已有的話）
+      const yearTag = (q.year && !q.explain.includes(q.year))
+        ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-xs);margin-left:6px;">(${q.year})</span>` : '';
       showFB('good', '🕵️ 正確！', q.explain + yearTag);
       showNext(cur.qIdx < QUESTION_DATA[cur.lessonId].length - 1 ? '下一題 →' : '查看成績', pracNext);
     } else {
@@ -748,7 +749,8 @@ function handleOpt(chosen) {
 
   } else if (cur.mode === 'retry-main') {
     // ── 第二次作答 ──
-    const yearTag = q.year ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-xs);margin-left:6px;">(${q.year})</span>` : '';
+    const yearTag = (q.year && !q.explain.includes(q.year))
+      ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-xs);margin-left:6px;">(${q.year})</span>` : '';
     if (chosen === q.ans) {
       markOpt(chosen, true);
       highlightBlank(true, q.ansWord);
@@ -1145,7 +1147,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'只有動詞 is'},{k:'B',t:'形容詞 beautiful + 指示詞 This'},{k:'C',t:'副詞 very'},{k:'D',t:'冠詞 a'}],
     clueKey:'B', clueExplain:'<b>This beautiful ___</b> → 指示詞 + 形容詞 + 空格，需要填<b>名詞</b>。現在選答案：',
     mainQ:'「This beautiful ___」需要名詞，哪個選項是名詞？',
-    mainOpts:[{k:'A',t:'ring（戒指）— 名詞 ✓'},{k:'B',t:'sing（唱歌）— 動詞'},{k:'C',t:'shiny（閃亮的）— 形容詞'},{k:'D',t:'brightly（明亮地）— 副詞'}],
+    mainOpts:[{k:'A',t:'ring（戒指）— 名詞'},{k:'B',t:'sing（唱歌）— 動詞'},{k:'C',t:'shiny（閃亮的）— 形容詞'},{k:'D',t:'brightly（明亮地）— 副詞'}],
     ans:'A', ansWord:'ring',
     explain:'🕵️ 正確！This beautiful + <b>名詞</b>，選 ring（戒指）。',
     guide:{ q:'「This beautiful ___」空格前有指示詞和形容詞，後面需要什麼詞性？',
@@ -1158,7 +1160,7 @@ const QUESTION_DATA = {
     sentence:'This common ___ is a wonder of simplicity and function.',
     ctx:'這個常見的____是簡單和功能的奇跡。（104年，答案是 device）',
     mainQ:'「This common ___」需要名詞。根據句意（簡單和功能的奇跡），哪個最合適？',
-    mainOpts:[{k:'A',t:'device（裝置）— 名詞 ✓'},{k:'B',t:'common（普通的）— 形容詞，已有了'},{k:'C',t:'function（功能）— 已在句子裡'},{k:'D',t:'wonder（奇跡）— 已在句子裡'}],
+    mainOpts:[{k:'A',t:'device（裝置）— 名詞'},{k:'B',t:'common（普通的）— 形容詞，已有了'},{k:'C',t:'function（功能）— 已在句子裡'},{k:'D',t:'wonder（奇跡）— 已在句子裡'}],
     ans:'A', ansWord:'device',
     explain:'🕵️ 正確！This common <b>device</b>（這個常見的裝置）= 名詞位置，是描述「迴紋針」的句子（104年學測）。',
     guide:{ q:'「This common ___」空格前有指示詞 this + 形容詞 common，空格需要什麼？',
@@ -1168,10 +1170,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The government announced an important ___ to fight climate change.',
-    mainQ:'What word fits "an important ___"?',
+    mainQ:'「an important ___」空格需要名詞，哪個選項正確？',
     mainOpts:[{k:'A',t:'initiative'},{k:'B',t:'initiate'},{k:'C',t:'initiated'},{k:'D',t:'initiating'}],
     ans:'A', ansWord:'initiative',
-    explain:'🕵️ "an important ___" → article + adjective → noun. "initiative"（倡議）is the noun form.',
+    explain:'🕵️ 正確！an + adjective + ___ → 名詞位置，initiative（倡議）是名詞形式。',
     guide:{ q:'「an important ___」中，冠詞 an + 形容詞 important 後面需要什麼？',
       opts:[{k:'A',t:'名詞（initiative）'},{k:'B',t:'動詞（initiate）'},{k:'C',t:'過去式（initiated）'},{k:'D',t:'動名詞（initiating）'}],
       key:'A', explain:'冠詞 + 形容詞 → 需要名詞，所以選 initiative。' }
@@ -1180,10 +1182,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'98年學測',
     sentence:'The ___ and consistent will always beat slow and steady.',
-    mainQ:'Which word fits "The ___ and consistent"? (98年學測)',
+    mainQ:'「The ___ and consistent」，哪個詞填入最合適？（98年學測）',
     mainOpts:[{k:'A',t:'fast'},{k:'B',t:'fastly'},{k:'C',t:'fasten'},{k:'D',t:'fastness'}],
     ans:'A', ansWord:'fast',
-    explain:'🕵️ "The ___ and consistent" — "The" precedes a noun or adjective functioning as a noun. "fast"（快的）here parallels "consistent"（穩定的）as an adjective used as a noun phrase. (98年)',
+    explain:'🕵️ 正確！The ___ and consistent 中，fast（快的）和 consistent 並列作形容詞，選 fast。（98年學測）',
     guide:{ q:'「The ___ and consistent」— consistent 是形容詞，空格也需要相同詞性的什麼？',
       opts:[{k:'A',t:'形容詞（fast）'},{k:'B',t:'副詞（fastly）'},{k:'C',t:'動詞（fasten）'},{k:'D',t:'名詞（fastness）'}],
       key:'A', explain:'consistent 是形容詞，前面的空格也要填形容詞 fast，兩者並列。' }
@@ -1192,10 +1194,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'104年學測',
     sentence:'The name most frequently associated with the paperclip ___ is Johan Vaaler.',
-    mainQ:'Which word fits "the paperclip ___"? (104年學測)',
+    mainQ:'「the paperclip ___」空格需要名詞，哪個選項正確？（104年學測）',
     mainOpts:[{k:'A',t:'invention'},{k:'B',t:'invent'},{k:'C',t:'inventive'},{k:'D',t:'invented'}],
     ans:'A', ansWord:'invention',
-    explain:'🕵️ "the paperclip ___" → "the" + noun already established (paperclip) modifying the blank → noun needed. "invention"（發明）is correct. (104年)',
+    explain:'🕵️ 正確！the + paperclip + 空格 = 複合名詞，invention（發明）是名詞。（104年學測）',
     guide:{ q:'「the paperclip ___」— the 後面加一個名詞 paperclip，空格是第二個名詞位置，需要？',
       opts:[{k:'A',t:'名詞（invention）'},{k:'B',t:'動詞（invent）'},{k:'C',t:'形容詞（inventive）'},{k:'D',t:'過去分詞（invented）'}],
       key:'A', explain:'the + 名詞 paperclip + 空格（名詞）= 複合名詞 paperclip invention（迴紋針的發明）。' }
@@ -1234,7 +1236,7 @@ const QUESTION_DATA = {
     sentence:'Napping may significantly ___ age-related brain shrinkage in older adults.',
     ctx:'打盹可能顯著地____老年人與年齡相關的大腦萎縮。（113年）',
     mainQ:'「may significantly ___」— may 是助動詞，後面需要動詞原形。哪個選項正確？',
-    mainOpts:[{k:'A',t:'delay（延緩）— 動詞原形 ✓'},{k:'B',t:'delayed（延緩了）— 過去式'},{k:'C',t:'delaying（正在延緩）— 動名詞'},{k:'D',t:'delays（第三人稱單數）'}],
+    mainOpts:[{k:'A',t:'delay（延緩）— 動詞原形'},{k:'B',t:'delayed（延緩了）— 過去式'},{k:'C',t:'delaying（正在延緩）— 動名詞'},{k:'D',t:'delays（第三人稱單數）'}],
     ans:'A', ansWord:'delay',
     explain:'🕵️ 正確！may + 動詞原形，選 delay（延緩）。研究顯示打盹可能延緩大腦萎縮（113年學測）。',
     guide:{ q:'「may ___」— may 是助動詞，後面接什麼？',
@@ -1244,10 +1246,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The company decided to ___ its headquarters to a larger city.',
-    mainQ:'Which word fits "decided to ___"?',
+    mainQ:'「decided to ___」，to 後面需要什麼形式的動詞？',
     mainOpts:[{k:'A',t:'relocated'},{k:'B',t:'relocating'},{k:'C',t:'relocate'},{k:'D',t:'relocation'}],
     ans:'C', ansWord:'relocate',
-    explain:'🕵️ "decided to ___" → to + verb base form. "relocate"（遷移）is the correct form.',
+    explain:'🕵️ 正確！decided to + 動詞原形，選 relocate（遷移）。',
     guide:{ q:'「decided to ___」— to 後面接什麼？',
       opts:[{k:'A',t:'過去式（relocated）'},{k:'B',t:'動名詞（relocating）'},{k:'C',t:'動詞原形（relocate）'},{k:'D',t:'名詞（relocation）'}],
       key:'C', explain:'to 後面接動詞原形，所以選 relocate。' }
@@ -1256,10 +1258,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'90年學測',
     sentence:'I had always thought it was more securely ___ in place.',
-    mainQ:'Which word fits "more securely ___"? (90年學測)',
+    mainQ:'「was more securely ___」是被動語態，空格填什麼？（90年學測）',
     mainOpts:[{k:'A',t:'fix'},{k:'B',t:'fixing'},{k:'C',t:'fixed'},{k:'D',t:'fixes'}],
     ans:'C', ansWord:'fixed',
-    explain:'🕵️ "securely ___" — here the blank follows an adverb (securely) modifying a past participle. "fixed"（固定的）completes "securely fixed in place". (90年)',
+    explain:'🕵️ 正確！be + 副詞 securely + 過去分詞 fixed = 被動語態，securely fixed（安全地固定）。（90年學測）',
     guide:{ q:'「securely ___」— securely 是副詞，修飾後面的過去分詞，這裡是 be + 副詞 + V-ed 的結構，空格填？',
       opts:[{k:'A',t:'動詞原形（fix）'},{k:'B',t:'動名詞（fixing）'},{k:'C',t:'過去分詞（fixed）'},{k:'D',t:'第三人稱（fixes）'}],
       key:'C', explain:'be + 副詞 + 過去分詞 = 被動語態，所以填 fixed。' }
@@ -1268,10 +1270,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'112年改編',
     sentence:'Researchers suggest that people should ___ at least eight glasses of water daily.',
-    mainQ:'Which word fits "should ___"?',
+    mainQ:'「should ___」後面需要什麼形式的動詞？',
     mainOpts:[{k:'A',t:'drank'},{k:'B',t:'drinking'},{k:'C',t:'drink'},{k:'D',t:'drunk'}],
     ans:'C', ansWord:'drink',
-    explain:'🕵️ "should ___" → modal verb + base form. "drink"（喝）is the verb base form.',
+    explain:'🕵️ 正確！should + 動詞原形，選 drink（喝）。',
     guide:{ q:'「should ___」— should 是助動詞，後面接什麼？',
       opts:[{k:'A',t:'過去式（drank）'},{k:'B',t:'動名詞（drinking）'},{k:'C',t:'動詞原形（drink）'},{k:'D',t:'過去分詞（drunk）'}],
       key:'C', explain:'助動詞 should 後面固定接動詞原形 drink。' }
@@ -1279,25 +1281,25 @@ const QUESTION_DATA = {
 ],
 
 // ──────────────────────────────────────────────────────
-// 1-3  形容詞：系動詞、感官動詞後
+// 1-3  形容詞：連綴動詞、感官動詞後
 // ──────────────────────────────────────────────────────
 '1-3': [
   // Q1 demo
   { phase:'demo', source:'made',
-    lesson:{ title:'🔍 1-3 形容詞接在系動詞、感官動詞後',
+    lesson:{ title:'🔍 1-3 形容詞接在連綴動詞、感官動詞後',
       body:'這些動詞後面接<b>形容詞</b>，描述主詞的狀態（不是副詞！）：<br><br>'+
-           '・<b>系動詞</b>：be、become、get、remain、stay、turn<br>'+
+           '・<b>連綴動詞（Linking Verb）</b>：be、become、get、remain、stay、turn<br>'+
            '・<b>感官動詞</b>：feel、look、seem、appear、sound、taste、smell<br><br>'+
            '例：She <b>feels</b> <u>confident</u>. ✓　　　She feels <s>confidently</s>. ✗<br><br>'+
-           '<b>陷阱：</b>-ly 結尾的副詞看起來很像「答案」，但系動詞後要填形容詞！<br>'+
+           '<b>陷阱：</b>-ly 結尾的副詞看起來很像「答案」，但be動詞/連綴動詞後要填形容詞！<br>'+
            '例：The soup <b>smells</b> good（✓）不是 smells <s>well</s>（副詞）' },
     sentence:'After the long meeting, everyone felt very ___.',
     ctx:'漫長的會議結束後，每個人都感到非常____。',
     clueQ:'步驟一：「felt very ___」是什麼結構？',
-    clueOpts:[{k:'A',t:'felt 是動作動詞 → 後面填副詞'},{k:'B',t:'felt 是感官/系動詞 + very → 後面填形容詞'},{k:'C',t:'felt 後面填名詞'},{k:'D',t:'felt 後面填動詞原形'}],
+    clueOpts:[{k:'A',t:'felt 是動作動詞 → 後面填副詞'},{k:'B',t:'felt 是感官/連綴動詞 + very → 後面填形容詞'},{k:'C',t:'felt 後面填名詞'},{k:'D',t:'felt 後面填動詞原形'}],
     clueKey:'B', clueExplain:'felt（感覺）是感官動詞，very 加強程度，後面填<b>形容詞</b>。現在選答案：',
     mainQ:'「felt very ___」後面需要形容詞，哪個選項正確？',
-    mainOpts:[{k:'A',t:'tired（疲倦的）— 形容詞 ✓'},{k:'B',t:'tiredly（疲倦地）— 副詞'},{k:'C',t:'tire（輪胎/使疲倦）— 名詞或動詞'},{k:'D',t:'tiredness（疲倦）— 名詞'}],
+    mainOpts:[{k:'A',t:'tired（疲倦的）— 形容詞'},{k:'B',t:'tiredly（疲倦地）— 副詞'},{k:'C',t:'tire（輪胎/使疲倦）— 名詞或動詞'},{k:'D',t:'tiredness（疲倦）— 名詞'}],
     ans:'A', ansWord:'tired',
     explain:'🕵️ 正確！felt + 形容詞，選 tired（疲倦的）。漫長會議後大家很疲倦，邏輯也合理。',
     guide:{ q:'feel / look / seem 後面接什麼詞性？',
@@ -1309,33 +1311,33 @@ const QUESTION_DATA = {
     year:'100年學測',
     sentence:'This substance, when inhaled, is ___ for some serious lung diseases.',
     ctx:'這種物質吸入後，對某些嚴重的肺部疾病____。（100年）',
-    mainQ:'「is ___ for some serious lung diseases」— is 是系動詞，空格填形容詞。哪個最符合句意？',
-    mainOpts:[{k:'A',t:'responsible（造成…的）— 形容詞 ✓'},{k:'B',t:'responsibility（責任）— 名詞'},{k:'C',t:'responsibly（負責地）— 副詞'},{k:'D',t:'respond（回應）— 動詞'}],
+    mainQ:'「is ___ for some serious lung diseases」— is 是be動詞/連綴動詞，空格填形容詞。哪個最符合句意？',
+    mainOpts:[{k:'A',t:'responsible（造成…的）— 形容詞'},{k:'B',t:'responsibility（責任）— 名詞'},{k:'C',t:'responsibly（負責地）— 副詞'},{k:'D',t:'respond（回應）— 動詞'}],
     ans:'A', ansWord:'responsible',
     explain:'🕵️ 正確！be + 形容詞：<b>be responsible for</b>（是…的原因）。這是一個重要的搭配詞，後面我們在 2-1 還會練習！（100年學測）',
-    guide:{ q:'「is ___ for」— is 是系動詞，後面接什麼詞性？',
+    guide:{ q:'「is ___ for」— is 是be動詞/連綴動詞，後面接什麼詞性？',
       opts:[{k:'A',t:'名詞（responsibility）'},{k:'B',t:'形容詞（responsible）'},{k:'C',t:'副詞（responsibly）'},{k:'D',t:'動詞（respond）'}],
-      key:'B', explain:'系動詞 is 後接形容詞，所以選 responsible。' }
+      key:'B', explain:'be動詞 is 後接形容詞，所以選 responsible。' }
   },
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The new policy remains ___ despite strong opposition from the public.',
-    mainQ:'Which word fits "remains ___"?',
+    mainQ:'「remains ___」— remains 是連綴動詞，空格填哪個詞？',
     mainOpts:[{k:'A',t:'controversy'},{k:'B',t:'controversially'},{k:'C',t:'controversial'},{k:'D',t:'controversialize'}],
     ans:'C', ansWord:'controversial',
-    explain:'🕵️ "remains ___" → linking verb → adjective. "controversial"（有爭議的）.',
-    guide:{ q:'remain（保持）是系動詞，後面接什麼詞性？',
+    explain:'🕵️ 正確！remains 是連綴動詞，後接形容詞 controversial（有爭議的）。',
+    guide:{ q:'remain（保持）是be動詞/連綴動詞，後面接什麼詞性？',
       opts:[{k:'A',t:'名詞（controversy）'},{k:'B',t:'副詞（controversially）'},{k:'C',t:'形容詞（controversial）'},{k:'D',t:'動詞'}],
-      key:'C', explain:'系動詞 remain 後接形容詞 controversial（有爭議的）。' }
+      key:'C', explain:'連綴動詞 remain 後接形容詞 controversial（有爭議的）。' }
   },
   // Q4 solo (真題 108年)
   { phase:'solo', source:'real',
     year:'108年',
     sentence:'My father\'s poor memory gave him certain advantages, though. He seemed ___ to many people.',
-    mainQ:'Which word fits "seemed ___"?',
+    mainQ:'「seemed ___」— seemed 是感官動詞，空格填哪個詞？',
     mainOpts:[{k:'A',t:'trustworthily'},{k:'B',t:'trustworthy'},{k:'C',t:'trustworthiness'},{k:'D',t:'trust'}],
     ans:'B', ansWord:'trustworthy',
-    explain:'🕵️ "seemed ___" → linking verb → adjective. "trustworthy"（值得信賴的）describes how the father appeared to people. (108年)',
+    explain:'🕵️ 正確！seemed 是感官動詞，後接形容詞 trustworthy（值得信賴的）。（108年學測）',
     guide:{ q:'seem（似乎）是感官動詞，後面接什麼詞性？',
       opts:[{k:'A',t:'副詞（trustworthily）'},{k:'B',t:'形容詞（trustworthy）'},{k:'C',t:'名詞（trustworthiness）'},{k:'D',t:'動詞（trust）'}],
       key:'B', explain:'感官動詞 seem 後接形容詞 trustworthy（值得信賴的）。' }
@@ -1344,13 +1346,13 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'學測改編',
     sentence:'The discovery of the new drug turned out to be ___ for millions of patients worldwide.',
-    mainQ:'Which word fits "turned out to be ___"?',
+    mainQ:'「turned out to be ___」— be 是連綴動詞，空格填哪個詞？',
     mainOpts:[{k:'A',t:'life-savingly'},{k:'B',t:'life-saving'},{k:'C',t:'life-saved'},{k:'D',t:'life-saver'}],
     ans:'B', ansWord:'life-saving',
-    explain:'🕵️ "turned out to be ___" → "be" is a linking verb → adjective needed. "life-saving"（救命的）is the adjective.',
-    guide:{ q:'「turned out to be ___」中，be 是系動詞，後面接什麼詞性？',
+    explain:'🕵️ 正確！turned out to be + 形容詞，life-saving（救命的）是形容詞。',
+    guide:{ q:'「turned out to be ___」中，be 是be動詞/連綴動詞，後面接什麼詞性？',
       opts:[{k:'A',t:'副詞（life-savingly）'},{k:'B',t:'形容詞（life-saving）'},{k:'C',t:'過去分詞（life-saved）'},{k:'D',t:'名詞（life-saver）'}],
-      key:'B', explain:'be 是系動詞，後接形容詞 life-saving（救命的）。' }
+      key:'B', explain:'be 是be動詞/連綴動詞，後接形容詞 life-saving（救命的）。' }
   },
 ],
 
@@ -1366,7 +1368,7 @@ const QUESTION_DATA = {
            '&nbsp;&nbsp;例：was <b>widely</b> used、is <b>commonly</b> known<br><br>'+
            '2. <b>動詞 + ___</b>（動詞後面修飾動作）：<br>'+
            '&nbsp;&nbsp;例：speaks <b>fluently</b>、reacted <b>quickly</b><br><br>'+
-           '陷阱：be + ___ + 形容詞 → 是系動詞後的形容詞（Unit 1-3）<br>'+
+           '陷阱：be + ___ + 形容詞 → 是be動詞/連綴動詞後的形容詞（Unit 1-3）<br>'+
            'be + ___ + V-ed → 是被動語態中間的<b>副詞</b>（本節重點）' },
     sentence:'The door was ___ closed by the security guard.',
     ctx:'門被保全____關上了。',
@@ -1374,7 +1376,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'was + 形容詞 + 名詞 → 填形容詞'},{k:'B',t:'was + ___ + V-ed（被動語態）→ 空格填副詞'},{k:'C',t:'was + 動詞原形 → 填動詞'},{k:'D',t:'was + 名詞 → 填名詞'}],
     clueKey:'B', clueExplain:'<b>was + ___ + closed（V-ed）</b> = 被動語態，空格在動詞前修飾，需要填<b>副詞</b>。現在選答案：',
     mainQ:'「was ___ closed」需要副詞，哪個選項正確？',
-    mainOpts:[{k:'A',t:'tight（緊的）— 形容詞'},{k:'B',t:'tightly（緊緊地）— 副詞 ✓'},{k:'C',t:'tightness（緊繃）— 名詞'},{k:'D',t:'tighten（拉緊）— 動詞'}],
+    mainOpts:[{k:'A',t:'tight（緊的）— 形容詞'},{k:'B',t:'tightly（緊緊地）— 副詞'},{k:'C',t:'tightness（緊繃）— 名詞'},{k:'D',t:'tighten（拉緊）— 動詞'}],
     ans:'B', ansWord:'tightly',
     explain:'🕵️ 正確！was ___ closed = 被動語態，空格填副詞 tightly（緊緊地）。',
     guide:{ q:'「was ___ closed」— be + ___ + V-ed 結構，空格填什麼詞性？',
@@ -1387,7 +1389,7 @@ const QUESTION_DATA = {
     sentence:'I had always thought it was more ___ fixed in place.',
     ctx:'我一直以為它被更____地固定在原位。（90年）',
     mainQ:'「was more ___ fixed」— 這是被動語態結構，空格修飾 fixed，需要副詞。哪個正確？',
-    mainOpts:[{k:'A',t:'secure（安全的）— 形容詞'},{k:'B',t:'securely（安全地）— 副詞 ✓'},{k:'C',t:'security（安全）— 名詞'},{k:'D',t:'secure（動詞）— 動詞'}],
+    mainOpts:[{k:'A',t:'secure（安全的）— 形容詞'},{k:'B',t:'securely（安全地）— 副詞'},{k:'C',t:'security（安全）— 名詞'},{k:'D',t:'secure（動詞）— 動詞'}],
     ans:'B', ansWord:'securely',
     explain:'🕵️ 正確！be + <b>securely</b>（副詞）+ fixed（V-ed）= 被動語態，副詞修飾過去分詞。（90年學測）',
     guide:{ q:'「was more ___ fixed」— V-ed 前面的空格需要什麼詞性？',
@@ -1397,10 +1399,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The new treatment is ___ regarded as a breakthrough in cancer research.',
-    mainQ:'Which word fits "is ___ regarded"?',
+    mainQ:'「is ___ regarded」是被動語態，空格填什麼詞性？',
     mainOpts:[{k:'A',t:'wide'},{k:'B',t:'widely'},{k:'C',t:'wideness'},{k:'D',t:'widen'}],
     ans:'B', ansWord:'widely',
-    explain:'🕵️ "is ___ regarded" → be + ___ + V-ed (passive) → adverb needed. "widely"（廣泛地）.',
+    explain:'🕵️ 正確！被動語態 be + V-ed 中間填副詞 widely（廣泛地）。',
     guide:{ q:'「is ___ regarded」— 被動語態 be + V-ed，中間空格需要什麼？',
       opts:[{k:'A',t:'形容詞（wide）'},{k:'B',t:'副詞（widely）'},{k:'C',t:'名詞（wideness）'},{k:'D',t:'動詞（widen）'}],
       key:'B', explain:'be + V-ed 中間填副詞，所以選 widely（廣泛地）。' }
@@ -1409,10 +1411,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'95年學測',
     sentence:'Our relationships are ___ filled with unnecessary disagreements and conflicts.',
-    mainQ:'Which word fits "are ___ filled"? (95年學測)',
+    mainQ:'「are ___ filled」是被動語態，空格填什麼詞性？（95年學測）',
     mainOpts:[{k:'A',t:'necessary'},{k:'B',t:'unnecessarily'},{k:'C',t:'unnecessary'},{k:'D',t:'unnecessariness'}],
     ans:'B', ansWord:'unnecessarily',
-    explain:'🕵️ "are ___ filled" → be + ___ + V-ed (passive) → adverb. "unnecessarily"（不必要地）. (95年)',
+    explain:'🕵️ 正確！被動語態 be + V-ed 中間填副詞 unnecessarily（不必要地）。（95年學測）',
     guide:{ q:'「are ___ filled」— 被動語態，空格需要什麼詞性？',
       opts:[{k:'A',t:'形容詞（unnecessary）'},{k:'B',t:'副詞（unnecessarily）'},{k:'C',t:'名詞'},{k:'D',t:'動詞'}],
       key:'B', explain:'be + V-ed 中間填副詞，選 unnecessarily（不必要地）。' }
@@ -1421,10 +1423,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'學測改編',
     sentence:'This technology is ___ used in hospitals around the world.',
-    mainQ:'Which word fits "is ___ used"?',
+    mainQ:'「is ___ used」是被動語態，空格填什麼詞性？',
     mainOpts:[{k:'A',t:'common'},{k:'B',t:'commons'},{k:'C',t:'commonly'},{k:'D',t:'commonness'}],
     ans:'C', ansWord:'commonly',
-    explain:'🕵️ "is ___ used" → be + ___ + V-ed → adverb. "commonly"（普遍地）.',
+    explain:'🕵️ 正確！被動語態 be + V-ed 中間填副詞 commonly（普遍地）。',
     guide:{ q:'「is ___ used」的被動語態，空格需要副詞，哪個是副詞？',
       opts:[{k:'A',t:'形容詞（common）'},{k:'B',t:'名詞（commons）'},{k:'C',t:'副詞（commonly）'},{k:'D',t:'名詞（commonness）'}],
       key:'C', explain:'be + V-ed 中間填副詞 commonly（普遍地）。' }
@@ -1452,7 +1454,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'介系詞 with'},{k:'B',t:'介系詞 for'},{k:'C',t:'介系詞 in'},{k:'D',t:'介系詞 to'}],
     clueKey:'B', clueExplain:'空格後有介系詞 <b>for</b>，聯想「哪個形容詞 + for」搭配。現在選答案：',
     mainQ:'「be ___ for cleaning」哪個形容詞與 for 搭配且符合句意？',
-    mainOpts:[{k:'A',t:'responsible（負責的）— be responsible for ✓'},{k:'B',t:'famous（著名的）— be famous for（但說掃地不合）'},{k:'C',t:'ready（準備好的）— be ready for（語意不合）'},{k:'D',t:'sorry（抱歉的）— be sorry for（語意不合）'}],
+    mainOpts:[{k:'A',t:'responsible（負責的）— be responsible for'},{k:'B',t:'famous（著名的）— be famous for（但說掃地不合）'},{k:'C',t:'ready（準備好的）— be ready for（語意不合）'},{k:'D',t:'sorry（抱歉的）— be sorry for（語意不合）'}],
     ans:'A', ansWord:'responsible',
     explain:'🕵️ 正確！<b>be responsible for</b>（負責）是最符合「誰負責打掃」的句意。',
     guide:{ q:'「be ___ for + 做某件事」，最常見的"負責"搭配是？',
@@ -1465,7 +1467,7 @@ const QUESTION_DATA = {
     sentence:'This substance, when inhaled, is ___ for some serious lung diseases.',
     ctx:'這種物質吸入後，是某些嚴重肺部疾病的原因。（100年）',
     mainQ:'「is ___ for some serious lung diseases」— for 在後，哪個形容詞最符合「導致疾病」的句意？',
-    mainOpts:[{k:'A',t:'responsible（導致；造成）— be responsible for ✓'},{k:'B',t:'famous（著名的）— be famous for'},{k:'C',t:'sorry（抱歉的）— be sorry for'},{k:'D',t:'ready（準備好的）— be ready for'}],
+    mainOpts:[{k:'A',t:'responsible（導致；造成）— be responsible for'},{k:'B',t:'famous（著名的）— be famous for'},{k:'C',t:'sorry（抱歉的）— be sorry for'},{k:'D',t:'ready（準備好的）— be ready for'}],
     ans:'A', ansWord:'responsible',
     explain:'🕵️ 正確！<b>be responsible for</b> 在這裡意思是「導致（疾病）」，是 100 年學測的關鍵搭配。',
     guide:{ q:'「is ___ for some lung diseases」— 哪個形容詞 + for 表示「導致某事」？',
@@ -1475,10 +1477,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The organization is widely ___ for its work in protecting endangered animals.',
-    mainQ:'Which word fits "is widely ___ for its work"?',
+    mainQ:'「is widely ___ for its work」— for 在後，哪個詞和 for 搭配？',
     mainOpts:[{k:'A',t:'known'},{k:'B',t:'knowledge'},{k:'C',t:'knowing'},{k:'D',t:'knowledgeable'}],
     ans:'A', ansWord:'known',
-    explain:'🕵️ "be ___ for" → adjective/past participle needed. "known for"（以…著名）is the fixed collocation.',
+    explain:'🕵️ 正確！be + ___ + for → known for（以…著名）是固定搭配。',
     guide:{ q:'「be ___ for」— for 在後，哪個詞和 for 搭配表示「以…著名」？',
       opts:[{k:'A',t:'known for（以…著名）'},{k:'B',t:'knowledge（名詞）'},{k:'C',t:'knowing（動名詞）'},{k:'D',t:'knowledgeable for（不常見）'}],
       key:'A', explain:'be known for = 以…著名，是固定搭配。' }
@@ -1487,10 +1489,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'104年',
     sentence:'Johan Vaaler was ___ for his invention of the paperclip in 1899.',
-    mainQ:'Which word fits "was ___ for his invention"? (104年)',
+    mainQ:'「was ___ for his invention」— for 在後，哪個詞和 for 搭配？（104年學測）',
     mainOpts:[{k:'A',t:'noted'},{k:'B',t:'note'},{k:'C',t:'noting'},{k:'D',t:'notably'}],
     ans:'A', ansWord:'noted',
-    explain:'🕵️ "was ___ for" → be + adjective + for. "noted for"（以…著名）is the collocation. (104年)',
+    explain:'🕵️ 正確！noted for（以…著名）是固定搭配，和 known for 同義。（104年學測）',
     guide:{ q:'「was ___ for his invention」— for 在後，哪個形容詞/分詞和 for 搭配表示「以…著名」？',
       opts:[{k:'A',t:'noted for（著名於）'},{k:'B',t:'note（動詞/名詞）'},{k:'C',t:'noting（動名詞）'},{k:'D',t:'notably（副詞）'}],
       key:'A', explain:'noted for = 以…著名，和 known for、famous for 同義。' }
@@ -1499,10 +1501,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'98年改編',
     sentence:'The slow and steady tortoise was ___ for never giving up.',
-    mainQ:'Which word fits "was ___ for never giving up"?',
+    mainQ:'「was ___ for never giving up」— for 在後，哪個詞和 for 搭配？',
     mainOpts:[{k:'A',t:'admired'},{k:'B',t:'admire'},{k:'C',t:'admiring'},{k:'D',t:'admiration'}],
     ans:'A', ansWord:'admired',
-    explain:'🕵️ "was ___ for" → be + past participle/adjective + for. "admired for"（因…而受到欽佩）.',
+    explain:'🕵️ 正確！be admired for（因…受欽佩）是固定搭配。',
     guide:{ q:'「was ___ for never giving up」— for 在後，哪個詞和 for 搭配表示「因…受欽佩」？',
       opts:[{k:'A',t:'admired for（因…而受欽佩）'},{k:'B',t:'admire（動詞原形）'},{k:'C',t:'admiring（動名詞）'},{k:'D',t:'admiration（名詞）'}],
       key:'A', explain:'be admired for = 因…而受到欽佩，是 be + V-ed + for 的搭配。' }
@@ -1530,7 +1532,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'介系詞 for'},{k:'B',t:'介系詞 with'},{k:'C',t:'介系詞 in'},{k:'D',t:'介系詞 to'}],
     clueKey:'B', clueExplain:'空格後有 <b>with</b>，聯想「哪個動詞/分詞 + with」。現在選答案：',
     mainQ:'「___ with a one-year warranty（保固）」哪個動詞最合句意？',
-    mainOpts:[{k:'A',t:'comes（附帶）— comes with ✓'},{k:'B',t:'associated（相關）— 通常用被動 is associated with'},{k:'C',t:'filled（充滿）— 通常是 be filled with'},{k:'D',t:'charged（被控）— 語意不符'}],
+    mainOpts:[{k:'A',t:'comes（附帶）— comes with'},{k:'B',t:'associated（相關）— 通常用被動 is associated with'},{k:'C',t:'filled（充滿）— 通常是 be filled with'},{k:'D',t:'charged（被控）— 語意不符'}],
     ans:'A', ansWord:'comes',
     explain:'🕵️ 正確！<b>comes with</b>（附帶；配備）是日常英文常用搭配，例如「The phone comes with free earbuds.」',
     guide:{ q:'「___ with a one-year warranty」— 哪個動詞 + with 表示「附帶保固」？',
@@ -1543,7 +1545,7 @@ const QUESTION_DATA = {
     sentence:'The name most frequently ___ with the paperclip invention is Johan Vaaler.',
     ctx:'最常與迴紋針發明____在一起的名字是 Johan Vaaler。（104年）',
     mainQ:'「most frequently ___ with the paperclip」哪個分詞最符合「與…相連/相關」的意思？',
-    mainOpts:[{k:'A',t:'associated（相關的）— be associated with ✓'},{k:'B',t:'comes（附帶）— 通常不用被動'},{k:'C',t:'filled（充滿）— be filled with，語意不符'},{k:'D',t:'compared（比較）— be compared with，語意不符'}],
+    mainOpts:[{k:'A',t:'associated（相關的）— be associated with'},{k:'B',t:'comes（附帶）— 通常不用被動'},{k:'C',t:'filled（充滿）— be filled with，語意不符'},{k:'D',t:'compared（比較）— be compared with，語意不符'}],
     ans:'A', ansWord:'associated',
     explain:'🕵️ 正確！<b>be associated with</b>（與…相關/連結）是 104 年學測的關鍵搭配。',
     guide:{ q:'「___ with the paperclip invention」— 哪個分詞 + with 表示「與…相關聯」？',
@@ -1553,10 +1555,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The researchers found that stress is closely ___ with a higher risk of heart disease.',
-    mainQ:'Which word fits "is closely ___ with"?',
+    mainQ:'「is closely ___ with」— with 在後，空格填哪個形式？',
     mainOpts:[{k:'A',t:'associates'},{k:'B',t:'association'},{k:'C',t:'associated'},{k:'D',t:'associating'}],
     ans:'C', ansWord:'associated',
-    explain:'🕵️ "is closely ___ with" → be + past participle + with. "associated with"（與…相關）.',
+    explain:'🕵️ 正確！be + 過去分詞 + with → associated with（與…相關）。',
     guide:{ q:'「is closely ___ with」— be + ___ + with，空格填什麼形式？',
       opts:[{k:'A',t:'第三人稱（associates）'},{k:'B',t:'名詞（association）'},{k:'C',t:'過去分詞（associated）'},{k:'D',t:'動名詞（associating）'}],
       key:'C', explain:'be + 過去分詞 + with = 被動搭配，選 associated。' }
@@ -1565,10 +1567,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'學測改編',
     sentence:'The risks ___ with extreme sports should not be underestimated.',
-    mainQ:'Which word fits "The risks ___ with extreme sports"?',
+    mainQ:'「The risks ___ with extreme sports」— 哪個分詞修飾 risks？',
     mainOpts:[{k:'A',t:'associate'},{k:'B',t:'associating'},{k:'C',t:'associated'},{k:'D',t:'association'}],
     ans:'C', ansWord:'associated',
-    explain:'🕵️ "The risks ___ with" → the noun "risks" is modified by a past participle phrase. "associated with"（與…相關的）.',
+    explain:'🕵️ 正確！名詞後跟過去分詞片語 associated with 作後置修飾，the risks associated with（與…相關的風險）。',
     guide:{ q:'「The risks ___ with extreme sports」— risks 是名詞，後面跟著一個修飾詞組，空格填什麼？',
       opts:[{k:'A',t:'動詞原形（associate）'},{k:'B',t:'動名詞（associating）'},{k:'C',t:'過去分詞（associated）'},{k:'D',t:'名詞（association）'}],
       key:'C', explain:'名詞後跟過去分詞片語 associated with 作後置修飾，就像「the risk associated with…」（與…相關的風險）。' }
@@ -1577,10 +1579,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'學測改編',
     sentence:'Her bag was ___ with books, notebooks, and stationery.',
-    mainQ:'Which word fits "was ___ with books"?',
+    mainQ:'「was ___ with books」— be + ___ + with，空格填哪個形式？',
     mainOpts:[{k:'A',t:'filling'},{k:'B',t:'fill'},{k:'C',t:'filled'},{k:'D',t:'fills'}],
     ans:'C', ansWord:'filled',
-    explain:'🕵️ "was ___ with" → be + past participle + with. "filled with"（充滿）.',
+    explain:'🕵️ 正確！be + 過去分詞 + with → filled with（充滿）。',
     guide:{ q:'「was ___ with books」— be + ___ + with，空格填什麼形式？',
       opts:[{k:'A',t:'動名詞（filling）'},{k:'B',t:'動詞原形（fill）'},{k:'C',t:'過去分詞（filled）'},{k:'D',t:'第三人稱（fills）'}],
       key:'C', explain:'be + 過去分詞 = 被動語態，filled with = 充滿，選 filled。' }
@@ -1609,7 +1611,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'因果：因為打電動，所以讀書'},{k:'B',t:'對比：不打電動，而是讀書'},{k:'C',t:'補充：打電動而且讀書'},{k:'D',t:'時間：打電動之後讀書'}],
     clueKey:'B', clueExplain:'「不做 A（打電動），而是做 B（讀書）」→ 這是<b>替代/對比</b>的關係，應用「instead of」。現在選答案：',
     mainQ:'「___ playing video games, he chose to study」哪個三字片語最符合？',
-    mainOpts:[{k:'A',t:'Instead of（而不是）— 不打電動，而是讀書 ✓'},{k:'B',t:'Regardless of（不管）— 語意不符'},{k:'C',t:'As well as（還有）— 語意相反'},{k:'D',t:'Due to（由於）— 語意不符'}],
+    mainOpts:[{k:'A',t:'Instead of（而不是）— 不打電動，而是讀書'},{k:'B',t:'Regardless of（不管）— 語意不符'},{k:'C',t:'As well as（還有）— 語意相反'},{k:'D',t:'Due to（由於）— 語意不符'}],
     ans:'A', ansWord:'Instead of',
     explain:'🕵️ 正確！<b>instead of + V-ing</b>（而不是做…）→「不打電動，而是讀書」。',
     guide:{ q:'「不做 A（打電動），而做 B（讀書）」的三字片語是？',
@@ -1622,7 +1624,7 @@ const QUESTION_DATA = {
     sentence:'___ taking time to understand and respect each other, we become demanding.',
     ctx:'____花時間互相理解和尊重，我們變得太苛求。（94年）',
     mainQ:'「___ taking time to understand each other, we become demanding」— 不理解對方，反而苛求，選哪個片語？',
-    mainOpts:[{k:'A',t:'Instead of（而不是）— 不花時間，而是苛求 ✓'},{k:'B',t:'Regardless of（不管）— 語意不符'},{k:'C',t:'In addition to（除了）— 語意相反'},{k:'D',t:'As a result of（由於）— 語意不符'}],
+    mainOpts:[{k:'A',t:'Instead of（而不是）— 不花時間，而是苛求'},{k:'B',t:'Regardless of（不管）— 語意不符'},{k:'C',t:'In addition to（除了）— 語意相反'},{k:'D',t:'As a result of（由於）— 語意不符'}],
     ans:'A', ansWord:'Instead of',
     explain:'🕵️ 正確！<b>Instead of</b>（而不是）：「不花時間理解對方，反而變得苛求」。（94年學測）',
     guide:{ q:'「不做 A（理解對方），反而做 B（苛求）」應選哪個片語？',
@@ -1635,7 +1637,7 @@ const QUESTION_DATA = {
     mainQ:'Which phrase fits the blank?',
     mainOpts:[{k:'A',t:'In spite of'},{k:'B',t:'As a result of'},{k:'C',t:'Due to'},{k:'D',t:'According to'}],
     ans:'A', ansWord:'In spite of',
-    explain:'🕵️ "In spite of the bad weather... was held as scheduled" → contrast: bad weather (negative) but event happened (positive). "In spite of"（儘管）= despite.',
+    explain:'🕵️ 正確！天氣不好（負）→ 但活動照常（正），In spite of（儘管）= despite，表讓步。',
     guide:{ q:'「___ the bad weather, the event was held」— 天氣不好但活動照常，這是什麼邏輯？',
       opts:[{k:'A',t:'對比/讓步（in spite of 儘管）'},{k:'B',t:'因果（as a result of 由於）'},{k:'C',t:'原因（due to 由於）'},{k:'D',t:'依據（according to 根據）'}],
       key:'A', explain:'天氣不好但活動照常 = 對比/讓步，用 in spite of（儘管）。' }
@@ -1647,7 +1649,7 @@ const QUESTION_DATA = {
     mainQ:'Which phrase fits? (改編)',
     mainOpts:[{k:'A',t:'Regardless of'},{k:'B',t:'Instead of'},{k:'C',t:'As well as'},{k:'D',t:'Due to'}],
     ans:'A', ansWord:'Regardless of',
-    explain:'🕵️ "Regardless of what they say" → "regardless of"（不管；無論）= no matter what.',
+    explain:'🕵️ 正確！Regardless of what they say = 不管他們說什麼，regardless of = 無論。',
     guide:{ q:'「___ what they say（不管他們說什麼）」哪個片語表示「不管」？',
       opts:[{k:'A',t:'Regardless of（不管）'},{k:'B',t:'Instead of（而不是）'},{k:'C',t:'As well as（還有）'},{k:'D',t:'Due to（由於）'}],
       key:'A', explain:'regardless of = 不管；無論，後面接名詞或 wh- 子句。' }
@@ -1659,7 +1661,7 @@ const QUESTION_DATA = {
     mainQ:'Which phrase best fits?',
     mainOpts:[{k:'A',t:'Instead of'},{k:'B',t:'Due to'},{k:'C',t:'Regardless of'},{k:'D',t:'In spite of'}],
     ans:'B', ansWord:'Due to',
-    explain:'🕵️ "Due to climate change, cities face threats" → cause and effect. "Due to"（由於）= because of.',
+    explain:'🕵️ 正確！氣候變遷（原因）→ 城市面臨威脅（結果），due to = 由於，表原因。',
     guide:{ q:'「___ climate change, cities face threats」— 氣候變遷是原因，城市面臨威脅是結果，用哪個片語？',
       opts:[{k:'A',t:'對比（instead of）'},{k:'B',t:'原因（due to 由於）'},{k:'C',t:'不管（regardless of）'},{k:'D',t:'讓步（in spite of 儘管）'}],
       key:'B', explain:'due to = 由於，表示原因，後面接名詞（climate change）。' }
@@ -1688,7 +1690,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'介系詞 for'},{k:'B',t:'介系詞 to'},{k:'C',t:'介系詞 with'},{k:'D',t:'介系詞 of'}],
     clueKey:'B', clueExplain:'空格後有介系詞 <b>to</b>，聯想「名詞 + to」的固定搭配。現在選答案：',
     mainQ:'「a ___ to the problem」哪個名詞 + to 搭配表示「解決方法」？',
-    mainOpts:[{k:'A',t:'solution（解決方法）— solution to ✓'},{k:'B',t:'risk（風險）— risk of（後面應該是 of）'},{k:'C',t:'key（關鍵）— key to（也可以，但 solution 更直接）'},{k:'D',t:'cause（原因）— cause of（後面是 of）'}],
+    mainOpts:[{k:'A',t:'solution（解決方法）— solution to'},{k:'B',t:'risk（風險）— risk of（後面應該是 of）'},{k:'C',t:'key（關鍵）— key to（也可以，但 solution 更直接）'},{k:'D',t:'cause（原因）— cause of（後面是 of）'}],
     ans:'A', ansWord:'solution',
     explain:'🕵️ 正確！<b>solution to</b>（解決…的方法）是固定搭配，a solution to the problem = 問題的解決方法。',
     guide:{ q:'「a ___ to the problem（問題的____）」哪個名詞 + to 表示「解決方法」？',
@@ -1701,7 +1703,7 @@ const QUESTION_DATA = {
     sentence:'Smoking is one of the leading ___ of lung cancer worldwide.',
     ctx:'吸菸是全球肺癌的主要____之一。',
     mainQ:'「one of the leading ___ of lung cancer」— of 在後，哪個名詞 + of 最符合句意？',
-    mainOpts:[{k:'A',t:'causes（原因）— cause of ✓'},{k:'B',t:'solutions（解決方法）— solution to（應是 to）'},{k:'C',t:'risks（風險）— 也可以，但 cause 更精準'},{k:'D',t:'effects（影響）— effect on（應是 on）'}],
+    mainOpts:[{k:'A',t:'causes（原因）— cause of'},{k:'B',t:'solutions（解決方法）— solution to（應是 to）'},{k:'C',t:'risks（風險）— 也可以，但 cause 更精準'},{k:'D',t:'effects（影響）— effect on（應是 on）'}],
     ans:'A', ansWord:'causes',
     explain:'🕵️ 正確！<b>cause of</b>（…的原因）：smoking is a cause of lung cancer（吸菸是肺癌的原因）。',
     guide:{ q:'「the leading ___ of lung cancer」— 空格後有 of，哪個名詞 + of 表示「原因」？',
@@ -1711,10 +1713,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'Regular exercise has a significant ___ on both physical and mental health.',
-    mainQ:'Which word fits "a significant ___ on"?',
+    mainQ:'「a significant ___ on health」— a + 形容詞 + ___ + on，空格需要什麼詞性？',
     mainOpts:[{k:'A',t:'affect'},{k:'B',t:'effect'},{k:'C',t:'effective'},{k:'D',t:'effectively'}],
     ans:'B', ansWord:'effect',
-    explain:'🕵️ "a significant ___ on" → "effect on"（對…的影響）. Note: "affect" is a verb; "effect" is the noun.',
+    explain:'🕵️ 正確！effect on（對…的影響）是固定搭配，注意 affect 是動詞，effect 是名詞。',
     guide:{ q:'「a significant ___ on health」— a + ___ + on，空格需要名詞，哪個是名詞？',
       opts:[{k:'A',t:'affect（動詞）'},{k:'B',t:'effect（名詞）'},{k:'C',t:'effective（形容詞）'},{k:'D',t:'effectively（副詞）'}],
       key:'B', explain:'effect（名詞）+ on = 對…的影響。affect 是動詞，不是名詞。' }
@@ -1723,10 +1725,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'學測改編',
     sentence:'Lack of sleep can ___ in poor concentration and decreased productivity.',
-    mainQ:'Which word fits "can ___ in poor concentration"?',
+    mainQ:'「can ___ in poor concentration」— 空格後有介系詞 in，哪個動詞 + in 表示「導致」？',
     mainOpts:[{k:'A',t:'result'},{k:'B',t:'cause'},{k:'C',t:'lead'},{k:'D',t:'contribute'}],
     ans:'A', ansWord:'result',
-    explain:'🕵️ "result in"（導致）is the fixed verb-preposition collocation with "in". "lead to" also works but requires "to" not "in".',
+    explain:'🕵️ 正確！result in（導致）是固定搭配，空格後是 in，所以選 result。',
     guide:{ q:'「can ___ in poor concentration」— 空格後面是介系詞 in，哪個動詞 + in 表示「導致」？',
       opts:[{k:'A',t:'result in（導致）✓'},{k:'B',t:'cause（通常不加 in）'},{k:'C',t:'lead（搭配 to，不是 in）'},{k:'D',t:'contribute（通常搭配 to）'}],
       key:'A', explain:'result in = 導致，固定搭配介系詞 in。' }
@@ -1735,10 +1737,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'112年改編',
     sentence:'The research found that drinking sufficient water is the ___ to maintaining good health.',
-    mainQ:'Which word fits "is the ___ to maintaining good health"?',
+    mainQ:'「the ___ to maintaining good health」— to 在後，哪個名詞和 to 搭配？',
     mainOpts:[{k:'A',t:'solution'},{k:'B',t:'key'},{k:'C',t:'cause'},{k:'D',t:'risk'}],
     ans:'B', ansWord:'key',
-    explain:'🕵️ "the ___ to" + gerund → "key to"（…的關鍵）is the most natural collocation here: "the key to maintaining good health".',
+    explain:'🕵️ 正確！key to（…的關鍵）是固定搭配，the key to maintaining good health = 維持健康的關鍵。',
     guide:{ q:'「the ___ to maintaining good health」— to 在後，哪個名詞 + to 表示「關鍵」？',
       opts:[{k:'A',t:'solution to（解決方法）'},{k:'B',t:'key to（關鍵）'},{k:'C',t:'cause of（原因，搭配 of）'},{k:'D',t:'risk of（風險，搭配 of）'}],
       key:'B', explain:'key to = …的關鍵，固定搭配介系詞 to。' }
@@ -1781,7 +1783,7 @@ const QUESTION_DATA = {
     sentence:'___, our relationships are filled with unnecessary disagreements and conflicts.',
     ctx:'____，我們的關係充滿了不必要的爭執和衝突。（95年）',
     mainQ:'「___，our relationships are filled with... disagreements」— 前文說人們不願意理解對方，這句話是結果，應填哪個連結詞？',
-    mainOpts:[{k:'A',t:'Consequently（因此）— 前因導致後果 ✓'},{k:'B',t:'Nevertheless（儘管如此）— 轉折'},{k:'C',t:'Furthermore（此外）— 補充'},{k:'D',t:'Instead（代替）— 替代'}],
+    mainOpts:[{k:'A',t:'Consequently（因此）— 前因導致後果'},{k:'B',t:'Nevertheless（儘管如此）— 轉折'},{k:'C',t:'Furthermore（此外）— 補充'},{k:'D',t:'Instead（代替）— 替代'}],
     ans:'A', ansWord:'Consequently',
     explain:'🕵️ 正確！前文描述人們不互相理解的原因，<b>Consequently</b>（因此）引出結果：關係充滿爭執。（95年學測）',
     guide:{ q:'前文是原因，這句話是結果，應填哪類連結詞？',
@@ -1791,10 +1793,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The company lost a major contract; ___, it had to lay off 200 workers.',
-    mainQ:'Which word fits the blank?',
+    mainQ:'哪個選項最適合填入空格？',
     mainOpts:[{k:'A',t:'therefore'},{k:'B',t:'however'},{k:'C',t:'moreover'},{k:'D',t:'instead'}],
     ans:'A', ansWord:'therefore',
-    explain:'🕵️ "Lost a major contract (cause) → ___, laid off workers (effect)." Therefore（因此）connects cause and effect.',
+    explain:'🕵️ 正確！失去合約（原因）→ therefore → 裁員（結果），therefore = 因此。',
     guide:{ q:'「失去合約（因）→ ___，裁員（果）」應填哪類連結詞？',
       opts:[{k:'A',t:'因果（therefore 因此）'},{k:'B',t:'轉折（however 然而）'},{k:'C',t:'補充（moreover 此外）'},{k:'D',t:'替代（instead 代替）'}],
       key:'A', explain:'前因後果 = 因果詞，選 therefore（因此）。' }
@@ -1803,10 +1805,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'108年改編',
     sentence:'My father often forgot his shopping list; ___, he would return home with the wrong items.',
-    mainQ:'Which word fits? (改編自 108年語境)',
+    mainQ:'哪個連結詞最適合填入空格？（108年改編）',
     mainOpts:[{k:'A',t:'as a result'},{k:'B',t:'in contrast'},{k:'C',t:'on the other hand'},{k:'D',t:'nevertheless'}],
     ans:'A', ansWord:'as a result',
-    explain:'🕵️ "forgot the list (cause) → ___, returned with wrong items (effect)." "As a result"（因此）.',
+    explain:'🕵️ 正確！忘了清單（原因）→ as a result → 買錯（結果）。（108年改編）',
     guide:{ q:'「忘了清單（因）→ ___，買錯東西（果）」應填哪類連結詞？',
       opts:[{k:'A',t:'因果（as a result）'},{k:'B',t:'對比（in contrast）'},{k:'C',t:'另一方面（on the other hand）'},{k:'D',t:'轉折（nevertheless）'}],
       key:'A', explain:'忘了清單導致買錯，前因後果 = as a result（因此）。' }
@@ -1815,10 +1817,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'112年改編',
     sentence:'Drinking more water can improve concentration and energy levels; ___, it helps maintain a healthy weight.',
-    mainQ:'Which word fits? (112年語境改編)',
+    mainQ:'哪個連結詞最適合填入空格？（112年改編）',
     mainOpts:[{k:'A',t:'however'},{k:'B',t:'in addition'},{k:'C',t:'as a result'},{k:'D',t:'instead'}],
     ans:'C', ansWord:'as a result',
-    explain:'🕵️ "Drinking water improves concentration (cause) → ___, helps maintain weight (effect)." "As a result"（因此）shows the causal relationship.',
+    explain:'🕵️ 正確！喝水改善專注力（原因）→ as a result → 維持體重（結果）。（112年改編）',
     guide:{ q:'「喝水改善專注力（因）→ ___，維持體重（果）」應填哪類連結詞？',
       opts:[{k:'A',t:'轉折（however）'},{k:'B',t:'補充（in addition）'},{k:'C',t:'因果（as a result）'},{k:'D',t:'替代（instead）'}],
       key:'C', explain:'前因後果 = as a result（因此）。' }
@@ -1847,7 +1849,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'因果：因為下雨，所以孩子想出去'},{k:'B',t:'轉折：下雨是障礙，但孩子們仍然____'},{k:'C',t:'補充：不只下雨，還有其他情況'},{k:'D',t:'沒有特別邏輯'}],
     clueKey:'B', clueExplain:'although = 雖然，帶出轉折。下雨是<b>負面障礙</b>，後半應填<b>正面情緒</b>（仍然想出去）。現在選答案：',
     mainQ:'「Although 下大雨（負面）... 孩子們仍然____想出去」空格填正面情緒：',
-    mainOpts:[{k:'A',t:'eager（迫不及待）— 正面 ✓'},{k:'B',t:'afraid（害怕）— 負面，方向反了'},{k:'C',t:'bored（無聊）— 無法呼應「想出去」'},{k:'D',t:'tired（疲倦）— 和「想出去玩」矛盾'}],
+    mainOpts:[{k:'A',t:'eager（迫不及待）— 正面'},{k:'B',t:'afraid（害怕）— 負面，方向反了'},{k:'C',t:'bored（無聊）— 無法呼應「想出去」'},{k:'D',t:'tired（疲倦）— 和「想出去玩」矛盾'}],
     ans:'A', ansWord:'eager',
     explain:'🕵️ 正確！although 轉折：大雨（障礙）→ 仍然 <b>eager</b>（迫不及待）想出去。',
     guide:{ q:'although 轉折：前半負面（下雨），後半空格應填正面還是負面？',
@@ -1860,7 +1862,7 @@ const QUESTION_DATA = {
     sentence:'Despite having a limited budget, they created an ___ film.',
     ctx:'儘管預算有限，他們製作了一部____的電影。',
     mainQ:'「Despite 預算有限（負面），they created an ___ film」— despite 轉折，電影應是正面的，哪個形容詞最符合？',
-    mainOpts:[{k:'A',t:'impressive（令人印象深刻的）— 正面 ✓'},{k:'B',t:'disappointing（令人失望的）— 負面，和 despite 後應是正面矛盾'},{k:'C',t:'expensive（昂貴的）— 描述預算不符'},{k:'D',t:'ordinary（普通的）— 弱，無法呼應 despite 的對比'}],
+    mainOpts:[{k:'A',t:'impressive（令人印象深刻的）— 正面'},{k:'B',t:'disappointing（令人失望的）— 負面，和 despite 後應是正面矛盾'},{k:'C',t:'expensive（昂貴的）— 描述預算不符'},{k:'D',t:'ordinary（普通的）— 弱，無法呼應 despite 的對比'}],
     ans:'A', ansWord:'impressive',
     explain:'🕵️ 正確！despite 轉折：預算有限（負面限制）→ 仍然製作了 <b>impressive</b>（令人印象深刻的）電影（正面結果）。',
     guide:{ q:'despite 轉折：前半「預算有限（負面）」，後半電影是____的，方向是？',
@@ -1870,10 +1872,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The report was long and complex; however, the main conclusion was surprisingly ___.',
-    mainQ:'Which word fits? (however signals contrast)',
+    mainQ:'however 表示轉折，空格應填哪個詞？',
     mainOpts:[{k:'A',t:'confusing'},{k:'B',t:'clear'},{k:'C',t:'lengthy'},{k:'D',t:'difficult'}],
     ans:'B', ansWord:'clear',
-    explain:'🕵️ "however" contrast: report was complex (negative) → conclusion was surprisingly clear（清楚的）(positive).',
+    explain:'🕵️ 正確！however 轉折：報告複雜（負）→ 結論 clear（清楚，正）。',
     guide:{ q:'however 轉折：報告很複雜（負面）→ 結論是____的，方向是？',
       opts:[{k:'A',t:'負面（confusing, difficult）'},{k:'B',t:'正面（clear, simple）'},{k:'C',t:'中性'},{k:'D',t:'和報告相同方向'}],
       key:'B', explain:'however 轉折 → 前負後正，報告複雜（負）→ 結論 clear（清楚，正）。' }
@@ -1882,22 +1884,22 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'94年改編',
     sentence:'Instead of taking time to understand each other, people often become too ___ in their demands.',
-    mainQ:'Which word fits "become too ___ in their demands"? (94年語境)',
+    mainQ:'「become too ___ in their demands」— instead of 轉折後，空格填哪個詞？（94年改編）',
     mainOpts:[{k:'A',t:'patient'},{k:'B',t:'understanding'},{k:'C',t:'demanding'},{k:'D',t:'flexible'}],
     ans:'C', ansWord:'demanding',
-    explain:'🕵️ "Instead of understanding each other → become too demanding（苛求）." "Instead of" = not A, but B. Not understanding → become demanding.',
+    explain:'🕵️ 正確！Instead of 轉折：不理解對方 → 反而變得 demanding（苛求）。（94年改編）',
     guide:{ q:'「Instead of 理解對方，反而變得太____」— instead of 引導"不做 A 而做 B"，空格填與理解相反的態度：',
-      opts:[{k:'A',t:'patient（有耐心）— 和理解相同方向'},{k:'B',t:'understanding（有理解心）— 重複了'},{k:'C',t:'demanding（苛求的）— 和理解相反 ✓'},{k:'D',t:'flexible（彈性的）— 方向不夠強烈'}],
+      opts:[{k:'A',t:'patient（有耐心）— 和理解相同方向'},{k:'B',t:'understanding（有理解心）— 重複了'},{k:'C',t:'demanding（苛求的）— 和理解相反'},{k:'D',t:'flexible（彈性的）— 方向不夠強烈'}],
       key:'C', explain:'instead of = 而不是；反而，不理解 → 變得 demanding（苛求），是對比關係。' }
   },
   // Q5 solo (真題 112年改編)
   { phase:'solo', source:'real',
     year:'112年改編',
     sentence:'While some people find it easy to stay hydrated, others ___ struggle to drink enough water.',
-    mainQ:'Which word fits "others ___ struggle"?',
+    mainQ:'「others ___ struggle」— others 和 struggle 之間，空格需要什麼詞性？',
     mainOpts:[{k:'A',t:'instead'},{k:'B',t:'genuinely'},{k:'C',t:'however'},{k:'D',t:'whereas'}],
     ans:'B', ansWord:'genuinely',
-    explain:'🕵️ "While some find it easy... others genuinely（真的）struggle" — "genuinely" here is an adverb modifying "struggle" to emphasize the contrast.',
+    explain:'🕵️ 正確！genuinely（真的）是副詞，修飾 struggle，強調對比。（112年改編）',
     guide:{ q:'「While 有些人覺得容易，其他人____感到困難」— 空格修飾 struggle，需要什麼詞性？',
       opts:[{k:'A',t:'替代詞（instead）'},{k:'B',t:'副詞（genuinely 真的）'},{k:'C',t:'轉折詞（however）'},{k:'D',t:'對比連接詞（whereas）'}],
       key:'B', explain:'空格在 others 和 struggle 之間，修飾動詞，需要副詞 genuinely（真的）。' }
@@ -1937,7 +1939,7 @@ const QUESTION_DATA = {
     sentence:'Regular exercise improves physical health. ___, it also has significant benefits for mental wellbeing.',
     ctx:'定期運動改善身體健康。____，它對心理健康也有顯著益處。',
     mainQ:'「改善身體健康 → ___ → 對心理健康也有益」— 兩句都是正面補充，選哪個連結詞？',
-    mainOpts:[{k:'A',t:'Moreover（此外）— 補充第二個正面效益 ✓'},{k:'B',t:'However（然而）— 轉折，方向相反'},{k:'C',t:'Therefore（因此）— 因果，但兩句並非因果'},{k:'D',t:'Instead（代替）— 替代，方向不符'}],
+    mainOpts:[{k:'A',t:'Moreover（此外）— 補充第二個正面效益'},{k:'B',t:'However（然而）— 轉折，方向相反'},{k:'C',t:'Therefore（因此）— 因果，但兩句並非因果'},{k:'D',t:'Instead（代替）— 替代，方向不符'}],
     ans:'A', ansWord:'Moreover',
     explain:'🕵️ 正確！<b>Moreover</b>（此外）補充第二個好處（心理健康），方向和第一句（身體健康）相同。',
     guide:{ q:'兩句都說「運動的好處」，方向相同，應填哪類連結詞？',
@@ -1947,10 +1949,10 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The new library offers a wide range of books. ___, it provides free access to academic databases.',
-    mainQ:'Which word fits?',
+    mainQ:'哪個選項最適合填入空格？',
     mainOpts:[{k:'A',t:'In addition'},{k:'B',t:'Nevertheless'},{k:'C',t:'As a result'},{k:'D',t:'On the contrary'}],
     ans:'A', ansWord:'In addition',
-    explain:'🕵️ Both sentences describe benefits of the library. "In addition"（此外）adds a second benefit in the same direction.',
+    explain:'🕵️ 正確！兩句都說圖書館的好處，In addition（此外）補充第二個好處，方向相同。',
     guide:{ q:'兩句都說「圖書館的好處」，方向相同，應填哪類連結詞？',
       opts:[{k:'A',t:'補充（in addition 此外）'},{k:'B',t:'轉折（nevertheless）'},{k:'C',t:'因果（as a result）'},{k:'D',t:'對比（on the contrary）'}],
       key:'A', explain:'兩個優點 = 補充詞 in addition（此外）。' }
@@ -1959,10 +1961,10 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'95年改編',
     sentence:'Not only do we misunderstand each other, but we also fail to ___ with each other respectfully.',
-    mainQ:'Which word fits "fail to ___ with each other respectfully"?',
+    mainQ:'「fail to ___ with each other respectfully」— 句意是無法____地對待彼此，空格填什麼？',
     mainOpts:[{k:'A',t:'disagree'},{k:'B',t:'communicate'},{k:'C',t:'compete'},{k:'D',t:'ignore'}],
     ans:'B', ansWord:'communicate',
-    explain:'🕵️ "Not only... but also" adds to the idea of misunderstanding. Failing to "communicate"（溝通）respectfully matches the context of relationship problems. (95年 語境)',
+    explain:'🕵️ 正確！not only... but also 補充：不只誤解，還無法 communicate（溝通）。（95年改編）',
     guide:{ q:'「不只誤解對方，還無法____地互相對待」— 說的是人際關係的問題，空格填什麼動詞？',
       opts:[{k:'A',t:'disagree（不同意）'},{k:'B',t:'communicate（溝通）'},{k:'C',t:'compete（競爭）'},{k:'D',t:'ignore（忽視）'}],
       key:'B', explain:'not only... but also 補充：不只誤解，還無法 communicate（溝通），兩個都是人際關係的問題。' }
@@ -1974,7 +1976,7 @@ const QUESTION_DATA = {
     mainQ:'Which word fits?',
     mainOpts:[{k:'A',t:'In contrast'},{k:'B',t:'As a result'},{k:'C',t:'Similarly'},{k:'D',t:'However'}],
     ans:'C', ansWord:'Similarly',
-    explain:'🕵️ "Similarly"（同樣地）adds a parallel positive quality (beautifully filmed) to the first positive quality (informative).',
+    explain:'🕵️ 正確！Similarly（同樣地）補充第二個優點，兩個優點並列，方向相同。',
     guide:{ q:'「紀錄片很有教育性（優點1）→ ___ 拍攝精美且感人（優點2）」— 兩個優點並列，應填哪類詞？',
       opts:[{k:'A',t:'對比（in contrast）'},{k:'B',t:'因果（as a result）'},{k:'C',t:'類比/補充（similarly 同樣地）'},{k:'D',t:'轉折（however）'}],
       key:'C', explain:'两個優點並列 = 補充/類比，similarly（同樣地）連接兩個相同性質的優點。' }
@@ -2002,7 +2004,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'補充：通常慢，今天也慢'},{k:'B',t:'反義：通常慢（A），今天（B）→ B 和 A 相反'},{k:'C',t:'因果：因為慢，所以____'},{k:'D',t:'沒有特別關係'}],
     clueKey:'B', clueExplain:'「but（但是）」是轉折詞，通常慢（負面）→ 今天是相反的，空格應填<b>速度快</b>的詞。現在選答案：',
     mainQ:'「usually slow, but today quite ___」— but 轉折，空格填與 slow 相反的意思：',
-    mainOpts:[{k:'A',t:'fast（快的）— slow 的反義詞 ✓'},{k:'B',t:'lazy（懶的）— 和 slow 同性質'},{k:'C',t:'careful（小心的）— 和速度無關'},{k:'D',t:'quiet（安靜的）— 和速度無關'}],
+    mainOpts:[{k:'A',t:'fast（快的）— slow 的反義詞'},{k:'B',t:'lazy（懶的）— 和 slow 同性質'},{k:'C',t:'careful（小心的）— 和速度無關'},{k:'D',t:'quiet（安靜的）— 和速度無關'}],
     ans:'A', ansWord:'fast',
     explain:'🕵️ 正確！but 轉折 + slow → 空格填反義詞 <b>fast</b>（快的）。這是最直接的上下文反義暗示。',
     guide:{ q:'「usually slow + but（轉折）→ today quite ___」空格應填 slow 的什麼？',
@@ -2015,7 +2017,7 @@ const QUESTION_DATA = {
     sentence:'The moral lesson is that ___ and consistent will always beat slow and steady.',
     ctx:'寓意是：____且持續的總是會打敗緩慢且穩定的。（98年）',
     mainQ:'「___ and consistent」和「slow and steady」構成對比。slow 的反義詞是？',
-    mainOpts:[{k:'A',t:'fast（快的）— slow 的直接反義詞 ✓'},{k:'B',t:'lazy（懶的）— 和 slow 同性質'},{k:'C',t:'careful（小心的）— 和速度無關'},{k:'D',t:'steady（穩定）— 已在對比的另一邊'}],
+    mainOpts:[{k:'A',t:'fast（快的）— slow 的直接反義詞'},{k:'B',t:'lazy（懶的）— 和 slow 同性質'},{k:'C',t:'careful（小心的）— 和速度無關'},{k:'D',t:'steady（穩定）— 已在對比的另一邊'}],
     ans:'A', ansWord:'fast',
     explain:'🕵️ 正確！「___ and consistent」對比「slow and steady」— slow 的反義詞是 <b>fast</b>，consistent 對應 steady。（98年學測）',
     guide:{ q:'「___ and consistent」和「slow and steady」形成對比，slow 的反義是？',
@@ -2028,7 +2030,7 @@ const QUESTION_DATA = {
     mainQ:'Which word fits? ("simple" suggests the opposite)',
     mainOpts:[{k:'A',t:'boring'},{k:'B',t:'short'},{k:'C',t:'complex'},{k:'D',t:'readable'}],
     ans:'C', ansWord:'complex',
-    explain:'🕵️ "simple" (positive, easy) → contrast with "increasingly ___" (negative, harder). "complex"（複雜的）is the antonym of "simple".',
+    explain:'🕵️ 正確！but 轉折：前面 simple（簡單）→ 後面 complex（複雜的）是反義詞。',
     guide:{ q:'「前面 simple（簡單），但後面越來越____」— simple 的反義詞是？',
       opts:[{k:'A',t:'boring（無聊，非反義）'},{k:'B',t:'short（短，非反義）'},{k:'C',t:'complex（複雜，simple 的反義）'},{k:'D',t:'readable（好讀，非反義）'}],
       key:'C', explain:'simple 的反義詞是 complex（複雜的）。' }
@@ -2040,7 +2042,7 @@ const QUESTION_DATA = {
     mainQ:'Which word fits? (contrast with "never failed")',
     mainOpts:[{k:'A',t:'excellent'},{k:'B',t:'reliable'},{k:'C',t:'unreliable'},{k:'D',t:'sharp'}],
     ans:'C', ansWord:'unreliable',
-    explain:'🕵️ Contrast: "never failed (reliable) when dinner time approached" vs. "___ when grocery shopping." The blank needs the opposite: "unreliable"（不可靠的）.',
+    explain:'🕵️ 正確！never failed（可靠）的反義是 unreliable（不可靠），買菜時記性不可靠。（108年改編）',
     guide:{ q:'「____（買菜時）但從不失敗（吃飯時）」— "never failed" 暗示空格填什麼？',
       opts:[{k:'A',t:'正面（excellent, reliable）'},{k:'B',t:'負面（unreliable 不可靠）'},{k:'C',t:'和 never failed 相同方向'},{k:'D',t:'描述記憶力很好'}],
       key:'B', explain:'never failed（從不失敗 = 可靠）的反義是 unreliable（不可靠），買菜時記憶不可靠。' }
@@ -2052,7 +2054,7 @@ const QUESTION_DATA = {
     mainQ:'Which word fits "claim to ___ hydration"?',
     mainOpts:[{k:'A',t:'reduce'},{k:'B',t:'eliminate'},{k:'C',t:'boost'},{k:'D',t:'ignore'}],
     ans:'C', ansWord:'boost',
-    explain:'🕵️ Sports drinks "claim to ___ hydration" (positive claim) while water is "effective." The context implies a positive claim: "boost"（提升）hydration.',
+    explain:'🕵️ 正確！飲料宣稱能 boost（提升）補水效果，是正面的宣傳用詞。（112年改編）',
     guide:{ q:'「運動飲料宣稱能____補水」— sports drinks 在做正面的宣傳，空格應填正面還是負面動詞？',
       opts:[{k:'A',t:'負面（reduce 減少, eliminate 消除）'},{k:'B',t:'正面（boost 提升, enhance 增強）'},{k:'C',t:'中性'},{k:'D',t:'和水有關的詞'}],
       key:'B', explain:'飲料宣傳自己能提升補水效果，所以填正面動詞 boost（提升）。' }
@@ -2083,7 +2085,7 @@ const BATTLE_PASSAGE_98 = {
       explain:'「continued to move ___」— 副詞位置，修飾動詞 move。烏龜的特質是穩定，steadily（穩定地）最符合 slow and steady 的主題。' },
     { num:34, ans:'D', ansWord:'shocked',
       opts:[{k:'A',t:'excited'},{k:'B',t:'prepared'},{k:'C',t:'bored'},{k:'D',t:'shocked'},{k:'E',t:'pleased'}],
-      explain:'「was ___ to find the tortoise already there」— 系動詞 was + 形容詞。兔子以為自己贏，卻發現烏龜已到了，是令人震驚的結果，shocked（震驚的）最合邏輯。' },
+      explain:'「was ___ to find the tortoise already there」— be動詞 was + 形容詞。兔子以為自己贏，卻發現烏龜已到了，是令人震驚的結果，shocked（震驚的）最合邏輯。' },
     { num:35, ans:'E', ansWord:'moral',
       opts:[{k:'A',t:'hidden'},{k:'B',t:'final'},{k:'C',t:'basic'},{k:'D',t:'important'},{k:'E',t:'moral'}],
       explain:'「the ___ lesson」— the ___ of a fable = moral（寓言的道德寓意）。the moral lesson = 寓意/教訓，這是固定搭配。' },
@@ -2139,7 +2141,7 @@ const BATTLE_PASSAGE_112 = {
       explain:'「do not drink ___ of it」— 搭配詞：enough of（足夠的）。前文說很多人喝水不足，enough 最符合語境。' },
     { num:32, ans:'C', ansWord:'hydrated',
       opts:[{k:'A',t:'active'},{k:'B',t:'healthy'},{k:'C',t:'hydrated'},{k:'D',t:'energized'},{k:'E',t:'fit'}],
-      explain:'「drink water... to stay ___」— 系動詞 stay + 形容詞；主題是喝水，hydrated（保持補水狀態）最直接符合文章主題。' },
+      explain:'「drink water... to stay ___」— be動詞/連綴動詞 stay + 形容詞；主題是喝水，hydrated（保持補水狀態）最直接符合文章主題。' },
     { num:33, ans:'B', ansWord:'regularly',
       opts:[{k:'A',t:'rarely'},{k:'B',t:'regularly'},{k:'C',t:'slowly'},{k:'D',t:'hardly'},{k:'E',t:'quietly'}],
       explain:'「people who exercise ___ need more water」— 副詞修飾 exercise；定期運動的人需要更多水，regularly（定期地）最合邏輯。' },
