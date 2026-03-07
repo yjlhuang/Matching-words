@@ -1169,26 +1169,25 @@ const QUESTION_DATA = {
   },
   // Q3 solo (自製)
   { phase:'solo', source:'made',
-    sentence:'The government announced an important ___ to fight climate change.',
+    sentence:'The government announced an important ___ to protect the environment.',
     mainQ:'「an important ___」空格需要名詞，哪個選項正確？',
-    mainOpts:[{k:'A',t:'initiative'},{k:'B',t:'initiate'},{k:'C',t:'initiated'},{k:'D',t:'initiating'}],
-    ans:'A', ansWord:'initiative',
-    explain:'🕵️ 正確！an + adjective + ___ → 名詞位置，initiative（倡議）是名詞形式。',
+    mainOpts:[{k:'A',t:'plan'},{k:'B',t:'planning'},{k:'C',t:'planned'},{k:'D',t:'planners'}],
+    ans:'A', ansWord:'plan',
+    explain:'🕵️ 正確！an + important + ___ → 名詞位置，plan（計畫）是名詞。planning 是動名詞，planned 是過去分詞，planners 雖是名詞但語意不合。',
     guide:{ q:'「an important ___」中，冠詞 an + 形容詞 important 後面需要什麼？',
-      opts:[{k:'A',t:'名詞（initiative）'},{k:'B',t:'動詞（initiate）'},{k:'C',t:'過去式（initiated）'},{k:'D',t:'動名詞（initiating）'}],
-      key:'A', explain:'冠詞 + 形容詞 → 需要名詞，所以選 initiative。' }
+      opts:[{k:'A',t:'名詞（plan）'},{k:'B',t:'動名詞（planning）'},{k:'C',t:'過去分詞（planned）'},{k:'D',t:'名詞（planners）'}],
+      key:'A', explain:'冠詞 + 形容詞 → 需要名詞。plan（計畫）符合語意，planners（計畫者）語意不合。' }
   },
   // Q4 solo (真題改編，98年)
-  { phase:'solo', source:'real',
-    year:'98年學測',
-    sentence:'The ___ and consistent will always beat slow and steady.',
-    mainQ:'「The ___ and consistent」，哪個詞填入最合適？（98年學測）',
-    mainOpts:[{k:'A',t:'fast'},{k:'B',t:'fastly'},{k:'C',t:'fasten'},{k:'D',t:'fastness'}],
-    ans:'A', ansWord:'fast',
-    explain:'🕵️ 正確！The ___ and consistent 中，fast（快的）和 consistent 並列作形容詞，選 fast。（98年學測）',
-    guide:{ q:'「The ___ and consistent」— consistent 是形容詞，空格也需要相同詞性的什麼？',
-      opts:[{k:'A',t:'形容詞（fast）'},{k:'B',t:'副詞（fastly）'},{k:'C',t:'動詞（fasten）'},{k:'D',t:'名詞（fastness）'}],
-      key:'A', explain:'consistent 是形容詞，前面的空格也要填形容詞 fast，兩者並列。' }
+  { phase:'solo', source:'made',
+    sentence:'She has a ___ memory for names and faces.',
+    mainQ:'「a ___ memory」空格需要名詞還是形容詞？哪個選項正確？',
+    mainOpts:[{k:'A',t:'sharp'},{k:'B',t:'sharply'},{k:'C',t:'sharpen'},{k:'D',t:'sharpness'}],
+    ans:'A', ansWord:'sharp',
+    explain:'🕵️ 正確！a + ___ + memory → 名詞 memory 前需要形容詞修飾，sharp（敏銳的）是形容詞。',
+    guide:{ q:'「a ___ memory」中，名詞 memory 前面需要什麼詞性修飾？',
+      opts:[{k:'A',t:'形容詞（sharp）'},{k:'B',t:'副詞（sharply）'},{k:'C',t:'動詞（sharpen）'},{k:'D',t:'名詞（sharpness）'}],
+      key:'A', explain:'名詞前需要形容詞修飾，sharp（敏銳的）是形容詞。' }
   },
   // Q5 solo (真題，104年)
   { phase:'solo', source:'real',
