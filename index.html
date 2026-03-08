@@ -693,7 +693,7 @@ function handleOpt(chosen) {
       cur.mode = 'main';
       // 收起 lesson box 節省空間
       document.getElementById('prac-lesson').style.display = 'none';
-      showFB('info', '🕵️ 線索找到了！', q.clueExplain + '<br><br><span style="color:var(--gold);font-size:12px;">▲ 現在請選出正確答案：</span>');
+      showFB('info', '🕵️ 線索找到了！', q.clueExplain + '<br><br><span style="color:var(--gold);font-size:12px;">▼ 現在請選出正確答案：</span>');
       document.getElementById('prac-step-ind').innerHTML = '→ <b>步驟二</b>：現在選答案';
       document.getElementById('prac-gq').innerHTML = q.mainQ;
       renderOpts(q.mainOpts);
