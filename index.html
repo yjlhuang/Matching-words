@@ -104,10 +104,11 @@ body{
 .lc.lc-locked{opacity:.38;cursor:not-allowed;}
 .lc.lc-done{border-color:var(--green-b);}
 .lc.lc-done::after{
-  content:'';position:absolute;top:9px;right:11px;
+  content:'✓';position:absolute;top:9px;right:11px;
   color:var(--green);font-family:'JetBrains Mono',monospace;font-size:11px;
 }
 .lc-num{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-xs);margin-bottom:5px;}
+.lc-score{display:inline-block;margin-top:4px;margin-left:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--green);border:1px solid var(--green-b);border-radius:4px;padding:1px 5px;}
 .lc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4;}
 .lc-desc{font-size:11px;color:var(--text-dim);line-height:1.6;}
 .lc-tag{
@@ -507,9 +508,20 @@ function getProgress() {
   try { return JSON.parse(localStorage.getItem('cloze_v3_progress') || '{}'); }
   catch(e) { return {}; }
 }
-function setDone(lessonId) {
+function setDone(lessonId, correct, total) {
   const p = getProgress(); p[lessonId] = true;
+  if (correct !== undefined && total !== undefined) {
+    const key = 'cloze_v3_score';
+    const scores = JSON.parse(localStorage.getItem(key) || '{}');
+    const prev = scores[lessonId];
+    if (!prev || correct > prev.c) scores[lessonId] = {c: correct, t: total};
+    localStorage.setItem(key, JSON.stringify(scores));
+  }
   localStorage.setItem('cloze_v3_progress', JSON.stringify(p));
+}
+function getBestScore(lessonId) {
+  const scores = JSON.parse(localStorage.getItem('cloze_v3_score') || '{}');
+  return scores[lessonId] || null;
 }
 function isDone(lessonId) { return !!getProgress()[lessonId]; }
 function isUnlocked(lesson) {
@@ -550,11 +562,13 @@ function buildHome() {
 
       const card = document.createElement('div');
       card.className = 'lc' + (locked ? ' lc-locked' : '') + (done ? ' lc-done' : '');
+      const sc = done ? getBestScore(l.id) : null;
+      const scoreTag = sc ? `<span class="lc-score">${sc.c}/${sc.t}</span>` : '';
       card.innerHTML = `
         <div class="lc-num">${l.id}</div>
         <div class="lc-title">${l.title}</div>
         <div class="lc-desc">${l.desc}</div>
-        <span class="lc-tag ${tagClass}">${tagLabel}</span>
+        <span class="lc-tag ${tagClass}">${tagLabel}</span>${scoreTag}
         ${locked ? `<div class="lc-lock-note">完成 ${l.unlock} 後解鎖</div>` : ''}
       `;
       if (!locked) card.onclick = () => startLesson(l.id);
@@ -783,7 +797,7 @@ function pracRetry() {} // handled inline
 function replayLesson() { startLesson(cur.lessonId); }
 
 function showDone() {
-  setDone(cur.lessonId);
+  setDone(cur.lessonId, cur.correct, cur.correct + cur.wrong);
   const lesson = LESSONS.find(l => l.id === cur.lessonId);
   const total = QUESTION_DATA[cur.lessonId].length;
   const pct = cur.correct / total;
@@ -939,7 +953,7 @@ function startStrategy() {
 
 function finishStrategy() {
   setDone('4-1');
-  goHome();
+  startPassage(BATTLE_PASSAGE_98);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1060,7 +1074,7 @@ function bpNext() {
 }
 
 function showBPResult() {
-  setDone(bp_cur.passage.lessonId);
+  setDone(bp_cur.passage.lessonId, bp_cur.correct, bp_cur.correct + bp_cur.wrong);
   const total = bp_cur.passage.blanks.length;
   const pct = bp_cur.correct / total;
   const area = document.getElementById('battle-area');
@@ -1631,7 +1645,7 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'___ the bad weather, the outdoor event was held as scheduled.',
-    mainQ:'Which phrase fits the blank?',
+    mainQ:'哪個片語最合適？',
     mainOpts:[{k:'A',t:'In spite of'},{k:'B',t:'As a result of'},{k:'C',t:'Due to'},{k:'D',t:'According to'}],
     ans:'A', ansWord:'In spite of',
     explain:'🕵️ 正確！天氣不好（負）→ 但活動照常（正），In spite of（儘管）= despite，表讓步。',
@@ -1643,7 +1657,7 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'95年改編',
     sentence:'___ what they say, actions speak louder than words.',
-    mainQ:'Which phrase fits? (改編)',
+    mainQ:'哪個片語最合適？（改編）',
     mainOpts:[{k:'A',t:'Regardless of'},{k:'B',t:'Instead of'},{k:'C',t:'As well as'},{k:'D',t:'Due to'}],
     ans:'A', ansWord:'Regardless of',
     explain:'🕵️ 正確！Regardless of what they say = 不管他們說什麼，regardless of = 無論。',
@@ -1655,7 +1669,7 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'112年改編',
     sentence:'___ climate change, many coastal cities face the threat of rising sea levels.',
-    mainQ:'Which phrase best fits?',
+    mainQ:'哪個片語最合適？',
     mainOpts:[{k:'A',t:'Instead of'},{k:'B',t:'Due to'},{k:'C',t:'Regardless of'},{k:'D',t:'In spite of'}],
     ans:'B', ansWord:'Due to',
     explain:'🕵️ 正確！氣候變遷（原因）→ 城市面臨威脅（結果），due to = 由於，表原因。',
@@ -1970,7 +1984,7 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'學測改編',
     sentence:'The documentary was informative. ___, it was beautifully filmed and emotionally moving.',
-    mainQ:'Which word fits?',
+    mainQ:'哪個詞最合適？',
     mainOpts:[{k:'A',t:'In contrast'},{k:'B',t:'As a result'},{k:'C',t:'Similarly'},{k:'D',t:'However'}],
     ans:'C', ansWord:'Similarly',
     explain:'🕵️ 正確！Similarly（同樣地）補充第二個優點，兩個優點並列，方向相同。',
@@ -2024,7 +2038,7 @@ const QUESTION_DATA = {
   // Q3 solo (自製)
   { phase:'solo', source:'made',
     sentence:'The first chapter was simple and easy to follow, but the later chapters became increasingly ___.',
-    mainQ:'Which word fits? ("simple" suggests the opposite)',
+    mainQ:'哪個詞最合適？（「simple」暗示反義）',
     mainOpts:[{k:'A',t:'boring'},{k:'B',t:'short'},{k:'C',t:'complex'},{k:'D',t:'readable'}],
     ans:'C', ansWord:'complex',
     explain:'🕵️ 正確！but 轉折：前面 simple（簡單）→ 後面 complex（複雜的）是反義詞。',
@@ -2036,7 +2050,7 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'108年改編',
     sentence:'His memory was ___ when it came to grocery shopping, but never failed when dinner time approached.',
-    mainQ:'Which word fits? (contrast with "never failed")',
+    mainQ:'哪個詞最合適？（與「never failed」對比）',
     mainOpts:[{k:'A',t:'excellent'},{k:'B',t:'reliable'},{k:'C',t:'unreliable'},{k:'D',t:'sharp'}],
     ans:'C', ansWord:'unreliable',
     explain:'🕵️ 正確！never failed（可靠）的反義是 unreliable（不可靠），買菜時記性不可靠。（108年改編）',
@@ -2048,7 +2062,7 @@ const QUESTION_DATA = {
   { phase:'solo', source:'real',
     year:'112年改編',
     sentence:'While sports drinks claim to ___ hydration, water remains the most natural and effective choice.',
-    mainQ:'Which word fits "claim to ___ hydration"?',
+    mainQ:'「claim to ___ hydration」空格填哪個詞？',
     mainOpts:[{k:'A',t:'reduce'},{k:'B',t:'eliminate'},{k:'C',t:'boost'},{k:'D',t:'ignore'}],
     ans:'C', ansWord:'boost',
     explain:'🕵️ 正確！飲料宣稱能 boost（提升）補水效果，是正面的宣傳用詞。（112年改編）',
