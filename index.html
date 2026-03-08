@@ -1155,17 +1155,16 @@ const QUESTION_DATA = {
       key:'B', explain:'指示詞 + 形容詞 + 空格 = 需要名詞。' }
   },
   // Q2 guided (104年真題)
-  { phase:'guided', source:'real',
-    year:'104年學測',
-    sentence:'This common ___ is a wonder of simplicity and function.',
-    ctx:'這個常見的____是簡單和功能的奇跡。（104年）',
-    mainQ:'「This common ___」需要名詞。根據句意（簡單和功能的奇跡），哪個最合適？',
-    mainOpts:[{k:'A',t:'device（裝置）'},{k:'B',t:'common（普通的）'},{k:'C',t:'function（功能）'},{k:'D',t:'wonder（奇跡）'}],
-    ans:'A', ansWord:'device',
-    explain:'🕵️ 正確！This common <b>device</b>（這個常見的裝置）= 名詞位置，是描述「迴紋針」的句子（104年學測）。',
-    guide:{ q:'「This common ___」空格前有指示詞 this + 形容詞 common，空格需要什麼？',
-      opts:[{k:'A',t:'形容詞'},{k:'B',t:'名詞'},{k:'C',t:'動詞'},{k:'D',t:'副詞'}],
-      key:'B', explain:'this + 形容詞 → 空格填名詞，所以選 device（裝置）。' }
+  { phase:'guided', source:'made',
+    sentence:'The scientist made an important ___ that changed medicine forever.',
+    ctx:'這位科學家做了一個重要的____，永遠改變了醫學。',
+    mainQ:'「an important ___」— 冠詞 + 形容詞後，空格需要什麼詞性？',
+    mainOpts:[{k:'A',t:'discovery（發現）'},{k:'B',t:'discover（發現）'},{k:'C',t:'discovered'},{k:'D',t:'discovering'}],
+    ans:'A', ansWord:'discovery',
+    explain:'🕵️ 正確！an + important + ___ → 冠詞 + 形容詞後需要名詞，discovery（發現）是名詞。discover 是動詞，discovered 是過去分詞，discovering 是動名詞。（104年學測同概念）',
+    guide:{ q:'「an important ___」中，冠詞 an + 形容詞 important 後面需要什麼詞性？',
+      opts:[{k:'A',t:'名詞'},{k:'B',t:'動詞'},{k:'C',t:'過去分詞'},{k:'D',t:'動名詞'}],
+      key:'A', explain:'冠詞 + 形容詞 → 需要名詞，discovery（發現）是名詞形式。' }
   },
   // Q3 solo (自製)
   { phase:'solo', source:'made',
