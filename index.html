@@ -104,7 +104,7 @@ body{
 .lc.lc-locked{opacity:.38;cursor:not-allowed;}
 .lc.lc-done{border-color:var(--green-b);}
 .lc.lc-done::after{
-  content:'✓';position:absolute;top:9px;right:11px;
+  content:'';position:absolute;top:9px;right:11px;
   color:var(--green);font-family:'JetBrains Mono',monospace;font-size:11px;
 }
 .lc-num{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-xs);margin-bottom:5px;}
@@ -1221,7 +1221,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'介系詞 to'},{k:'B',t:'助動詞 should'},{k:'C',t:'形容詞 hard'},{k:'D',t:'連接詞 to'}],
     clueKey:'B', clueExplain:'空格前是助動詞 <b>should</b>，後面必須接<b>動詞原形</b>。現在選答案：',
     mainQ:'「should ___」後面需要動詞原形，哪個選項正確？',
-    mainOpts:[{k:'A',t:'study（動詞原形）✓'},{k:'B',t:'student（名詞）'},{k:'C',t:'studious（形容詞）'},{k:'D',t:'studying（動名詞）'}],
+    mainOpts:[{k:'A',t:'study（動詞原形）'},{k:'B',t:'student（名詞）'},{k:'C',t:'studious（形容詞）'},{k:'D',t:'studying（動名詞）'}],
     ans:'A', ansWord:'study',
     explain:'🕵️ 正確！should + 動詞原形，選 study（讀書）。',
     guide:{ q:'助動詞 should 後面接什麼形式的動詞？',
@@ -1728,7 +1728,7 @@ const QUESTION_DATA = {
     ans:'A', ansWord:'result',
     explain:'🕵️ 正確！result in（導致）是固定搭配，空格後是 in，所以選 result。',
     guide:{ q:'「can ___ in poor concentration」— 空格後面是介系詞 in，哪個動詞 + in 表示「導致」？',
-      opts:[{k:'A',t:'result in（導致）✓'},{k:'B',t:'cause（通常不加 in）'},{k:'C',t:'lead（搭配 to，不是 in）'},{k:'D',t:'contribute（通常搭配 to）'}],
+      opts:[{k:'A',t:'result in（導致）'},{k:'B',t:'cause（通常不加 in）'},{k:'C',t:'lead（搭配 to，不是 in）'},{k:'D',t:'contribute（通常搭配 to）'}],
       key:'A', explain:'result in = 導致，固定搭配介系詞 in。' }
   },
   // Q5 solo (真題 112年改編)
@@ -1768,7 +1768,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'轉折：雖然每天練習，但技巧沒進步'},{k:'B',t:'因果：每天練習（因）→ 技巧進步（果）'},{k:'C',t:'補充：不只練習，還做了別的事'},{k:'D',t:'沒有特別邏輯，只是順序'}],
     clueKey:'B', clueExplain:'每天練習（原因）→ 技巧進步（結果），這是<b>因果</b>邏輯，空格應填因果連結詞。現在選答案：',
     mainQ:'哪個因果連結詞最適合放在這裡？',
-    mainOpts:[{k:'A',t:'Consequently（因此）✓'},{k:'B',t:'However（然而）— 轉折詞，不是因果'},{k:'C',t:'Furthermore（此外）— 補充，不是因果'},{k:'D',t:'Instead（代替）— 替代，不是因果'}],
+    mainOpts:[{k:'A',t:'Consequently（因此）'},{k:'B',t:'However（然而）— 轉折詞，不是因果'},{k:'C',t:'Furthermore（此外）— 補充，不是因果'},{k:'D',t:'Instead（代替）— 替代，不是因果'}],
     ans:'A', ansWord:'Consequently',
     explain:'🕵️ 正確！<b>Consequently</b>（因此）連結前因（每天練習）和後果（技巧進步）。',
     guide:{ q:'「每天練習（因）→ ___，技巧進步（果）」應填哪類連結詞？',
@@ -1924,7 +1924,7 @@ const QUESTION_DATA = {
     clueOpts:[{k:'A',t:'轉折：雖然好用，但浪費時間'},{k:'B',t:'因果：因為好用，所以節省時間'},{k:'C',t:'補充：不只好用，還節省時間'},{k:'D',t:'對比：好用但費時'}],
     clueKey:'C', clueExplain:'好用（優點1）→ 節省時間（優點2），這是<b>補充/遞進</b>關係，前後方向相同。現在選答案：',
     mainQ:'哪個補充連結詞最適合連接兩個優點？',
-    mainOpts:[{k:'A',t:'Furthermore（此外）✓'},{k:'B',t:'However（然而）— 轉折'},{k:'C',t:'Therefore（因此）— 因果'},{k:'D',t:'Instead（代替）— 替代'}],
+    mainOpts:[{k:'A',t:'Furthermore（此外）'},{k:'B',t:'However（然而）— 轉折'},{k:'C',t:'Therefore（因此）— 因果'},{k:'D',t:'Instead（代替）— 替代'}],
     ans:'A', ansWord:'Furthermore',
     explain:'🕵️ 正確！<b>Furthermore</b>（此外）補充說明第二個優點（節省時間），方向和第一個優點（好用）相同。',
     guide:{ q:'前後都是「優點」，方向相同，應填哪類連結詞？',
