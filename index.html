@@ -922,11 +922,17 @@ function startStrategy() {
         <div class="strat-step">
           <div class="strat-num">②</div>
           <div class="strat-body">
-            <div class="strat-title">詞性輪：句型結構分析</div>
+            <div class="strat-title">詞性輪：選項先分堆，空格再對號</div>
             <div class="strat-desc">
-              剩下的空格，看空格前後的句型線索：<br>
+              <b style="color:var(--gold)">Step A｜選項先分堆</b><br>
+              把 10 個選項按詞性分組：名詞一堆、動詞一堆、形容詞一堆、副詞一堆、片語單獨列。<br>
+              某一堆只剩一個選項 → 找到那個詞性的空格，直接填。<br>
+              <span style="font-size:11px;color:var(--red);margin-top:4px;display:inline-block;">⚠️ <b>-ed 要小心</b>：可能是①過去式動詞（主詞 + ___）、②被動 pp（be + ___）、③形容詞（狀態描述）— 先放「待確認」區，看到 be 前才決定歸哪堆。<br>V-ing 也可當形容詞（competing stories, demanding job），不一定是動詞堆。</span><br><br>
+              <b style="color:var(--gold)">Step B｜看空格詞性</b><br>
               <code>to + ___</code> → 動詞原形　　<code>be/feel/look + ___</code> → 形容詞<br>
-              <code>a/the + ___</code> → 名詞　　　<code>be + ___ + V-ed</code> → 副詞
+              <code>a/the + ___</code> → 名詞　　　<code>be + ___ + V-ed</code> → 副詞<br>
+              <code>___ and 形容詞</code> → 空格也是形容詞　　<code>___ and 名詞</code> → 空格也是名詞<br>
+              <span style="font-size:11px;color:var(--text-xs);">⭐ and 前後詞性對稱，是最快的判斷線索，幾乎是送分題</span>
             </div>
           </div>
         </div>
@@ -957,7 +963,7 @@ function startStrategy() {
 
       <div class="divider"></div>
       <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.8;">
-        記住：這四輪不一定要按順序——遇到什麼線索就用什麼方法。<br>
+        流程提示：①秒殺先填固定搭配 → ②把選項分堆、空格對號（and 對稱優先）→ ③同堆有多個選項時用語意/邏輯決定 → ④剩餘消去。<br>
         <b style="color:var(--gold)">最重要的是：每一題都要找到線索，不能純猜。</b>
       </div>
       <button class="act-btn primary on" onclick="finishStrategy()">我懂了，去做整段實戰 →</button>
@@ -2801,7 +2807,7 @@ My father's poor memory gave him certain advantages, though. For instance, he wa
     { num:34, ans:'B', ansWord:'purchases',
       explain:'「the ___ that he made」— 冠詞 the + 名詞（Stage 1-1），make purchases = 採購，purchases（採購品）作名詞。' },
     { num:35, ans:'D', ansWord:'requests',
-      explain:'「different from Mom\'s ___」— 所有格 Mom\'s + 名詞，requests（要求；清單上的項目）= 媽媽的要求，和採購品不同。' },
+      explain:'「different from Mom\'s ___」— ③邏輯輪：purchases（採購品）和媽媽的 ___ 不同，Mom\'s ___ = 媽媽的要求/需求清單，requests（要求）語意最合。' },
     { num:36, ans:'C', ansWord:'trusted',
       explain:'「he was ___ with many secrets」— be trusted with（Stage 2-2）固定被動搭配，be trusted with sth. = 被信任保管某東西。' },
     { num:37, ans:'H', ansWord:'privilege',
@@ -2809,14 +2815,14 @@ My father's poor memory gave him certain advantages, though. For instance, he wa
     { num:38, ans:'J', ansWord:'obvious',
       explain:'「The reason was ___」— 連綴動詞 was + 形容詞（Stage 1-3），obvious（顯而易見的），後面冒號說明理由。' },
     { num:39, ans:'I', ansWord:'revealed',
-      explain:'「secrets would never be ___」— 被動語態，秘密永遠不會被揭露，revealed（揭露）固定搭配。' },
+      explain:'「secrets would never be ___」— ②詞性輪：be + ___ = 被動語態，空格填過去分詞；選項裡的過去分詞有 trusted / ruined / revealed / insisted，語境「秘密不會被___」→ revealed（揭露）。' },
     { num:40, ans:'A', ansWord:'little',
       explain:'「cared ___ about who did what」— 副詞修飾動詞 cared（Stage 1-4），little（幾乎不），care little about = 幾乎不在乎，消去法最後剩這個。' },
   ],
   roundLabels: {
     31: '③邏輯', 32: '①秒殺', 33: '①秒殺', 34: '②詞性',
-    35: '②詞性', 36: '①秒殺', 37: '②詞性', 38: '②詞性',
-    39: '③邏輯', 40: '④消去'
+    35: '③邏輯', 36: '①秒殺', 37: '②詞性', 38: '②詞性',
+    39: '②詞性', 40: '④消去'
   }
 };
 
