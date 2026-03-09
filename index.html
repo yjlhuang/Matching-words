@@ -492,6 +492,8 @@ const LESSONS = [
   { id:'4-2', stage:4, title:'整段實戰 A（98年）',            desc:'The Tortoise and the Hare',       tag:'b', unlock:'4-1' },
   { id:'4-3', stage:4, title:'整段實戰 B（108年）',           desc:'父親的記憶問題',                  tag:'b', unlock:'4-2' },
   { id:'4-4', stage:4, title:'整段實戰 C（112年）',           desc:'喝水與補水的科學',                tag:'b', unlock:'4-3' },
+  { id:'4-5', stage:4, title:'鷹架實戰 A（94年）',            desc:'四輪帶著走：愛情的魔法',           tag:'b', unlock:'4-4' },
+  { id:'4-6', stage:4, title:'鷹架實戰 B（104年）',           desc:'四輪帶著走：迴紋針的故事',         tag:'b', unlock:'4-5' },
 ];
 
 const STAGE_META = {
@@ -594,6 +596,8 @@ function startLesson(id) {
   if (id === '4-2') { startPassage(BATTLE_PASSAGE_98); return; }
   if (id === '4-3') { startPassage(BATTLE_PASSAGE_108); return; }
   if (id === '4-4') { startPassage(BATTLE_PASSAGE_112); return; }
+  if (id === '4-5') { startScaffold(SCAFFOLD_PASSAGE_94); return; }
+  if (id === '4-6') { startScaffold(SCAFFOLD_PASSAGE_104); return; }
 
   const lesson = LESSONS.find(l => l.id === id);
   const qs = QUESTION_DATA[id];
@@ -2170,6 +2174,403 @@ const BATTLE_PASSAGE_112 = {
       explain:'「The key ___ staying healthy」— 搭配詞：the key to（…的關鍵）固定搭配介系詞 to，後接動名詞。' },
   ]
 };
+
+// ═══════════════════════════════════════════════════════
+//  SCAFFOLD ENGINE — 四輪鷹架實戰
+// ═══════════════════════════════════════════════════════
+
+let sc_cur = {
+  passage: null,
+  roundIdx: 0,       // 0=intro, 1=R1, 2=R2, 3=R3, 4=R4
+  blankIdx: 0,       // index within current round's blanks
+  correct: 0,
+  wrong: 0,
+  answers: {}        // num → ansWord (for passage display)
+};
+
+function startScaffold(passageData) {
+  sc_cur = { passage: passageData, roundIdx: 0, blankIdx: 0, correct: 0, wrong: 0, answers: {} };
+  document.getElementById('battle-eyebrow').textContent = passageData.lessonId;
+  document.getElementById('battle-title').textContent = passageData.title;
+  document.getElementById('battle-sub').textContent = passageData.year + ' · 四輪鷹架實戰';
+  showScreen('s-battle');
+  renderScaffoldRoundIntro();
+}
+
+function buildPassageHTML(passageData) {
+  let html = passageData.text;
+  passageData.allBlanks.forEach(b => {
+    const filled = sc_cur.answers[b.num];
+    const cls = filled ? (filled === b.ansWord ? 'p-blank ok' : 'p-blank no') : 'p-blank';
+    const display = filled ? filled : `(${b.num})`;
+    html = html.replace(`[${b.num}]`, `<span class="${cls}" id="pb${b.num}">${display}</span>`);
+  });
+  return html;
+}
+
+function renderScaffoldRoundIntro() {
+  const p = sc_cur.passage;
+  const round = p.rounds[sc_cur.roundIdx];
+  const area = document.getElementById('battle-area');
+
+  const roundColors = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)'];
+  const color = roundColors[sc_cur.roundIdx] || 'var(--gold)';
+
+  area.innerHTML = `
+    <div class="card">
+      <div class="card-top-line"></div>
+      <div class="lesson-box" style="border-left:3px solid ${color};">
+        <div class="lb-title" style="color:${color};">第${sc_cur.roundIdx + 1}輪：${round.name}</div>
+        <div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-top:6px;">${round.tip}</div>
+      </div>
+      <div class="passage-box">${buildPassageHTML(p)}</div>
+      <div style="margin-top:16px;font-size:13px;color:var(--text-dim);line-height:1.7;">
+        ${round.preview}
+      </div>
+      <button class="act-btn primary on" style="margin-top:16px;" onclick="startScaffoldRound()">
+        開始第${sc_cur.roundIdx + 1}輪 →
+      </button>
+    </div>
+  `;
+}
+
+function startScaffoldRound() {
+  sc_cur.blankIdx = 0;
+  renderScaffoldBlank();
+}
+
+function renderScaffoldBlank() {
+  const p = sc_cur.passage;
+  const round = p.rounds[sc_cur.roundIdx];
+  const blanks = round.blanks;
+
+  if (sc_cur.blankIdx >= blanks.length) {
+    // Round done
+    if (sc_cur.roundIdx < p.rounds.length - 1) {
+      sc_cur.roundIdx++;
+      renderScaffoldRoundIntro();
+    } else {
+      showScaffoldResult();
+    }
+    return;
+  }
+
+  const b = blanks[sc_cur.blankIdx];
+  const area = document.getElementById('battle-area');
+  const roundColors = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)'];
+  const color = roundColors[sc_cur.roundIdx] || 'var(--gold)';
+  const total = p.allBlanks.length;
+  const done = Object.keys(sc_cur.answers).length;
+
+  area.innerHTML = `
+    <div class="card">
+      <div class="card-top-line"></div>
+      <div class="prog-wrap">
+        <div class="prog-meta">
+          <span style="color:${color};">第${sc_cur.roundIdx+1}輪 ${p.rounds[sc_cur.roundIdx].name} — 空格 (${b.num})</span>
+          <div class="score-row">
+            <div class="sc">答對 <span>${sc_cur.correct}</span></div>
+            <div class="sc">答錯 <span>${sc_cur.wrong}</span></div>
+          </div>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${done/total*100}%;background:${color};"></div></div>
+      </div>
+      <div class="passage-box" style="margin-top:12px;">${buildPassageHTML(p)}</div>
+      <div style="margin-top:14px;">
+        <div class="q-meta-row">
+          <span class="q-case">空格 (${b.num})</span>
+          <span class="phase-badge pb-battle" style="background:${color};">第${sc_cur.roundIdx+1}輪</span>
+        </div>
+        <div class="guide-q" style="margin:10px 0 4px;">${b.hint}</div>
+        <div style="font-size:11px;color:var(--text-xs);margin-bottom:12px;">
+          剩餘選項：${p.remaining(sc_cur.answers).map(o=>`<b>${o.k}</b> ${o.t}`).join('　')}
+        </div>
+        <div class="opts" id="sc-opts"></div>
+        <div class="fb" id="sc-fb"><div class="fb-t" id="sc-fb-t"></div><div id="sc-fb-body"></div></div>
+        <button class="act-btn primary" id="sc-next" style="display:none;" onclick="scNext()">
+          ${sc_cur.blankIdx < blanks.length - 1 ? '下一個空格 →' : (sc_cur.roundIdx < p.rounds.length - 1 ? '進入下一輪 →' : '查看成績')}
+        </button>
+      </div>
+    </div>
+  `;
+
+  const wrap = document.getElementById('sc-opts');
+  p.remaining(sc_cur.answers).forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="key">${o.k}</span><span>${o.t}</span>`;
+    btn.onclick = () => handleScaffold(o.k);
+    wrap.appendChild(btn);
+  });
+}
+
+function handleScaffold(chosen) {
+  const p = sc_cur.passage;
+  const round = p.rounds[sc_cur.roundIdx];
+  const b = round.blanks[sc_cur.blankIdx];
+
+  document.querySelectorAll('#sc-opts .opt').forEach(btn => btn.disabled = true);
+  document.querySelectorAll('#sc-opts .opt').forEach(btn => {
+    const k = btn.querySelector('.key').textContent;
+    if (k === chosen) btn.classList.add(chosen === b.ans ? 'ok' : 'no');
+    if (k === b.ans) btn.classList.add('ok');
+  });
+
+  sc_cur.answers[b.num] = b.ansWord;
+  const pb = document.getElementById('pb' + b.num);
+  if (pb) { pb.className = chosen === b.ans ? 'p-blank ok' : 'p-blank no'; pb.textContent = b.ansWord; }
+
+  const fb = document.getElementById('sc-fb');
+  if (chosen === b.ans) {
+    sc_cur.correct++;
+    fb.className = 'fb good on';
+    document.getElementById('sc-fb-t').textContent = `🕵️ (${b.num}) 正確！`;
+    document.getElementById('sc-fb-body').innerHTML = b.explain;
+  } else {
+    sc_cur.wrong++;
+    fb.className = 'fb bad on';
+    document.getElementById('sc-fb-t').textContent = `🕵️ (${b.num}) 答錯了`;
+    document.getElementById('sc-fb-body').innerHTML = `正確答案是 <b>${b.ans}. ${b.ansWord}</b>。<br>${b.explain}`;
+  }
+  document.getElementById('sc-next').style.display = 'block';
+}
+
+function scNext() {
+  sc_cur.blankIdx++;
+  const p = sc_cur.passage;
+  const round = p.rounds[sc_cur.roundIdx];
+  if (sc_cur.blankIdx >= round.blanks.length) {
+    if (sc_cur.roundIdx < p.rounds.length - 1) {
+      sc_cur.roundIdx++;
+      renderScaffoldRoundIntro();
+    } else {
+      showScaffoldResult();
+    }
+  } else {
+    renderScaffoldBlank();
+  }
+}
+
+function showScaffoldResult() {
+  const p = sc_cur.passage;
+  const total = p.allBlanks.length;
+  setDone(p.lessonId, sc_cur.correct, total);
+  const pct = sc_cur.correct / total;
+  const area = document.getElementById('battle-area');
+  area.innerHTML = `
+    <div class="card" style="text-align:center;">
+      <div class="card-top-line"></div>
+      <div style="font-size:13px;color:var(--text-xs);letter-spacing:2px;margin-bottom:8px;">${p.lessonId} · 完成</div>
+      <div class="done-big">${sc_cur.correct}/${total}</div>
+      <div style="font-size:13px;color:${pct===1?'var(--green)':pct>=0.7?'var(--gold)':'var(--red)'};margin:8px 0 20px;">
+        ${pct===1?'🎉 完美！四輪解題全部命中！':pct>=0.7?'👍 不錯！再練一次更穩。':'💪 多練幾次，熟悉四輪流程！'}
+      </div>
+      <div class="passage-box" style="text-align:left;margin-bottom:20px;">${buildPassageHTML(p)}</div>
+      <button class="act-btn primary on" onclick="goHome()">← 返回首頁</button>
+    </div>
+  `;
+}
+
+
+// ═══════════════════════════════════════════════════════
+//  SCAFFOLD PASSAGE DATA
+// ═══════════════════════════════════════════════════════
+
+const SCAFFOLD_PASSAGE_94 = {
+  lessonId: '4-5',
+  title: '鷹架實戰 A',
+  year: '94年學測',
+  text: `Falling in love is always magical. It feels eternal as if love will last [31]. We naively believe that somehow we are [32] from the problems our parents had. We are assured that we are destined to live happily ever after.
+But as the magic fades and daily life [33], it happens that men forget that men and women are supposed to be different. They continue to expect women to think and react the way men do; women, [34], expect men to feel and behave the way women do. [35] taking time to understand and respect each other, we become demanding, resentful, judgmental, and intolerant.
+[36], our relationships are filled with unnecessary disagreements and conflicts. Somehow, problems creep in, resentments build, and communication [37]. Mistrust increases and rejection and repression surface. The magic of love is then lost.
+Very [38] people are able to grow in love. Yet, it does happen. [39] men and women are able to respect and accept their differences, love has a chance to blossom. Love is, [40], magical, and it certainly can last if we remember our differences and respect each other.`,
+  allOptions: [
+    {k:'A', t:'breaks down'},
+    {k:'B', t:'Consequently'},
+    {k:'C', t:'similarly'},
+    {k:'D', t:'indeed'},
+    {k:'E', t:'few'},
+    {k:'F', t:'forever'},
+    {k:'G', t:'Instead of'},
+    {k:'H', t:'takes over'},
+    {k:'I', t:'free'},
+    {k:'J', t:'As long as'},
+  ],
+  allBlanks: [
+    {num:31, ans:'F', ansWord:'forever'},
+    {num:32, ans:'I', ansWord:'free'},
+    {num:33, ans:'H', ansWord:'takes over'},
+    {num:34, ans:'C', ansWord:'similarly'},
+    {num:35, ans:'G', ansWord:'Instead of'},
+    {num:36, ans:'B', ansWord:'Consequently'},
+    {num:37, ans:'A', ansWord:'breaks down'},
+    {num:38, ans:'E', ansWord:'few'},
+    {num:39, ans:'J', ansWord:'As long as'},
+    {num:40, ans:'D', ansWord:'indeed'},
+  ],
+  remaining(answers) {
+    const usedWords = Object.values(answers);
+    return this.allOptions.filter(o => !usedWords.includes(o.t));
+  },
+  rounds: [
+    {
+      name: '秒殺輪',
+      tip: '掃全文，找<b>固定片語</b>或<b>講義裡認識的線索詞</b>，一眼有把握的直接填。<br>這輪不需要分析句型，靠「認出來」就填。',
+      preview: '這輪推薦先做：<b>(35)</b>、<b>(36)</b>、<b>(39)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：Instead of / Consequently / As long as 都在講義裡，看到就填！</span>',
+      blanks: [
+        { num:35, ans:'G', ansWord:'Instead of',
+          hint:'「___ taking time to understand each other」— 看到三字片語空格，選項裡有幾個片語，哪個接 V-ing 且語意是「沒有花時間…，反而變得苛求」？',
+          explain:'<b>Instead of</b>（而不是）+ V-ing — Stage 2-3 三字片語。「不是花時間理解，而是變得苛求」，Instead of 完整片語缺一不可。' },
+        { num:36, ans:'B', ansWord:'Consequently',
+          hint:'「___, our relationships are filled with disagreements」— 這個空格在句首，前面說溝通出問題，後面說關係充滿衝突，是什麼邏輯關係？',
+          explain:'<b>Consequently</b>（因此）— Stage 3-1 因果連結詞。前因（溝通不良）→ 後果（關係充滿衝突），方向一致選因果詞。' },
+        { num:39, ans:'J', ansWord:'As long as',
+          hint:'「___ men and women are able to respect each other, love has a chance」— 這個空格後面接「只要…，愛就有機會」，哪個片語表示「條件」？',
+          explain:'<b>As long as</b>（只要）— Stage 2-3 三字片語。表條件：只要男女能互相尊重，愛就有機會開花。' },
+      ]
+    },
+    {
+      name: '詞性輪',
+      tip: '看空格前後的<b>句型結構</b>，判斷需要什麼詞性。<br>特別注意：冠詞/形容詞後 → 名詞；be/feel/seem 後 → 形容詞；be + ___ + V-ed → 副詞。',
+      preview: '這輪推薦先做：<b>(31)</b>、<b>(32)</b>、<b>(38)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：看空格前的線索詞，判斷詞性再看選項！</span>',
+      blanks: [
+        { num:31, ans:'F', ansWord:'forever',
+          hint:'「love will last ___」— will 是助動詞，後面接動詞原形 last；last 後面的空格是修飾動詞的什麼詞性？選項裡哪個是副詞？',
+          explain:'<b>forever</b>（永遠）— Stage 1-4 副詞修飾動詞。last + forever = 永遠持續，副詞 forever 修飾動詞 last。' },
+        { num:32, ans:'I', ansWord:'free',
+          hint:'「we are ___ from the problems」— be + ___ 後面接什麼詞性？be free from = 免於…，哪個選項是形容詞？',
+          explain:'<b>free</b>（免於的）— Stage 1-3 連綴動詞後接形容詞。be free from（免於）是固定搭配，形容詞 free。' },
+        { num:38, ans:'E', ansWord:'few',
+          hint:'「Very ___ people are able to grow」— Very 修飾後面的形容詞，people 是名詞，空格填修飾名詞的形容詞，哪個選項是形容詞？',
+          explain:'<b>few</b>（很少的）— Stage 1-1 形容詞修飾名詞。Very few people = 很少人，few 是形容詞修飾 people。' },
+      ]
+    },
+    {
+      name: '邏輯輪',
+      tip: '看前後句的<b>方向</b>：轉折？因果？補充？<br>找關鍵詞 but / however / therefore / and 等確認方向再選。',
+      preview: '這輪推薦先做：<b>(33)</b>、<b>(34)</b>、<b>(37)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：看整句語意，找前後關係！</span>',
+      blanks: [
+        { num:33, ans:'H', ansWord:'takes over',
+          hint:'「as the magic fades and daily life ___」— 魔法消退，日常生活開始___，這個動作和「魔法消退」是同一方向（並列），日常生活接管/佔據了，哪個片語最合適？',
+          explain:'<b>takes over</b>（接管；佔據）— Stage 3-4 上下文語意推論。魔法消退，日常生活「接管」，takes over 表示現實取代了浪漫。' },
+        { num:34, ans:'C', ansWord:'similarly',
+          hint:'「men expect women to think like men; women, ___, expect men to feel like women」— 前後兩句描述相同的模式（都是期待對方像自己），這是什麼邏輯關係？',
+          explain:'<b>similarly</b>（同樣地）— Stage 3-3 遞進補充。男性期待女性像男性思考；女性同樣地期待男性像女性感受，前後方向相同用補充詞。' },
+        { num:37, ans:'A', ansWord:'breaks down',
+          hint:'「resentments build, and communication ___」— 前面說積怨加深，後面說溝通___，方向一致（都是負面惡化），哪個片語是「瓦解/中斷」？',
+          explain:'<b>breaks down</b>（瓦解；中斷）— Stage 3-1/3-4 因果+語意推論。積怨加深，溝通跟著瓦解，breaks down = 中斷崩潰，方向一致。' },
+      ]
+    },
+    {
+      name: '消去輪',
+      tip: '剩下最後一格，把還沒用的選項代入，選最順、最符合文章語氣的。<br>注意：時態一致、前後呼應。',
+      preview: '只剩 <b>(40)</b> 了，把剩下的選項代入念念看，哪個最順？',
+      blanks: [
+        { num:40, ans:'D', ansWord:'indeed',
+          hint:'「Love is, ___, magical」— 整篇文章的結論，強調愛確實是有魔力的，哪個選項表示「確實；的確」帶有強調語氣？',
+          explain:'<b>indeed</b>（確實；的確）— Stage 4 消去法。前面用了 forever / consequently / similarly / instead of / as long as / breaks down / few / takes over / free，剩下 indeed。句意「愛確實是有魔力的」，indeed 強調語氣完全符合結論。' },
+      ]
+    }
+  ]
+};
+
+const SCAFFOLD_PASSAGE_104 = {
+  lessonId: '4-6',
+  title: '鷹架實戰 B',
+  year: '104年學測',
+  text: `A paperclip, made of steel wire bent into a hooped shape, is an instrument used to hold sheets of paper together. This common [31] is a wonder of simplicity and function. But where did this simple, cheap, and indispensable invention come from?
+In the late 19th century, the most common way to hold papers together was by using a pin. Although the pin was inexpensive and was easily [32], it would leave holes in the paper. Later, as steel wire became more common, inventors began to notice its elastic feature. With this feature, it could be stretched and [33] various clip-like objects. In the years just prior to 1900, quite a few paperclip designs emerged. The name most frequently [34] the paperclip invention is Johan Vaaler, a Norwegian inventor. However, Vaaler's clips were not the same as the paperclips currently in use. The [35] looped design was invented by Gem Manufacturing Ltd. in England. This clip is therefore sometimes [36] the Gem clip.
+Because of Vaaler, the paperclip played an important [37] role in Norway. During World War II, Norway was occupied by the Nazis. Norwegians were prohibited from wearing any [38] of their national unity, such as buttons with the initials of their king. Thus, in [39], they started wearing paperclips to show their solidarity. After the war, a giant paperclip statue was erected in Oslo to [40] Vaaler.`,
+  allOptions: [
+    {k:'A', t:'familiar'},
+    {k:'B', t:'honor'},
+    {k:'C', t:'device'},
+    {k:'D', t:'removable'},
+    {k:'E', t:'known as'},
+    {k:'F', t:'protest'},
+    {k:'G', t:'symbol'},
+    {k:'H', t:'twisted into'},
+    {k:'I', t:'associated with'},
+    {k:'J', t:'historical'},
+  ],
+  allBlanks: [
+    {num:31, ans:'C', ansWord:'device'},
+    {num:32, ans:'D', ansWord:'removable'},
+    {num:33, ans:'H', ansWord:'twisted into'},
+    {num:34, ans:'I', ansWord:'associated with'},
+    {num:35, ans:'A', ansWord:'familiar'},
+    {num:36, ans:'E', ansWord:'known as'},
+    {num:37, ans:'J', ansWord:'historical'},
+    {num:38, ans:'G', ansWord:'symbol'},
+    {num:39, ans:'F', ansWord:'protest'},
+    {num:40, ans:'B', ansWord:'honor'},
+  ],
+  remaining(answers) {
+    const usedWords = Object.values(answers);
+    return this.allOptions.filter(o => !usedWords.includes(o.t));
+  },
+  rounds: [
+    {
+      name: '秒殺輪',
+      tip: '掃全文，找<b>講義裡的固定搭配</b>或<b>一眼就認出的線索</b>直接填。<br>這篇有幾個講義例句直接出現，認出來就是分數！',
+      preview: '這輪推薦先做：<b>(31)</b>、<b>(34)</b>、<b>(36)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：device 和 associated with 都是講義例句，知道答案直接填！</span>',
+      blanks: [
+        { num:31, ans:'C', ansWord:'device',
+          hint:'「This common ___ is a wonder of simplicity」— Stage 1-1 的例題！this + 形容詞 + 空格，需要什麼詞性？',
+          explain:'<b>device</b>（裝置）— Stage 1-1 名詞判定。This common + ___ → 指示詞 + 形容詞後填名詞。這正是 Stage 1-1 的例句！' },
+        { num:34, ans:'I', ansWord:'associated with',
+          hint:'「The name most frequently ___ the paperclip invention is Johan Vaaler」— Stage 2-2 的例句！be ___ with，哪個選項和 with 搭配？',
+          explain:'<b>associated with</b>（與…相關）— Stage 2-2 分詞 + with。be associated with 是超高頻搭配，這正是 Stage 2-2 的例句！' },
+        { num:36, ans:'E', ansWord:'known as',
+          hint:'「This clip is therefore sometimes ___ the Gem clip」— 這個迴紋針被___叫做 Gem clip，哪個片語表示「被稱為」？',
+          explain:'<b>known as</b>（被稱為）— Stage 2-2 分詞搭配。be known as = 被稱為，固定片語。' },
+      ]
+    },
+    {
+      name: '詞性輪',
+      tip: '看空格前後的<b>句型結構</b>，判斷需要什麼詞性。<br>特別注意：be + ___ + V-ed → 副詞；形容詞後 → 名詞；冠詞 + ___ → 名詞。',
+      preview: '這輪推薦先做：<b>(32)</b>、<b>(33)</b>、<b>(35)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：看空格前後各一個字，判斷詞性！</span>',
+      blanks: [
+        { num:32, ans:'D', ansWord:'removable',
+          hint:'「was easily ___」— be + 副詞 easily + 空格，這裡是 be 動詞後的補語，需要什麼詞性？選項裡哪個是形容詞？',
+          explain:'<b>removable</b>（可移除的）— Stage 1-3 連綴動詞後接形容詞。was easily removable = 容易移除的，be + 形容詞補語。' },
+        { num:33, ans:'H', ansWord:'twisted into',
+          hint:'「it could be stretched and ___  various clip-like objects」— be stretched and ___ = 被動語態並列，空格需要過去分詞，哪個選項是過去分詞片語？',
+          explain:'<b>twisted into</b>（被扭成）— Stage 1-4 被動語態。be stretched and twisted into = 被拉伸並扭成，兩個過去分詞並列的被動結構。' },
+        { num:35, ans:'A', ansWord:'familiar',
+          hint:'「The ___ looped design」— 冠詞 The + 空格 + 名詞 looped design，空格填修飾名詞的形容詞，哪個選項最符合「這個廣為人知的設計」？',
+          explain:'<b>familiar</b>（熟悉的；廣為人知的）— Stage 1-1 形容詞修飾名詞。The familiar looped design = 那個大家熟悉的環形設計（就是現在通用的款式）。' },
+      ]
+    },
+    {
+      name: '邏輯輪',
+      tip: '看整段語境，理解文章意思後再選。<br>這輪的格子語意比較重要，要靠閱讀理解推斷。',
+      preview: '這輪推薦先做：<b>(37)</b>、<b>(38)</b>、<b>(39)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：這三格都在二戰挪威那段，先讀懂那段再選！</span>',
+      blanks: [
+        { num:37, ans:'J', ansWord:'historical',
+          hint:'「the paperclip played an important ___ role in Norway」— 迴紋針在挪威二戰中扮演了重要的___角色，後面整段說挪威人用迴紋針抗議納粹，這是什麼性質的角色？',
+          explain:'<b>historical</b>（歷史性的）— Stage 3-4 語境推論。迴紋針在二戰中的象徵意義讓它扮演了重要的「歷史性」角色。' },
+        { num:38, ans:'G', ansWord:'symbol',
+          hint:'「prohibited from wearing any ___ of their national unity」— 挪威人被禁止展示任何國家團結的___，後面舉例說「如國王縮寫的徽章」，這是什麼名詞？',
+          explain:'<b>symbol</b>（象徵）— Stage 3-4 語境推論。symbol of national unity = 國家團結的象徵，後面舉例 buttons with king\'s initials 都是象徵物。' },
+        { num:39, ans:'F', ansWord:'protest',
+          hint:'「in ___, they started wearing paperclips」— 挪威人在_______中開始戴迴紋針，上文說他們被禁止展示國家象徵，下文說為了表達團結，這個行為是什麼？',
+          explain:'<b>protest</b>（抗議）— Stage 3-4 語境推論。in protest = 作為抗議，挪威人戴迴紋針是對納粹禁令的抗議行動。' },
+      ]
+    },
+    {
+      name: '消去輪',
+      tip: '最後一格，把剩下的選項代入，選最符合文意的。',
+      preview: '只剩 <b>(40)</b> 了！',
+      blanks: [
+        { num:40, ans:'B', ansWord:'honor',
+          hint:'「a giant paperclip statue was erected in Oslo to ___ Vaaler」— 戰後在奧斯陸豎立巨型迴紋針雕像是為了___Vaaler，哪個動詞表示「紀念；致敬」？',
+          explain:'<b>honor</b>（紀念；致敬）— Stage 4 消去法。用過 device/removable/twisted into/associated with/familiar/known as/historical/symbol/protest，剩下 honor。erect a statue to honor sb. = 豎立雕像以紀念某人，完全符合。' },
+      ]
+    }
+  ]
+};
+
 </script>
 
 </body>
