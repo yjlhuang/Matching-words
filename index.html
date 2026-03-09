@@ -325,6 +325,18 @@ body{
 
 /* ── MISC ────────────────────────────────────────────── */
 .tag-inline{display:inline-block;padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;margin-left:5px;vertical-align:middle;}
+
+/* Free Passage */
+.fp-opts-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.fp-opt-tag{font-size:11px;color:var(--text-dim);background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-family:'JetBrains Mono',monospace;}
+.fp-passage{font-size:14px;}
+.fp-sel{background:var(--card2);color:var(--gold);border:1px solid var(--gold-b);border-radius:6px;padding:2px 6px;font-size:13px;cursor:pointer;max-width:160px;}
+.fp-round-tag{display:inline-block;font-size:9px;font-family:'JetBrains Mono',monospace;padding:1px 5px;border-radius:3px;margin-left:3px;vertical-align:middle;background:var(--card2);color:var(--text-xs);}
+.fp-round-tag.r1{background:rgba(99,179,237,0.15);color:#63b3ed;}
+.fp-round-tag.r2{background:rgba(104,211,145,0.15);color:#68d391;}
+.fp-round-tag.r3{background:rgba(246,173,85,0.15);color:#f6ad55;}
+.fp-round-tag.r4{background:rgba(180,130,255,0.15);color:#b482ff;}
+.fp-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
 </style>
 </head>
 <body>
@@ -488,12 +500,11 @@ const LESSONS = [
   { id:'3-3', stage:3, title:'遞進與補充關係',                desc:'Furthermore, Similarly, As well…',tag:'l', unlock:'3-2' },
   { id:'3-4', stage:3, title:'同義／反義上下文暗示',          desc:'上文 slow → 下文考 fast…',       tag:'l', unlock:'3-3' },
   // STAGE 4 — 實戰
-  { id:'4-1', stage:4, title:'策略教學：四輪解題法',          desc:'秒殺→詞性→朗讀→消去',            tag:'b', unlock:'3-4' },
-  { id:'4-2', stage:4, title:'整段實戰 A（98年）',            desc:'The Tortoise and the Hare',       tag:'b', unlock:'4-1' },
-  { id:'4-3', stage:4, title:'整段實戰 B（108年）',           desc:'父親的記憶問題',                  tag:'b', unlock:'4-2' },
-  { id:'4-4', stage:4, title:'整段實戰 C（112年）',           desc:'喝水與補水的科學',                tag:'b', unlock:'4-3' },
-  { id:'4-5', stage:4, title:'鷹架實戰 A（94年）',            desc:'四輪帶著走：愛情的魔法',           tag:'b', unlock:'4-4' },
-  { id:'4-6', stage:4, title:'鷹架實戰 B（104年）',           desc:'四輪帶著走：迴紋針的故事',         tag:'b', unlock:'4-5' },
+  { id:'4-1', stage:4, title:'策略教學：四輪解題法',          desc:'秒殺→詞性→邏輯→消去',            tag:'b', unlock:'3-4' },
+  { id:'4-2', stage:4, title:'鷹架實戰 A（94年）',            desc:'四輪帶著走：愛情的魔法',           tag:'b', unlock:'4-1' },
+  { id:'4-3', stage:4, title:'鷹架實戰 B（104年）',           desc:'四輪帶著走：迴紋針的故事',         tag:'b', unlock:'4-2' },
+  { id:'4-4', stage:4, title:'自由實戰 A（98年）',            desc:'自己用四輪法：兔子與烏龜',         tag:'b', unlock:'4-3' },
+  { id:'4-5', stage:4, title:'自由實戰 B（108年）',           desc:'自己用四輪法：父親的記憶',         tag:'b', unlock:'4-4' },
 ];
 
 const STAGE_META = {
@@ -593,11 +604,10 @@ let cur = { lessonId:null, qIdx:0, correct:0, wrong:0, wrongList:[], mode:null }
 function startLesson(id) {
   // Special handling for stage 4
   if (id === '4-1') { startStrategy(); return; }
-  if (id === '4-2') { startPassage(BATTLE_PASSAGE_98); return; }
-  if (id === '4-3') { startPassage(BATTLE_PASSAGE_108); return; }
-  if (id === '4-4') { startPassage(BATTLE_PASSAGE_112); return; }
-  if (id === '4-5') { startScaffold(SCAFFOLD_PASSAGE_94); return; }
-  if (id === '4-6') { startScaffold(SCAFFOLD_PASSAGE_104); return; }
+  if (id === '4-2') { startScaffold(SCAFFOLD_PASSAGE_94); return; }
+  if (id === '4-3') { startScaffold(SCAFFOLD_PASSAGE_104); return; }
+  if (id === '4-4') { startFreePassage(FREE_PASSAGE_98); return; }
+  if (id === '4-5') { startFreePassage(FREE_PASSAGE_108); return; }
 
   const lesson = LESSONS.find(l => l.id === id);
   const qs = QUESTION_DATA[id];
@@ -957,7 +967,7 @@ function startStrategy() {
 
 function finishStrategy() {
   setDone('4-1');
-  startPassage(BATTLE_PASSAGE_98);
+  startScaffold(SCAFFOLD_PASSAGE_94);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1213,7 +1223,7 @@ const QUESTION_DATA = {
     mainQ:'「the paperclip ___」空格需要名詞，哪個選項正確？（104年學測）',
     mainOpts:[{k:'A',t:'invention'},{k:'B',t:'invent'},{k:'C',t:'inventive'},{k:'D',t:'invented'}],
     ans:'A', ansWord:'invention',
-    explain:'🕵️ 正確！the + paperclip + 空格 = 複合名詞，invention（發明）是名詞。（104年學測）',
+    explain:'🕵️ 正確！the + paperclip + 空格 = 複合名詞（N+N），invention（發明）是名詞。（104年學測）<br><span style="color:var(--gold);font-size:11px;">💡 N+N 判斷法（Last Resort）：空格後有名詞，先填形容詞；形容詞選項語意都不順時，才考慮 N+N。確認方法：空格後的名詞後面接動詞或句點，代表名詞片語在這裡結束了。</span>',
     guide:{ q:'「the paperclip ___」— the 後面加一個名詞 paperclip，空格是第二個名詞位置，需要？',
       opts:[{k:'A',t:'名詞（invention）'},{k:'B',t:'動詞（invent）'},{k:'C',t:'形容詞（inventive）'},{k:'D',t:'過去分詞（invented）'}],
       key:'A', explain:'the + 名詞 paperclip + 空格（名詞）= 複合名詞 paperclip invention（迴紋針的發明）。' }
@@ -2377,7 +2387,7 @@ function showScaffoldResult() {
 // ═══════════════════════════════════════════════════════
 
 const SCAFFOLD_PASSAGE_94 = {
-  lessonId: '4-5',
+  lessonId: '4-2',
   title: '鷹架實戰 A',
   year: '94年學測',
   text: `Falling in love is always magical. It feels eternal as if love will last [31]. We naively believe that somehow we are [32] from the problems our parents had. We are assured that we are destined to live happily ever after.
@@ -2475,7 +2485,7 @@ Very [38] people are able to grow in love. Yet, it does happen. [39] men and wom
 };
 
 const SCAFFOLD_PASSAGE_104 = {
-  lessonId: '4-6',
+  lessonId: '4-3',
   title: '鷹架實戰 B',
   year: '104年學測',
   text: `A paperclip, made of steel wire bent into a hooped shape, is an instrument used to hold sheets of paper together. This common [31] is a wonder of simplicity and function. But where did this simple, cheap, and indispensable invention come from?
@@ -2517,7 +2527,7 @@ Because of Vaaler, the paperclip played an important [37] role in Norway. During
       blanks: [
         { num:31, ans:'C', ansWord:'device',
           hint:'「This common ___ is a wonder of simplicity」— Stage 1-1 的例題！this + 形容詞 + 空格，需要什麼詞性？',
-          explain:'<b>device</b>（裝置）— Stage 1-1 名詞判定。This common + ___ → 指示詞 + 形容詞後填名詞。這正是 Stage 1-1 的例句！' },
+          explain:'<b>device</b>（裝置）— Stage 1-1 名詞判定。This common + ___ → 指示詞 + 形容詞後填名詞。這正是 Stage 1-1 的例句！<br><b style="color:var(--gold)">注意：</b>空格後有 is（動詞），不是另一個名詞，所以不是 N+N——這題的主詞就是 this common device 整個片語。但同一篇的 paperclip invention（迴紋針+發明）是 N+N：invention 前沒有形容詞，paperclip 以名詞身份修飾 invention。' },
         { num:34, ans:'I', ansWord:'associated with',
           hint:'「The name most frequently ___ the paperclip invention is Johan Vaaler」— Stage 2-2 的例句！be ___ with，哪個選項和 with 搭配？',
           explain:'<b>associated with</b>（與…相關）— Stage 2-2 分詞 + with。be associated with 是超高頻搭配，這正是 Stage 2-2 的例句！' },
@@ -2570,6 +2580,247 @@ Because of Vaaler, the paperclip played an important [37] role in Norway. During
     }
   ]
 };
+
+
+// ═══════════════════════════════════════════════════════
+//  FREE PASSAGE ENGINE — 自由實戰（學測格式）
+// ═══════════════════════════════════════════════════════
+
+let fp_cur = { passage: null, userAnswers: {}, submitted: false };
+
+function startFreePassage(passageData) {
+  fp_cur = { passage: passageData, userAnswers: {}, submitted: false };
+  document.getElementById('battle-eyebrow').textContent = passageData.lessonId;
+  document.getElementById('battle-title').textContent = passageData.title;
+  document.getElementById('battle-sub').textContent = passageData.year + ' · 自由實戰';
+  showScreen('s-battle');
+  renderFreePassage();
+}
+
+function renderFreePassage() {
+  const p = fp_cur.passage;
+  const area = document.getElementById('battle-area');
+
+  // Build passage with blank selects
+  let passHTML = p.text;
+  p.blanks.forEach(b => {
+    const sel = `<select class="fp-sel" id="fps${b.num}" onchange="fpSelect(${b.num},this.value)">
+      <option value="">__(${b.num})__</option>
+      ${p.allOptions.map(o=>`<option value="${o.k}">${o.k}. ${o.t}</option>`).join('')}
+    </select>`;
+    passHTML = passHTML.replace(`[${b.num}]`, sel);
+  });
+
+  const optHTML = p.allOptions.map(o =>
+    `<span class="fp-opt-tag">${o.k}. ${o.t}</span>`
+  ).join(' ');
+
+  area.innerHTML = `
+    <div class="card">
+      <div class="card-top-line"></div>
+      <div class="lesson-box">
+        <div class="lb-title">🗡️ 自由實戰 — 用四輪解題法</div>
+        <div style="font-size:12px;color:var(--text-dim);line-height:1.8;margin-top:4px;">
+          先閱讀全文，用四輪解題法決定填入順序，完成後按送出。<br>
+          <b style="color:var(--gold)">每個選項只能用一次。</b>
+        </div>
+      </div>
+      <div style="margin:12px 0 8px;font-size:11px;color:var(--text-xs);letter-spacing:1px;">選項：</div>
+      <div class="fp-opts-bar">${optHTML}</div>
+      <div class="passage-box fp-passage" style="margin-top:14px;line-height:2.2;">${passHTML}</div>
+      <div id="fp-warn" style="color:var(--red);font-size:12px;margin-top:10px;display:none;">⚠️ 請填完所有空格再送出</div>
+      <button class="act-btn primary on" style="margin-top:16px;" onclick="submitFreePassage()">送出答案 →</button>
+    </div>
+  `;
+}
+
+function fpSelect(num, val) {
+  if (!val) {
+    delete fp_cur.userAnswers[num];
+    return;
+  }
+  // Check if this option is already used elsewhere
+  const alreadyUsed = Object.entries(fp_cur.userAnswers).find(([n, v]) => v === val && parseInt(n) !== num);
+  if (alreadyUsed) {
+    // Warn and revert
+    const sel = document.getElementById('fps' + num);
+    sel.value = fp_cur.userAnswers[num] || '';
+    const warn = document.getElementById('fp-warn');
+    warn.textContent = `⚠️ 選項 ${val} 已用在空格 (${alreadyUsed[0]})，每個選項只能用一次`;
+    warn.style.display = 'block';
+    setTimeout(() => { warn.style.display = 'none'; warn.textContent = '⚠️ 請填完所有空格再送出'; }, 2500);
+    return;
+  }
+  fp_cur.userAnswers[num] = val;
+}
+
+function submitFreePassage() {
+  const p = fp_cur.passage;
+  // Check all filled
+  if (Object.keys(fp_cur.userAnswers).length < p.blanks.length) {
+    document.getElementById('fp-warn').style.display = 'block';
+    return;
+  }
+  fp_cur.submitted = true;
+  showFreeResult();
+}
+
+function showFreeResult() {
+  const p = fp_cur.passage;
+  let correct = 0;
+  const total = p.blanks.length;
+
+  // Score
+  p.blanks.forEach(b => {
+    if (fp_cur.userAnswers[b.num] === b.ans) correct++;
+  });
+
+  setDone(p.lessonId, correct, total);
+  const pct = correct / total;
+
+  // Build reviewed passage
+  let passHTML = p.text;
+  p.blanks.forEach(b => {
+    const userAns = fp_cur.userAnswers[b.num];
+    const isRight = userAns === b.ans;
+    const roundLabel = p.roundLabels[b.num];
+    const cls = isRight ? 'p-blank ok' : 'p-blank no';
+    const display = `${b.ansWord}<span class="fp-round-tag">${roundLabel}</span>`;
+    passHTML = passHTML.replace(`[${b.num}]`, `<span class="${cls}">${display}</span>`);
+  });
+
+  // Wrong answers detail
+  const wrongBlanks = p.blanks.filter(b => fp_cur.userAnswers[b.num] !== b.ans);
+  const wrongHTML = wrongBlanks.length === 0 ? '' : `
+    <div style="margin-top:20px;">
+      <div style="font-size:12px;color:var(--text-xs);letter-spacing:1px;margin-bottom:10px;">錯題解析</div>
+      ${wrongBlanks.map(b => {
+        const userK = fp_cur.userAnswers[b.num];
+        const userWord = p.allOptions.find(o=>o.k===userK)?.t || '?';
+        return `<div style="margin-bottom:14px;padding:10px 12px;background:rgba(255,80,80,0.06);border-radius:8px;border-left:3px solid var(--red);">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">
+            (${b.num}) 你選：${userK}. ${userWord} → 正確：${b.ans}. ${b.ansWord}
+            <span class="fp-round-tag" style="margin-left:6px;">${p.roundLabels[b.num]}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">${b.explain}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  const area = document.getElementById('battle-area');
+  area.innerHTML = `
+    <div class="card">
+      <div class="card-top-line"></div>
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:11px;color:var(--text-xs);letter-spacing:2px;margin-bottom:6px;">${p.lessonId} · 完成</div>
+        <div class="done-big">${correct}/${total}</div>
+        <div style="font-size:13px;color:${pct===1?'var(--green)':pct>=0.7?'var(--gold)':'var(--red)'};margin-top:6px;">
+          ${pct===1?'🎉 滿分！四輪全命中！':pct>=0.7?'👍 不錯！看看覆盤再提升。':'💪 對照四輪標籤，找出下次的切入點！'}
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-xs);margin-bottom:8px;">
+        ▼ 四輪覆盤：每格顏色 = 答對/錯，標籤 = 這題應用哪一輪
+      </div>
+      <div class="fp-legend">
+        <span class="fp-round-tag r1">①秒殺</span>
+        <span class="fp-round-tag r2">②詞性</span>
+        <span class="fp-round-tag r3">③邏輯</span>
+        <span class="fp-round-tag r4">④消去</span>
+      </div>
+      <div class="passage-box" style="margin-top:10px;line-height:2.4;">${passHTML}</div>
+      ${wrongHTML}
+      <button class="act-btn primary on" style="margin-top:20px;" onclick="goHome()">← 返回首頁</button>
+    </div>
+  `;
+}
+
+
+// ═══════════════════════════════════════════════════════
+//  FREE PASSAGE DATA — 自由實戰
+// ═══════════════════════════════════════════════════════
+
+const FREE_PASSAGE_98 = {
+  lessonId: '4-4',
+  title: '自由實戰 A',
+  year: '98年學測',
+  text: `Familiar fables can be narrated differently or extended in interesting and humorous ways. The end of the famous fable of "The Tortoise and the Hare" is well known to all: the tortoise wins the race against the hare. The moral lesson is that slow and steady wins the race. We all have grown up with this popular version, but the [31] fable can be extended with different twists. At the request of the hare, a second race is [32] and this time, the hare runs without taking a rest and wins. The moral lesson is that [33] and consistent will always beat slow and steady. Then it is the tortoise that [34] the hare to a third race along a different route in which there is a river just before the final destination. This time, the tortoise wins the race because the hare cannot swim. The moral lesson is "First [35] your strengths, and then change the playing field to suit them."
+But the story continues. Both [36] know their own drawbacks and limitations very well; therefore, they jointly decide to have one last race—not to decide who the winner or loser is, but just for their own pleasure and satisfaction. The two [37] as a team. Firstly, the hare carries the tortoise on its back to the river. Then, the tortoise carries the hare and swims to the [38] bank of the river. Lastly, the hare carries the tortoise again on its back. Thus they reach the [39] line together. Overall, many moral lessons from the last match are highlighted. The most obvious one is the importance of [40]. Another moral which also means a great deal is "competition against situations rather than against rivals."`,
+  allOptions: [
+    {k:'A', t:'arranged'}, {k:'B', t:'challenges'}, {k:'C', t:'competitors'},
+    {k:'D', t:'cooperate'}, {k:'E', t:'fast'}, {k:'F', t:'finishing'},
+    {k:'G', t:'identify'}, {k:'H', t:'opposite'}, {k:'I', t:'same'}, {k:'J', t:'teamwork'}
+  ],
+  blanks: [
+    { num:31, ans:'I', ansWord:'same',
+      explain:'「the ___ fable」— 冠詞 the + 形容詞 + 名詞（Stage 1-1）。上文說大家都熟悉這個故事，the same fable（同一個寓言）= 但接下來要延伸不同結局。' },
+    { num:32, ans:'A', ansWord:'arranged',
+      explain:'「a second race is ___」— be + 過去分詞（Stage 1-4 被動語態），比賽被安排好，arranged（被安排的）。' },
+    { num:33, ans:'E', ansWord:'fast',
+      explain:'「___ and consistent will always beat slow and steady」— 對比結構（Stage 3-2）：slow 的反義是 fast，兩組詞形成對稱對比。' },
+    { num:34, ans:'B', ansWord:'challenges',
+      explain:'「the tortoise that ___ the hare to a third race」— 動詞位置，烏龜主動向兔子「下戰帖」，challenges（挑戰）作及物動詞。' },
+    { num:35, ans:'G', ansWord:'identify',
+      explain:'「First ___ your strengths」— 祈使句，動詞原形（Stage 1-2），identify（辨認；找出）your strengths = 先認清自己的強項。' },
+    { num:36, ans:'C', ansWord:'competitors',
+      explain:'「Both ___」— 主詞位置，名詞，competitors（競爭者）代指兔子和烏龜，前文一直在講兩人競賽。' },
+    { num:37, ans:'D', ansWord:'cooperate',
+      explain:'「The two ___ as a team」— 動詞位置，cooperate（合作）as a team，從競爭轉為合作，呼應整段主旨。' },
+    { num:38, ans:'H', ansWord:'opposite',
+      explain:'「the ___ bank」— 形容詞修飾名詞（Stage 1-1），烏龜游泳帶兔子到對岸，the opposite bank = 對岸，固定搭配。' },
+    { num:39, ans:'F', ansWord:'finishing',
+      explain:'「the ___ line」— 形容詞修飾名詞，finishing line（終點線）是固定搭配，reach the finishing line = 抵達終點線。' },
+    { num:40, ans:'J', ansWord:'teamwork',
+      explain:'「the importance of ___」— of + 名詞（Stage 2-4），teamwork（團隊合作）是整篇文章最終的寓意，前文反復鋪陳合作的重要性。' },
+  ],
+  roundLabels: {
+    31: '②詞性', 32: '②詞性', 33: '①秒殺',  34: '③邏輯',
+    35: '②詞性', 36: '③邏輯', 37: '③邏輯',  38: '②詞性',
+    39: '①秒殺', 40: '②詞性'
+  }
+};
+
+const FREE_PASSAGE_108 = {
+  lessonId: '4-5',
+  title: '自由實戰 B',
+  year: '108年學測',
+  text: `My father started to suffer from memory loss right after his marriage. Or so my mother told us. She said they were married on May 26, while my dad's memory told him it was June 25. This often [31] their anniversary celebration, for his rose bouquet always came one month late. Mom seldom asked Dad to go shopping in the traditional market for her. But whenever Dad [32] on going, she made sure that he brought a shopping list. Dad certainly had the list [33] when he left for the market, but he would somehow forget it, and then would find it again only after he returned home. Of course, the [34] that he made were based mainly on his memory of the list. Unfortunately, the items were usually different from Mom's [35].
+My father's poor memory gave him certain advantages, though. For instance, he was [36] with many secrets in my family and our community. Because of his poor memory, he had the [37] of hearing everyone's private matters. The reason was [38]: Dad would not remember any of it, we thought. As for our neighbors, they liked to invite my father to dinner so that they could tell him stories about their children, parents, friends, and pets. They also believed the secrets in their families would never be [39]. They were quite right, for my father cared [40] about who did what to whom. But there is one thing he would never forget: showing up for dinner on time.`,
+  allOptions: [
+    {k:'A', t:'little'}, {k:'B', t:'purchases'}, {k:'C', t:'trusted'},
+    {k:'D', t:'requests'}, {k:'E', t:'insisted'}, {k:'F', t:'ready'},
+    {k:'G', t:'ruined'}, {k:'H', t:'privilege'}, {k:'I', t:'revealed'}, {k:'J', t:'obvious'}
+  ],
+  blanks: [
+    { num:31, ans:'G', ansWord:'ruined',
+      explain:'「This often ___ their anniversary」— 動詞位置，花束晚一個月，週年紀念被毀了，ruined（毀掉）最符合語境。' },
+    { num:32, ans:'E', ansWord:'insisted',
+      explain:'「whenever Dad ___ on going」— insist on + V-ing（Stage 2-2 動詞 + with/on）固定搭配，insist on going = 堅持要去。' },
+    { num:33, ans:'F', ansWord:'ready',
+      explain:'「had the list ___ when he left」— have sth. ready（Stage 2 搭配詞）= 把某東西準備好，出發前確實有帶著清單。' },
+    { num:34, ans:'B', ansWord:'purchases',
+      explain:'「the ___ that he made」— 冠詞 the + 名詞（Stage 1-1），make purchases = 採購，purchases（採購品）作名詞。' },
+    { num:35, ans:'D', ansWord:'requests',
+      explain:'「different from Mom\'s ___」— 所有格 Mom\'s + 名詞，requests（要求；清單上的項目）= 媽媽的要求，和採購品不同。' },
+    { num:36, ans:'C', ansWord:'trusted',
+      explain:'「he was ___ with many secrets」— be trusted with（Stage 2-2）固定被動搭配，be trusted with sth. = 被信任保管某東西。' },
+    { num:37, ans:'H', ansWord:'privilege',
+      explain:'「had the ___ of hearing everyone\'s private matters」— 冠詞 the + 名詞，privilege（特權）of + V-ing，因為記性差反而有特殊待遇，諷刺語氣。' },
+    { num:38, ans:'J', ansWord:'obvious',
+      explain:'「The reason was ___」— 連綴動詞 was + 形容詞（Stage 1-3），obvious（顯而易見的），後面冒號說明理由。' },
+    { num:39, ans:'I', ansWord:'revealed',
+      explain:'「secrets would never be ___」— 被動語態，秘密永遠不會被揭露，revealed（揭露）固定搭配。' },
+    { num:40, ans:'A', ansWord:'little',
+      explain:'「cared ___ about who did what」— 副詞修飾動詞 cared（Stage 1-4），little（幾乎不），care little about = 幾乎不在乎，消去法最後剩這個。' },
+  ],
+  roundLabels: {
+    31: '③邏輯', 32: '①秒殺', 33: '①秒殺', 34: '②詞性',
+    35: '②詞性', 36: '①秒殺', 37: '②詞性', 38: '②詞性',
+    39: '③邏輯', 40: '④消去'
+  }
+};
+
+
 
 </script>
 
