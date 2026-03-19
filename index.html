@@ -911,51 +911,52 @@ function startStrategy() {
         <div class="strat-step">
           <div class="strat-num">①</div>
           <div class="strat-body">
-            <div class="strat-title">秒殺輪：固定片語 & 搭配詞</div>
+            <div class="strat-title">秒殺輪：固定搭配直接填</div>
             <div class="strat-desc">
-              先掃描所有空格，找你<b>認得的固定搭配</b>直接填入。<br>
-              例：看到 <code>play a ___ role</code> → 直接填 <b>key / major / vital</b>（搭配詞）<br>
-              例：看到 <code>be responsible ___</code> → 直接填 <b>for</b>
+              掃全部空格，看到<b>認得的固定搭配</b>或<b>講義裡的句型結構</b>直接填，不需要語意判斷。<br>
+              例：<code>insist on + ___</code> → 動名詞　　<code>be trusted with</code> → 直接命中<br>
+              <span style="font-size:11px;color:var(--text-xs);">⚠️ 不是每篇都有秒殺輪——沒有明顯固定搭配的篇章，直接跳②詞性輪。</span>
             </div>
           </div>
         </div>
         <div class="strat-step">
           <div class="strat-num">②</div>
           <div class="strat-body">
-            <div class="strat-title">詞性輪：選項先分堆，空格再對號</div>
+            <div class="strat-title">詞性輪：選項分堆，副詞先行</div>
             <div class="strat-desc">
               <b style="color:var(--gold)">Step A｜選項先分堆</b><br>
-              把 10 個選項按詞性分組：名詞一堆、動詞一堆、形容詞一堆、副詞一堆、片語單獨列。<br>
-              某一堆只剩一個選項 → 找到那個詞性的空格，直接填。<br>
-              <span style="font-size:11px;color:var(--red);margin-top:4px;display:inline-block;">⚠️ <b>-ed 要小心</b>：可能是①過去式動詞（主詞 + ___）、②被動 pp（be + ___）、③形容詞（狀態描述）— 先放「待確認」區，看到 be 前才決定歸哪堆。<br>V-ing 也可當形容詞（competing stories, demanding job），不一定是動詞堆。</span><br><br>
-              <b style="color:var(--gold)">Step B｜看空格詞性</b><br>
+              把選項按詞性分組：副詞堆、形容詞堆、名詞堆、動詞堆、片語堆。<br>
+              <b>副詞堆最先處理</b>——詞性最乾淨，選項通常只有一兩個，認知負荷最低。<br>
+              句子副詞（Consequently / Similarly）只需判斷順向/逆向就能決定。<br>
+              <span style="font-size:11px;color:var(--red);display:block;margin:4px 0;">⚠️ <b>-ed 先放「待確認」區</b>：可能是過去式動詞、被動 pp、或形容詞，看到 be 才決定歸堆。V-ing 也可當形容詞（competing / demanding），不一定是動詞堆。</span>
+              <b style="color:var(--gold)">Step B｜空格詞性判斷</b><br>
               <code>to + ___</code> → 動詞原形　　<code>be/feel/look + ___</code> → 形容詞<br>
               <code>a/the + ___</code> → 名詞　　　<code>be + ___ + V-ed</code> → 副詞<br>
               <code>___ and 形容詞</code> → 空格也是形容詞　　<code>___ and 名詞</code> → 空格也是名詞<br>
-              <span style="font-size:11px;color:var(--text-xs);">⭐ and 前後詞性對稱，是最快的判斷線索，幾乎是送分題</span>
+              <span style="font-size:11px;color:var(--text-xs);">⭐ and 前後詞性對稱，最快的判斷線索</span>
             </div>
           </div>
         </div>
         <div class="strat-step">
           <div class="strat-num">③</div>
           <div class="strat-body">
-            <div class="strat-title">邏輯輪：語境與轉折</div>
+            <div class="strat-title">語意輪：同堆多個選項，看上下文決定</div>
             <div class="strat-desc">
-              還不確定的空格，看整句邏輯：<br>
-              看到 <code>although / however / despite</code> → 前後相反，找對比詞<br>
-              看到 <code>therefore / as a result</code> → 前因後果，方向一致<br>
-              看到 <code>similarly / furthermore</code> → 前後補充，方向相同
+              詞性確定但同堆有多個選項時，讀整句甚至前後兩句：<br>
+              看到 <code>although / however</code> → 前後相反，找對比詞<br>
+              看到 <code>therefore / consequently</code> → 前因後果，方向一致<br>
+              看到 <code>similarly / furthermore</code> → 前後補充，方向相同<br>
+              <span style="font-size:11px;color:var(--text-xs);">三字片語也在這輪確認——先判斷後接詞性（V-ing？子句？），再確認語意方向。</span>
             </div>
           </div>
         </div>
         <div class="strat-step">
           <div class="strat-num">④</div>
           <div class="strat-body">
-            <div class="strat-title">消去法：最後兩題的處理</div>
+            <div class="strat-title">消去輪：最後剩餘代入確認</div>
             <div class="strat-desc">
-              剩下最後幾個空格時，把<b>剩餘選項逐一代入</b>，大聲念出整句。<br>
-              感覺最「順」、最符合文章整體語氣的就是答案。<br>
-              注意：<b>時態一致性</b>（過去式文章 → 選過去式動詞）、<b>單複數</b>（a ___ → 單數名詞）
+              前三輪做完後剩下的格子，把<b>剩餘選項代入</b>念出整句，選最順的。<br>
+              注意：<b>時態一致</b>（過去式文章 → 選過去式）、<b>單複數</b>（a ___ → 單數名詞）
             </div>
           </div>
         </div>
@@ -963,7 +964,7 @@ function startStrategy() {
 
       <div class="divider"></div>
       <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.8;">
-        流程提示：①秒殺先填固定搭配 → ②把選項分堆、空格對號（and 對稱優先）→ ③同堆有多個選項時用語意/邏輯決定 → ④剩餘消去。<br>
+        核心原則：<b>從判斷成本低的開始做</b>——秒殺 → 副詞 → 其他詞性 → 三字片語/語意 → 消去。不是每篇都有秒殺輪，但詞性輪的副詞堆幾乎每篇都有。<br>
         <b style="color:var(--gold)">最重要的是：每一題都要找到線索，不能純猜。</b>
       </div>
       <button class="act-btn primary on" onclick="finishStrategy()">我懂了，去做整段實戰 →</button>
@@ -2430,63 +2431,56 @@ Very [38] people are able to grow in love. Yet, it does happen. [39] men and wom
   },
   rounds: [
     {
-      name: '秒殺輪',
-      tip: '掃全文，找<b>固定片語</b>或<b>講義裡認識的線索詞</b>，一眼有把握的直接填。<br>這輪不需要分析句型，靠「認出來」就填。',
-      preview: '這輪推薦先做：<b>(35)</b>、<b>(36)</b>、<b>(39)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：Instead of / Consequently / As long as 都在講義裡，看到就填！</span>',
+      name: '詞性輪—副詞先行',
+      tip: '這篇沒有一眼命中的固定搭配，<b>直接從詞性輪開始</b>。<br>先掃選項，把副詞堆挑出來——副詞最好辨認，選項通常只有幾個，認知負荷最低。<br>插入語位置（兩個逗號之間）幾乎必然是副詞，看到就先處理。',
+      preview: '推薦先做：<b>(38)</b>、<b>(31)</b>、<b>(36)</b>、<b>(34)</b>、<b>(40)</b><br><span style="color:var(--text-xs);font-size:11px;">(38)(31) 副詞唯一無需語意；(36) 句首，順向/逆向判斷；(34)(40) 插入語位置，確認方向就填</span>',
       blanks: [
-        { num:35, ans:'G', ansWord:'Instead of',
-          hint:'「___ taking time to understand each other」— 看到三字片語空格，選項裡有幾個片語，哪個接 V-ing 且語意是「沒有花時間…，反而變得苛求」？',
-          explain:'<b>Instead of</b>（而不是）+ V-ing — Stage 2-3 三字片語。「不是花時間理解，而是變得苛求」，Instead of 完整片語缺一不可。' },
-        { num:36, ans:'B', ansWord:'Consequently',
-          hint:'「___, our relationships are filled with disagreements」— 這個空格在句首，前面說溝通出問題，後面說關係充滿衝突，是什麼邏輯關係？',
-          explain:'<b>Consequently</b>（因此）— Stage 3-1 因果連結詞。前因（溝通不良）→ 後果（關係充滿衝突），方向一致選因果詞。' },
-        { num:39, ans:'J', ansWord:'As long as',
-          hint:'「___ men and women are able to respect each other, love has a chance」— 這個空格後面接「只要…，愛就有機會」，哪個片語表示「條件」？',
-          explain:'<b>As long as</b>（只要）— Stage 2-3 三字片語。表條件：只要男女能互相尊重，愛就有機會開花。' },
-      ]
-    },
-    {
-      name: '詞性輪',
-      tip: '看空格前後的<b>句型結構</b>，判斷需要什麼詞性。<br>特別注意：冠詞/形容詞後 → 名詞；be/feel/seem 後 → 形容詞；be + ___ + V-ed → 副詞。',
-      preview: '這輪推薦先做：<b>(31)</b>、<b>(32)</b>、<b>(38)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：看空格前的線索詞，判斷詞性再看選項！</span>',
-      blanks: [
-        { num:31, ans:'F', ansWord:'forever',
-          hint:'「love will last ___」— will 是助動詞，後面接動詞原形 last；last 後面的空格是修飾動詞的什麼詞性？選項裡哪個是副詞？',
-          explain:'<b>forever</b>（永遠）— Stage 1-4 副詞修飾動詞。last + forever = 永遠持續，副詞 forever 修飾動詞 last。' },
-        { num:32, ans:'I', ansWord:'free',
-          hint:'「we are ___ from the problems」— be + ___ 後面接什麼詞性？be free from = 免於…，哪個選項是形容詞？',
-          explain:'<b>free</b>（免於的）— Stage 1-3 連綴動詞後接形容詞。be free from（免於）是固定搭配，形容詞 free。' },
         { num:38, ans:'E', ansWord:'few',
-          hint:'「Very ___ people are able to grow」— Very 修飾後面的形容詞，people 是名詞，空格填修飾名詞的形容詞，哪個選項是形容詞？',
-          explain:'<b>few</b>（很少的）— Stage 1-1 形容詞修飾名詞。Very few people = 很少人，few 是形容詞修飾 people。' },
-      ]
-    },
-    {
-      name: '邏輯輪',
-      tip: '看前後句的<b>方向</b>：轉折？因果？補充？<br>找關鍵詞 but / however / therefore / and 等確認方向再選。',
-      preview: '這輪推薦先做：<b>(33)</b>、<b>(34)</b>、<b>(37)</b><br><span style="color:var(--text-xs);font-size:11px;">小提示：看整句語意，找前後關係！</span>',
-      blanks: [
-        { num:33, ans:'H', ansWord:'takes over',
-          hint:'「as the magic fades and daily life ___」— 魔法消退，日常生活開始___，這個動作和「魔法消退」是同一方向（並列），日常生活接管/佔據了，哪個片語最合適？',
-          explain:'<b>takes over</b>（接管；佔據）— Stage 3-4 上下文語意推論。魔法消退，日常生活「接管」，takes over 表示現實取代了浪漫。' },
+          hint:'「Very ___ people」— Very 後面修飾什麼詞性？空格在名詞 people 前，先掃選項副詞堆：哪個是形容詞且語意是「很少」？',
+          explain:'<b>few</b>（很少的）— 詞性最乾淨的一格。Very + 形容詞 + 名詞，few 唯一符合，完全不需要看上下文。' },
+        { num:31, ans:'F', ansWord:'forever',
+          hint:'「love will last ___」— will last 後面，修飾動詞的是什麼詞性？選項副詞堆裡哪個語意是「永遠」？',
+          explain:'<b>forever</b>（永遠）— 副詞修飾動詞 last，選項裡唯一語意「永遠持續」的副詞，不需要看上下文。' },
+        { num:36, ans:'B', ansWord:'Consequently',
+          hint:'「___, our relationships are filled with conflicts」— 句首 + 逗號，這個位置是句子副詞。前面說溝通瓦解，後面說關係充滿衝突，順向還是逆向？',
+          explain:'<b>Consequently</b>（因此）— 句首副詞，順向因果：前因（溝通瓦解）→ 後果（關係充滿衝突）。選項裡句首因果副詞只有這一個，方向確認直接填。' },
         { num:34, ans:'C', ansWord:'similarly',
-          hint:'「men expect women to think like men; women, ___, expect men to feel like women」— 前後兩句描述相同的模式（都是期待對方像自己），這是什麼邏輯關係？',
-          explain:'<b>similarly</b>（同樣地）— Stage 3-3 遞進補充。男性期待女性像男性思考；女性同樣地期待男性像女性感受，前後方向相同用補充詞。' },
-        { num:37, ans:'A', ansWord:'breaks down',
-          hint:'「resentments build, and communication ___」— 前面說積怨加深，後面說溝通___，方向一致（都是負面惡化），哪個片語是「瓦解/中斷」？',
-          explain:'<b>breaks down</b>（瓦解；中斷）— Stage 3-1/3-4 因果+語意推論。積怨加深，溝通跟著瓦解，breaks down = 中斷崩潰，方向一致。' },
+          hint:'「men expect women to think like men; women, ___, expect men...」— 兩個逗號夾住，插入語位置一定是副詞。前句男性期待女性像男性，後句女性期待男性像女性，兩句方向相同還是相反？',
+          explain:'<b>similarly</b>（同樣地）— 插入語副詞，前後兩句描述完全對稱的模式，方向相同，similarly 表示「同樣地」。' },
+        { num:40, ans:'D', ansWord:'indeed',
+          hint:'「Love is, ___, magical」— 又是兩個逗號夾住的插入語，副詞。整篇結論在強調愛確實有魔力，哪個選項表示「確實、的確」的強調語氣？',
+          explain:'<b>indeed</b>（確實；的確）— 插入語副詞，和 similarly 同樣結構（, ___, ）。全篇結論強調語氣，indeed 完全符合，不需要等到消去才決定。' },
       ]
     },
     {
-      name: '消去輪',
-      tip: '剩下最後一格，把還沒用的選項代入，選最順、最符合文章語氣的。<br>注意：時態一致、前後呼應。',
-      preview: '只剩 <b>(40)</b> 了，把剩下的選項代入念念看，哪個最順？',
+      name: '片語輪',
+      tip: '處理三字片語和固定搭配。<br>先看<b>空格後接什麼結構</b>（V-ing？完整子句？介系詞？）縮小範圍，再確認語意方向。<br>後接完整子句的片語比後接 V-ing 的更容易確認，優先處理。',
+      preview: '推薦順序：<b>(39)</b>、<b>(35)</b>、<b>(32)</b><br><span style="color:var(--text-xs);font-size:11px;">(39) 後接完整子句，結構最單純；(35) 後接 V-ing，確認接續再判斷語意；(32) 固定搭配 be free from</span>',
       blanks: [
-        { num:40, ans:'D', ansWord:'indeed',
-          hint:'「Love is, ___, magical」— 整篇文章的結論，強調愛確實是有魔力的，哪個選項表示「確實；的確」帶有強調語氣？',
-          explain:'<b>indeed</b>（確實；的確）— Stage 4 消去法。前面用了 forever / consequently / similarly / instead of / as long as / breaks down / few / takes over / free，剩下 indeed。句意「愛確實是有魔力的」，indeed 強調語氣完全符合結論。' },
+        { num:39, ans:'J', ansWord:'As long as',
+          hint:'「___ men and women are able to respect each other, love has a chance」— 空格後接完整子句（主詞 + 動詞），片語選項裡哪個後面接完整子句？語意是「___男女互相尊重，愛就有機會」，是條件還是對比？',
+          explain:'<b>As long as</b>（只要）— 後接完整子句，表條件關係。「只要男女能互相尊重，愛就有機會開花」，結構比 Instead of 單純，優先確認。' },
+        { num:35, ans:'G', ansWord:'Instead of',
+          hint:'「___ taking time to understand each other, we become demanding」— 空格後接 taking（V-ing），哪個三字片語後面接 V-ing？確認接續後，語意是「我們沒有___理解對方，反而變苛求」，前後是對比還是因果？',
+          explain:'<b>Instead of</b>（而不是）+ V-ing — 後接動名詞 taking，對比關係。「不是花時間理解，而是變苛求」，Instead of 完整三字片語缺一不可。' },
+        { num:32, ans:'I', ansWord:'free',
+          hint:'「we are ___ from the problems」— be + ___ + from，看到 from 在後面，哪個選項和 from 固定搭配且語意是「免於…的問題」？',
+          explain:'<b>free</b>（免於的）— be free from（免於）固定搭配。年輕時以為自己免於父母的婚姻問題，be free from 是固定片語。' },
       ]
-    }
+    },
+    {
+      name: '語意輪—and 並列',
+      tip: '剩下兩格都是動詞位置，都有 <b>and</b> 這個關鍵線索。<br>and 並列 → 空格和前後動詞<b>詞性一致、方向一致</b>——鎖定動詞堆，再用語意決定哪個動詞最合理。',
+      preview: '先做：<b>(37)</b>、再做 <b>(33)</b><br><span style="color:var(--text-xs);font-size:11px;">兩格都靠 and 確認是動詞，語意再決定哪個動詞</span>',
+      blanks: [
+        { num:37, ans:'A', ansWord:'breaks down',
+          hint:'「problems creep in, resentments build, and communication ___」— and 並列三個動詞，前兩個都是負面惡化（問題滲入、積怨加深），communication ___ 也應該是負面的，哪個片語表示「溝通中斷/瓦解」？',
+          explain:'<b>breaks down</b>（瓦解；中斷）— and 並列，確認空格是動詞，方向和前面兩個動詞一致（都是負面惡化）。breaks down = 溝通中斷崩潰。' },
+        { num:33, ans:'H', ansWord:'takes over',
+          hint:'「the magic fades and daily life ___」— and 並列兩個動詞，magic fades（魔法消退）是動詞，daily life ___ 也是動詞。日常生活做了什麼動作？哪個片語語意是「接管、佔據」？',
+          explain:'<b>takes over</b>（接管；佔據）— and 並列，確認空格是動詞。magic fades and daily life takes over，魔法消退，現實接管，描述浪漫被日常取代。' },
+      ]
+    },
   ]
 };
 
